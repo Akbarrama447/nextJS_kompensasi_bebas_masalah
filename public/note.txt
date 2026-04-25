@@ -1,0 +1,29 @@
+📋 Notulensi Percakapan Akbar (22 April 2026)
+Struktur Project
+- Tech Stack: Next.js + Prisma + PostgreSQL
+- User Role: Mahasiswa (/user/)
+- Admin Role: Admin (/admin/ - dikerjakan teman)
+Database (22 Tabel)
+- Level 1: jurusan, ref_status_*, roles, semester, menus, pengaturan_sistem
+- Level 2: users, prodi, gedung
+- Level 3: staf, kelas, ruangan, mahasiswa
+- Level 4: daftar_pekerjaan, ekuivalensi_kelas, import_log
+- Level 5: penugasan, kompen_awal, log_potong_jam
+Perubahan Kode (Sudah Dilakukan)
+1. src/app/user/layout.tsx - Ambil data user dari cookie nim, tampilkan nama + NIM dari database
+2. src/app/user/ekuivalensi/page.tsx - Filter query by nim dari cookie
+Yang Perlu Dibuat (Belum Jadi)
+1. Login Page - unified untuk admin & mahasiswa
+   - Input: NIM + Password
+   - Flow: Find mahasiswa -> get user_id -> check password in users -> get role -> redirect
+   - Cookie: nim diset setelah login
+Keamanan
+- kata_sandi di database plain text - perlu discussion apakah mau hash atau tidak
+Konflik Avoidance
+- User fokus di /src/app/user/
+- Admin fokus di /src/app/admin/
+- Shared: cookie nim naming convention
+Progress
+- ✅ Layout user dgn data dinamis
+- ✅ Ekuivalensi page filter by user
+- ⏳ Login page (waiting input dari Akbar)
