@@ -1,4 +1,4 @@
-📋 Notulensi Percakapan Akbar (22 April 2026)
+📋 Notulensi (22 April 2026)
 Struktur Project
 - Tech Stack: Next.js + Prisma + PostgreSQL
 - User Role: Mahasiswa (/user/)
@@ -26,4 +26,4 @@ Konflik Avoidance
 Progress
 - ✅ Layout user dgn data dinamis
 - ✅ Ekuivalensi page filter by user
-- ⏳ Login page (waiting input dari Akbar)
+- ⏳ Login page 
