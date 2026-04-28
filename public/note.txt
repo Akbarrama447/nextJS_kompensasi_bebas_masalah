@@ -27,3 +27,51 @@ Progress
 - ✅ Layout user dgn data dinamis
 - ✅ Ekuivalensi page filter by user
 - ⏳ Login page 
+
+📋 Notulensi - 27 April 2026
+✅ Yang Sudah Selesai
+1. Sidebar/Navigation
+- Shared Sidebar component (src/components/Sidebar.tsx)
+- Menu dari database (menus table)
+- Active menu detection via activePath prop
+- Icon support: lucide-react OR PNG gambar
+- User profile + logout di bawah sidebar
+2. UI/UX
+- Sidebar: bg biru (blue-950), active menu: border kiri sky-400
+- Table ekuivalensi: font bold, garis hitam (divide-gray-400)
+- Logo Politeknik Negeri Semarang di header sidebar
+- Verifikasi label di ekuivalensi page
+3. Login Page
+- UI: /login (kiri branding, kanan form)
+- API: /api/login
+- Password: plain text (perlu di-hash)
+4. Dashboard Page
+- Created: /user/dashboard/page.tsx
+- Biodata + status kompensasi
+5. Database
+- Install bcryptjs + @types/bcryptjs
+- Menus seeded (Dashboard, List Pekerjaan, Ekuivalensi)
+- Akun test: 2372001@student.polnes.ac.id / 2372001 (plain text)
+⏳ Yang Belum Selesai
+1. Password Hashing
+- Status: bcryptjs installed, login API updated
+- Tinggal: Run script hash-passwords.ts buat hash semua password
+- Script: npx tsx prisma/hash-passwords.ts
+2. Active Menu Detection
+- Layout butuh pass activePath dinamis
+- Setiap page harus specify path yang bener
+3. Page Lain (User)
+- /user/pekerjaan - belum dibuat
+- /user/laporan - belum dibuat
+4. Logout
+- Belum ada logic logout (hapus cookie)
+📝 Info Penting
+- Login: NIM + Password
+- Redirect: /user/dashboard
+- User: mahasiswa (bukan admin dulu)
+- Password di database: udah hash brycpt
+🔥 Next Steps (Besok)
+1. Run: npx tsx prisma/hash-passwords.ts (hash password)
+2. Test login: NIM 2372001, password 2372001
+3. Fix active menu detection di setiap layout
+4. Lanjut bikin page /user/pekerjaan   
