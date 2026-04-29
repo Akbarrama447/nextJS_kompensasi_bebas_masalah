@@ -36,6 +36,6 @@
     "typescript": "^5"
   },
   "prisma": {
-    "seed": "tsx prisma/menu.seed.ts"
+    "seed": "tsx prisma/seed.ts"
   }
 }
