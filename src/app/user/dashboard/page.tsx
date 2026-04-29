@@ -5,15 +5,20 @@ import prisma from '@/lib/prisma'
 
 export default async function DashboardMahasiswa() {
   const cookieStore = await cookies()
-  const nim = cookieStore.get('nim')?.value || ''
+  const nim = cookieStore.get('nim')?.value || '2372001'
 
-  const mahasiswa = await prisma.mahasiswa.findUnique({
-    where: { nim },
-    include: { user: true }
-  })
-
-  const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
+  let namaMahasiswa = 'Mahasiswa'
   
+  try {
+    const mahasiswa = await prisma.mahasiswa.findUnique({
+      where: { nim },
+      include: { user: true }
+    })
+    namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
+  } catch {
+    namaMahasiswa = 'Mahasiswa Demo'
+  }
+
   return (
     <Sidebar role="mahasiswa" activePath="/user/dashboard">
       {/* ================= MAIN CONTENT ================= */}

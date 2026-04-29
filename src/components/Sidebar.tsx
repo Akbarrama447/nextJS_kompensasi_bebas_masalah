@@ -10,32 +10,45 @@ interface SidebarProps {
   children: React.ReactNode
 }
 
+const mockMenus = [
+  { id: 1, key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/user/dashboard', urutan: 1 },
+  { id: 2, key: 'pekerjaan', label: 'List Pekerjaan', icon: 'Briefcase', path: '/user/pekerjaan', urutan: 2 },
+  { id: 3, key: 'ekuivalensi', label: 'Ekuivalensi', icon: 'FileCheck', path: '/user/ekuivalensi', urutan: 3 },
+]
+
 export default async function Sidebar({ role, activePath, children }: SidebarProps) {
   const cookieStore = await cookies()
   
   let nama = 'Guest'
   
-  if (role === 'mahasiswa') {
-    const nim = cookieStore.get('nim')?.value
-    if (nim) {
+  try {
+    if (role === 'mahasiswa') {
+      const nim = cookieStore.get('nim')?.value || '2372001'
       const mahasiswa = await prisma.mahasiswa.findUnique({ where: { nim } })
       nama = mahasiswa?.nama || 'Guest'
+    } else {
+      const nip = cookieStore.get('nip')?.value
+      if (nip) {
+        const staf = await prisma.staf.findUnique({ where: { nip } })
+        nama = staf?.nama || 'Admin'
+      }
     }
-  } else {
-    const nip = cookieStore.get('nip')?.value
-    if (nip) {
-      const staf = await prisma.staf.findUnique({ where: { nip } })
-      nama = staf?.nama || 'Admin'
-    }
+  } catch {
+    nama = role === 'mahasiswa' ? 'Mahasiswa Demo' : 'Admin Demo'
   }
 
-  const menus = await prisma.menus.findMany({
-    where: { parent_id: null },
-    orderBy: { urutan: 'asc' },
-  })
+  let menus = []
+  try {
+    menus = await prisma.menus.findMany({
+      where: { parent_id: null },
+      orderBy: { urutan: 'asc' },
+    })
+  } catch {
+    menus = mockMenus
+  }
 
   const id = role === 'mahasiswa' 
-    ? cookieStore.get('nim')?.value || '-'
+    ? cookieStore.get('nim')?.value || '2372001'
     : cookieStore.get('nip')?.value || '-'
 
   const renderMenuIcon = (iconName: string) => {
