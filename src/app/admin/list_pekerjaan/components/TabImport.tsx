@@ -43,7 +43,7 @@ export default function TabImport() {
     };
 
     return (
-        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4">
+        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4" suppressHydrationWarning>
             {/* Hidden File Input */}
             <input 
                 type="file" 

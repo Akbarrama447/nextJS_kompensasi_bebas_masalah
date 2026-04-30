@@ -93,7 +93,7 @@ export default function TabKelola() {
     };
 
     return (
-        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4">
+        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4" suppressHydrationWarning>
             {/* Action Bar */}
             <div className="flex justify-end items-center mb-4">
                 <div className="flex gap-3">

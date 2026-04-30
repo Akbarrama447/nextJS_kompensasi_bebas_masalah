@@ -31,10 +31,10 @@ export default function ClientPage() {
     };
 
     return (
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col" suppressHydrationWarning>
             <UserHeader nama="Admin" role="admin" />
 
-            <div className="p-6 max-w-6xl mx-auto w-full">
+            <div className="p-6 max-w-6xl mx-auto w-full" suppressHydrationWarning>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h1 className="text-2xl font-bold mb-1 text-gray-900">

@@ -29,9 +29,9 @@ export default function TabPenugasan() {
     };
 
     return (
-        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4">
+        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4" suppressHydrationWarning>
             {/* Search + Filter */}
-            <div className="flex gap-3 mb-4">
+            <div className="flex gap-3 mb-4" suppressHydrationWarning>
                 <input
                     placeholder="Cari NIM, Nama Mahasiswa..."
                     className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400"
