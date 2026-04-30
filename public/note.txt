@@ -75,3 +75,21 @@ Progress
 2. Test login: NIM 2372001, password 2372001
 3. Fix active menu detection di setiap layout
 4. Lanjut bikin page /user/pekerjaan   
+
+NOTULENSI - 30 April 2026
+Judul Pekerjaan: Fix Responsive Design Web Sistem Kompen
+Deskripsi: Memperbaiki tampilan web agar menyesuaikan di HP dan desktop, tidak lagi kepotong-potong.
+Detail Perubahan:
+No	File	Aksi
+1	src/app/layout.tsx	Tambah viewport meta tag (width=device-width, initial-scale=1)
+2	src/components/SidebarLayout.tsx	Buat komponen baru: hamburger menu + sidebar overlay di mobile, sidebar fixed di desktop
+3	src/components/Sidebar.tsx	Refactor: strip outer wrapper, jadi komponen isi sidebar aja
+4	src/components/UserHeader.tsx	Hapus search bar (ga mobile-friendly), tambah responsive padding + spacer buat hamburger button
+5	src/app/user/dashboard/page.tsx	Ubah grid jadi 1 kolom (mobile) → 2 (tablet) → 3 (desktop), padding responsive
+6	src/app/user/ekuivalensi/page.tsx	Tambah overflow-x-auto di table, padding responsive
+7	src/app/admin/list_pekerjaan/page.tsx	Wrap pake SidebarLayout
+8	src/app/admin/list_pekerjaan/ClientPage.tsx	Tab buttons scroll horizontal di mobile, heading spacing adjust
+9	src/app/admin/list_pekerjaan/components/TabPenugasan.tsx	Table min-width + overflow-x-auto, filter stack vertikal di mobile
+10	eslint.config.mjs	Exclude src/generated/ dan prisma/ dari linting
+Teknologi: Next.js 15, TailwindCSS v4, TypeScript, Lucide React
+Hasil: Build sukses, tampilan responsive di HP dan desktop.

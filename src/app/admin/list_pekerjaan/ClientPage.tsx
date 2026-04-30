@@ -34,31 +34,31 @@ export default function ClientPage() {
         <main className="flex-1 flex flex-col">
             <UserHeader nama="Admin" role="admin" />
 
-            <div className="p-6 max-w-6xl mx-auto w-full">
+            <div className="p-4 sm:p-6 max-w-6xl mx-auto w-full">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold mb-1 text-gray-900">
+                    <div className="pt-12 lg:pt-0">
+                        <h1 className="text-xl sm:text-2xl font-bold mb-1 text-gray-900">
                             Kelola Pekerjaan & Penugasan
                         </h1>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-500">
                             Atur daftar pekerjaan Anda dan verifikasi penyelesaian mahasiswa
                         </p>
                     </div>
 
                     {/* TAB */}
-                    <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-gray-200/60 w-fit">
+                    <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-gray-200/60 w-full md:w-auto overflow-x-auto">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
                             return (
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key as Tab)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none ${activeTab === tab.key
+                                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all focus:outline-none whitespace-nowrap ${activeTab === tab.key
                                         ? "bg-white text-blue-600 shadow-sm"
                                         : "text-gray-700 hover:text-gray-900 hover:bg-slate-200/50"
                                         }`}
                                 >
-                                    <Icon className="w-4 h-4" />
+                                    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                     {tab.label}
                                 </button>
                             );

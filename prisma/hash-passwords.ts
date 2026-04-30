@@ -24,7 +24,7 @@ async function main() {
         where: { user_id: user.user_id },
         data: { kata_sandi: hashed },
       })
-      console.log(`Hashed password for user: ${user.username || user.user_id}`)
+      console.log(`Hashed password for user: ${user.email || user.user_id}`)
     }
   }
   
