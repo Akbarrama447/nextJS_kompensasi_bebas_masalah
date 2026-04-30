@@ -54,7 +54,7 @@ export default function ClientPage() {
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key as Tab)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none ${activeTab === tab.key
-                                        ? "bg-white text-blue-600 shadow-sm"
+                                        ? "bg-white text-[var(--color-primary)] shadow-sm"
                                         : "text-gray-700 hover:text-gray-900 hover:bg-slate-200/50"
                                         }`}
                                 >
