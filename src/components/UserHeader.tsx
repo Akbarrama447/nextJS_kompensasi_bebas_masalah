@@ -1,3 +1,5 @@
+"use client";
+
 interface UserHeaderProps {
   nama: string
   role?: 'mahasiswa' | 'admin'
