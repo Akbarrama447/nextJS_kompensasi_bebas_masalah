@@ -1,5 +1,4 @@
 generator client {
-  
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
@@ -247,6 +246,7 @@ model Penugasan {
   diverifikasi_oleh_nip String?           @db.VarChar
   waktu_verifikasi      DateTime?         @db.Timestamp(6)
   created_at            DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?         @db.Timestamp(6)
   log_potong_jam        Log_potong_jam[]
   staf_verified         Staf?             @relation("Verifikasi", fields: [diverifikasi_oleh_nip], references: [nip], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa             Mahasiswa?        @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
@@ -267,7 +267,6 @@ model Kompen_awal {
   mahasiswa       Mahasiswa?  @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   semester        Semester?   @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@unique([nim, semester_id])
   @@map("kompen_awal")
 }
 
@@ -280,6 +279,7 @@ model Log_potong_jam {
   jam_dikurangi  Float?
   keterangan     String?
   created_at     DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?          @db.Timestamp(6)
   ekuivalensi    Ekuivalensi_kelas? @relation(fields: [ekuivalensi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa      Mahasiswa?         @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   penugasan      Penugasan?         @relation(fields: [penugasan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -298,5 +298,18 @@ model registrasi_mahasiswa {
   mahasiswa   Mahasiswa? @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   semester    Semester?  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@unique([nim, semester_id])
+  @@unique([nim, semester_id], map: "registrasi_mahasiswa_unique")
+}
+
+model menus {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique @db.VarChar
+  label       String    @db.VarChar
+  icon        String?   @db.VarChar
+  path        String    @db.VarChar
+  urutan      Int?      @default(0)
+  parent_id   Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  menus       menus?    @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus menus[]   @relation("menusTomenus")
 }
