@@ -1,44 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { compare } from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   try {
-    const { nim, password } = await req.json()
+    const { identifier } = await req.json() // Kita cuekin field 'password'
 
-    if (!nim || !password) {
-      return NextResponse.json({ error: 'NIM dan password wajib diisi' }, { status: 400 })
-    }
-
-    const mahasiswa = await prisma.mahasiswa.findUnique({
-      where: { nim },
-      include: { user: true },
+    // 1. Verifikasi User: Cari berdasarkan Email atau NIM
+    const user = await prisma.users.findFirst({
+      where: {
+        OR: [
+          { email: identifier },
+          { mahasiswa: { nim: identifier } }
+        ]
+      },
+      include: {
+        mahasiswa: true,
+        role: true
+      }
     })
 
-    if (!mahasiswa) {
-      return NextResponse.json({ error: 'NIM tidak ditemukan' }, { status: 401 })
+    // Kalau user nggak ada di database, tetep kasih tau biar gak bingung
+    if (!user) {
+      return NextResponse.json({ error: 'NIM atau Email tidak terdaftar di sistem' }, { status: 404 })
     }
 
-    const isValidPassword = await compare(password, mahasiswa.user?.kata_sandi || '')
-    if (!isValidPassword) {
-      return NextResponse.json({ error: 'Password salah' }, { status: 401 })
-    }
+    // 2. BYPASS LOGIC: Langsung Login Berhasil
+    console.log(`--- BYPASS LOGIN SUCCESS ---`)
+    console.log(`User: ${user.email} | NIM: ${user.mahasiswa?.nim || 'N/A'}`)
 
     const response = NextResponse.json({ 
       success: true, 
-      message: 'Login berhasil',
-      nama: mahasiswa.nama,
+      message: 'Login berhasil (Mode Dev)',
+      nama: user.mahasiswa?.nama || user.email,
+      role: user.role?.nama
     })
 
-    response.cookies.set('nim', nim, {
+    // 3. Set Cookie buat Middleware
+    response.cookies.set('token', 'bypass-token-sitama', { 
       httpOnly: true,
       path: '/',
-      maxAge: 60 * 60 * 24,
+      maxAge: 60 * 60 * 24 // Berlaku 1 hari
     })
 
     return response
-  } catch (error) {
-    console.error('Login error:', error)
+
+  } catch (error: any) {
+    console.error('--- DETAIL ERROR LOGIN ---')
+    console.error(error.message)
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 })
   }
 }

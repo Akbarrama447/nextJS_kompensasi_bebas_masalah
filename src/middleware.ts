@@ -3,23 +3,24 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
-  const nim = req.cookies.get('nim')?.value
-  const nip = req.cookies.get('nip')?.value
-  const isAuthenticated = !!(nim || nip)
+  
+  // Ambil cookie 'token' yang kita set di API login
+  const token = req.cookies.get('token')?.value
+  const isAuthenticated = !!token
 
+  // 1. Kalau akses root atau dashboard tanpa login, lempar ke login
   if (pathname === '/' || pathname === '/user' || pathname === '/admin') {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL(nim ? '/user/dashboard' : '/admin', req.url))
+      // Untuk sementara kita default ke user dashboard kalau login sukses
+      return NextResponse.redirect(new URL('/user/dashboard', req.url))
     } else {
       return NextResponse.redirect(new URL('/login', req.url))
     }
   }
 
-  if (pathname.startsWith('/user') && !nim) {
-    return NextResponse.redirect(new URL('/login', req.url))
-  }
-
-  if (pathname.startsWith('/admin') && !nip) {
+  // 2. Proteksi folder /user dan /admin
+  // Jika mencoba masuk tapi tidak ada token, tendang ke login
+  if ((pathname.startsWith('/user') || pathname.startsWith('/admin')) && !isAuthenticated) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
@@ -27,5 +28,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/user', '/user/:path*', '/admin', '/admin/:path*'],
-}
+  matcher: ['/', '/user/:path*', '/admin/:path*'],
+};

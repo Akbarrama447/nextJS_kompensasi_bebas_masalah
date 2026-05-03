@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [nim, setNim] = useState('')
+  const [identifier, setIdentifier] = useState('') 
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,83 +19,85 @@ export default function LoginPage() {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nim, password }),
+        body: JSON.stringify({ identifier, password }), 
       })
 
       const data = await res.json()
 
-      if (!res.ok) {
-        setError(data.error || 'Login gagal')
-        return
+      if (res.ok) {
+        const userRole = data.role; 
+        console.log("Login sukses, role:", userRole);
+
+        // Pakai window.location biar cookie nempel sempurna
+        if (userRole === 'User') {
+          window.location.href = '/user/dashboard';
+        } else {
+          window.location.href = '/user/dashboard';
+        }
+        return; 
+        
+      } else {
+        setError(data.error || 'Login gagal');
       }
 
-      router.push('/user/dashboard')
-    } catch {
-      setError('Terjadi kesalahan')
+    } catch (err) {
+      setError('Terjadi kesalahan koneksi ke server');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-white">
       {/* Kolom Kiri - Branding */}
       <div className="hidden lg:flex flex-col w-1/2 bg-[#0F172A] items-center justify-center p-12">
-        <div className="text-center space-y-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              Sistem Kompensasi dan Bebas Masalah
-            </h1>
-            <h2 className="text-xl font-bold text-[#0ea5e9]">
-              Politeknik Negeri Semarang
-            </h2>
+        <div className="max-w-md text-center space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-white tracking-tight">SITAMA</h1>
+            <h2 className="text-xl font-medium text-[#0ea5e9]">Politeknik Negeri Semarang</h2>
           </div>
-          <p className="text-slate-400 text-sm tracking-wide leading-relaxed">
-            Platform managemen kompensasi <br />
-            mahasiswa Politeknik Negeri Semarang
+          <p className="text-slate-400 text-sm leading-relaxed">
+            Sistem Informasi Tugas Akhir dan Manajemen Kompensasi <br />
+            untuk lingkungan civitas akademika Polines.
           </p>
         </div>
       </div>
 
       {/* Kolom Kanan - Form Login */}
-      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-10">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang</h2>
-            <p className="text-sm text-gray-500">Masuk ke akun anda untuk melanjutkan</p>
+      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-sm bg-white rounded-3xl shadow-lg p-8 md:p-10 border border-slate-100">
+          <div className="mb-10 text-center lg:text-left">
+            <h2 className="text-2xl font-black text-slate-800 mb-2">Welcome Back!</h2>
+            <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Silahkan masuk ke akun anda</p>
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs font-bold rounded-r-lg">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                NIM
-              </label>
+              <label className="block text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-2">NIM / Email</label>
               <input
                 type="text"
-                value={nim}
-                onChange={(e) => setNim(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="Masukkan NIM"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all text-sm"
+                placeholder="Contoh: 3.34.24.2.02"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Password
-              </label>
+              <label className="block text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-2">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="Masukkan Password"
+                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all text-sm"
+                placeholder="••••••••"
                 required
               />
             </div>
@@ -103,11 +105,15 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors mt-4 disabled:opacity-50"
+              className="w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white text-sm font-bold py-4 rounded-2xl transition-all shadow-lg disabled:opacity-50"
             >
-              {loading ? 'Memuat...' : 'Masuk'}
+              {loading ? 'Memproses...' : 'Sign In'}
             </button>
           </form>
+
+          <div className="mt-10 text-center">
+             <p className="text-[10px] text-slate-400 font-medium">Lupa password? Hubungi Admin Jurusan.</p>
+          </div>
         </div>
       </div>
     </div>
