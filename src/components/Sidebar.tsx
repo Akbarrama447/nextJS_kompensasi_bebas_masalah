@@ -13,19 +13,33 @@ interface SidebarProps {
 export default async function Sidebar({ role, activePath, children }: SidebarProps) {
   const cookieStore = await cookies()
   
-  let nama = 'Guest'
+  
+  
+  let nama = 'User' 
   
   if (role === 'mahasiswa') {
     const nim = cookieStore.get('nim')?.value
+    console.log("DEBUG: NIM dari Cookie =", nim) // Lihat ini di terminal VS Code
+
     if (nim) {
       const mahasiswa = await prisma.mahasiswa.findUnique({ where: { nim } })
-      nama = mahasiswa?.nama || 'Guest'
+      if (mahasiswa) {
+        nama = mahasiswa.nama
+        console.log("DEBUG: Nama MHS Ketemu =", nama)
+      } else {
+        console.log("DEBUG: NIM ada tapi di DB GAK KETEMU")
+      }
     }
   } else {
     const nip = cookieStore.get('nip')?.value
+    console.log("DEBUG: NIP dari Cookie =", nip)
+
     if (nip) {
       const staf = await prisma.staf.findUnique({ where: { nip } })
-      nama = staf?.nama || 'Admin'
+      if (staf) {
+        nama = staf.nama || 'Admin'
+        console.log("DEBUG: Nama STAF Ketemu =", nama)
+      }
     }
   }
 
@@ -65,10 +79,20 @@ export default async function Sidebar({ role, activePath, children }: SidebarPro
         <nav className="flex-1">
           <ul className="space-y-1">
             {menus.map((menu) => {
-              const isActive = activePath === menu.path
+              // Menentukan path berdasarkan role
+              let href = menu.path
+              if (role === 'admin') {
+                if (menu.key === 'pekerjaan') {
+                  href = '/admin/list_pekerjaan'
+                } else {
+                  href = menu.path.replace('/user/', '/admin/')
+                }
+              }
+
+              const isActive = activePath === href
               return (
                 <li key={menu.id}>
-                  <Link href={menu.path}>
+                  <Link href={href}>
                     <div className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${isActive ? 'bg-[#f1f5f9] text-[#2e5299] ml-4 py-2.5 px-5 rounded-l-full shadow-lg' : 'px-9 py-3 text-white/80 hover:text-white hover:bg-white/10 hover:translate-x-1 cursor-pointer'}`}>
                       {renderMenuIcon(menu.icon || '')}
                       <span className="font-medium text-[14px]">{menu.label}</span>

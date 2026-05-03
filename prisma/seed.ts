@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.env' })
+
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 import { PrismaClient } from '../src/generated/prisma'
@@ -8,13 +11,32 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
+// Test accounts
 const testAccounts = [
   { nim: '2372001', password: '2372001', nama: 'Test User 2372001' },
 ]
 
-async function main() {
-  console.log('Seeding test student accounts...')
+// Menus
+const menusData = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/user/dashboard', urutan: 1 },
+  { key: 'pekerjaan', label: 'List Pekerjaan', icon: 'Briefcase', path: '/user/pekerjaan', urutan: 2 },
+  { key: 'ekuivalensi', label: 'Ekuivalensi', icon: 'BookOpen', path: '/user/ekuivalensi', urutan: 3 },
+]
 
+async function seedMenus() {
+  console.log('\n📋 Seeding menus...')
+  for (const menu of menusData) {
+    await prisma.menus.upsert({
+      where: { key: menu.key },
+      update: { label: menu.label, icon: menu.icon, path: menu.path, urutan: menu.urutan },
+      create: { key: menu.key, label: menu.label, icon: menu.icon, path: menu.path, urutan: menu.urutan },
+    })
+    console.log(`  ✓ Menu: ${menu.label}`)
+  }
+}
+
+async function seedStudents() {
+  console.log('\n👨‍🎓 Seeding test student accounts...')
   for (const account of testAccounts) {
     try {
       // Check if user already exists
@@ -24,7 +46,7 @@ async function main() {
       })
 
       if (existingMahasiswa?.user) {
-        console.log(`✓ User ${account.nim} already exists, skipping...`)
+        console.log(`  ✓ Student ${account.nim} already exists, skipping...`)
         continue
       }
 
@@ -54,20 +76,23 @@ async function main() {
         },
       })
 
-      console.log(
-        `✓ Created: ${account.nim} (${account.nama}) | Password: ${account.password}`,
-      )
+      console.log(`  ✓ Student: ${account.nim} (${account.nama}) | Password: ${account.password}`)
     } catch (error) {
-      console.error(`✗ Error creating ${account.nim}:`, error instanceof Error ? error.message : error)
+      console.error(`  ✗ Error creating ${account.nim}:`, error instanceof Error ? error.message : error)
     }
   }
+}
 
-  console.log('✓ Seeding completed!')
+async function main() {
+  console.log('🌱 Starting database seeding...')
+  await seedMenus()
+  await seedStudents()
+  console.log('\n✅ Seeding completed successfully!\n')
 }
 
 main()
   .catch((e) => {
-    console.error('Error:', e)
+    console.error('❌ Error:', e)
     process.exit(1)
   })
   .finally(async () => {
