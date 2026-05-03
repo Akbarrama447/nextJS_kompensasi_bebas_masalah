@@ -8,18 +8,18 @@ datasource db {
 }
 
 model Jurusan {
-  id            Int        @id @default(autoincrement())
-  nama_jurusan  String?    @map("nama_jurusan")
-  prodi         Prodi[]
-  staf          Staf[]
-  gedung        Gedung[]
+  id           Int      @id @default(autoincrement())
+  nama_jurusan String?  @map("nama_jurusan") @db.VarChar
+  gedung       Gedung[]
+  prodi        Prodi[]
+  staf         Staf[]
 
   @@map("jurusan")
 }
 
 model roles {
-  id            Int      @id
-  nama          String?
+  id            Int     @id
+  nama          String? @db.VarChar
   key_menu      Json?
   key_condition Json?
   users         Users[]
@@ -28,91 +28,75 @@ model roles {
 }
 
 model Users {
-  user_id    Int       @id @default(autoincrement())
-  email      String?   @unique
-  kata_sandi String?
+  user_id    Int        @id @default(autoincrement())
+  email      String?    @unique @db.VarChar
+  kata_sandi String?    @db.VarChar
   role_id    Int?
-  created_at DateTime? @default(now())
-  role       roles?    @relation(fields: [role_id], references: [id])
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
   mahasiswa  Mahasiswa?
   staf       Staf?
+  role       roles?     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("users")
 }
 
 model ref_status_ekuivalensi {
   id                Int                 @id
-  nama              String?
+  nama              String?             @db.VarChar
   ekuivalensi_kelas Ekuivalensi_kelas[]
 
   @@map("ref_status_ekuivalensi")
 }
 
 model ref_status_import {
-  id          Int         @id
-  nama        String?
-  import_log  Import_log[]
+  id         Int          @id
+  nama       String?      @db.VarChar
+  import_log Import_log[]
 
   @@map("ref_status_import")
 }
 
 model ref_status_tugas {
-  id        Int        @id
-  nama      String?
+  id        Int         @id
+  nama      String?     @db.VarChar
   penugasan Penugasan[]
 
   @@map("ref_status_tugas")
 }
 
 model ref_tipe_pekerjaan {
-  id               Int               @id
-  nama             String?
+  id               Int                @id
+  nama             String?            @db.VarChar
   daftar_pekerjaan Daftar_pekerjaan[]
 
   @@map("ref_tipe_pekerjaan")
 }
 
 model Semester {
-  id              Int                  @id @default(autoincrement())
-  nama            String?
-  tahun           Int?
-  periode         String?
-  is_aktif        Boolean              @default(false)
-  mulai           DateTime?            @db.Date
-  selesai         DateTime?            @db.Date
-  registrasi_mahasiswa RegistrasiMahasiswa[]
-  daftar_pekerjaan Daftar_pekerjaan[]
-  ekuivalensi_kelas Ekuivalensi_kelas[]
-  import_log      Import_log[]
-  kompen_awal     Kompen_awal[]
-  log_potong_jam  Log_potong_jam[]
+  id                   Int                    @id @default(autoincrement())
+  nama                 String?                @db.VarChar
+  tahun                Int?
+  periode              String?                @db.VarChar
+  is_aktif             Boolean?               @default(false)
+  mulai                DateTime?              @db.Date
+  selesai              DateTime?              @db.Date
+  daftar_pekerjaan     Daftar_pekerjaan[]
+  ekuivalensi_kelas    Ekuivalensi_kelas[]
+  import_log           Import_log[]
+  kompen_awal          Kompen_awal[]
+  log_potong_jam       Log_potong_jam[]
+  registrasi_mahasiswa registrasi_mahasiswa[]
 
   @@map("semester")
 }
 
-model Menus {
-  id          Int       @id @default(autoincrement())
-  key         String    @unique
-  label       String
-  icon        String?
-  path        String
-  urutan      Int       @default(0)
-  parent_id   Int?
-  created_at  DateTime? @default(now())
-
-  parent      Menus?    @relation("MenuRelation", fields: [parent_id], references: [id])
-  children    Menus[]   @relation("MenuRelation")
-
-  @@map("menus")
-}
-
 model Pengaturan_sistem {
-  id          Int       @id @default(autoincrement())
-  grup        String?
-  key         String    @unique
-  value       String?
-  tipe_data   String?
-  keterangan  String?   @db.Text
+  id         Int     @id @default(autoincrement())
+  grup       String? @db.VarChar
+  key        String? @unique @db.VarChar
+  value      String? @db.VarChar
+  tipe_data  String? @db.VarChar
+  keterangan String?
 
   @@map("pengaturan_sistem")
 }
@@ -120,9 +104,9 @@ model Pengaturan_sistem {
 model Prodi {
   id              Int      @id @default(autoincrement())
   jurisdiction_id Int?     @map("jurusan_id")
-  nama_prodi      String?
-  jurisdiction    Jurusan? @relation(fields: [jurisdiction_id], references: [id])
+  nama_prodi      String?  @db.VarChar
   kelas           Kelas[]
+  jurisdiction    Jurusan? @relation(fields: [jurisdiction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("prodi")
 }
@@ -130,45 +114,45 @@ model Prodi {
 model Gedung {
   id              Int       @id @default(autoincrement())
   jurisdiction_id Int?      @map("jurusan_id")
-  nama_gedung     String?
-  jurisdiction    Jurusan?  @relation(fields: [jurisdiction_id], references: [id])
+  nama_gedung     String?   @db.VarChar
+  jurisdiction    Jurusan?  @relation(fields: [jurisdiction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ruangan         Ruangan[]
 
   @@map("gedung")
 }
 
 model Ruangan {
-  id            Int       @id @default(autoincrement())
-  gedung_id     Int?
-  nama_ruangan  String?
-  kode_ruangan  String?
-  gedung        Gedung?   @relation(fields: [gedung_id], references: [id])
+  id               Int                @id @default(autoincrement())
+  gedung_id        Int?
+  nama_ruangan     String?            @db.VarChar
+  kode_ruangan     String?            @db.VarChar
   daftar_pekerjaan Daftar_pekerjaan[]
+  gedung           Gedung?            @relation(fields: [gedung_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("ruangan")
 }
 
 model Kelas {
-  id         Int       @id @default(autoincrement())
-  prodi_id   Int?
-  nama_kelas String?
-  prodi      Prodi?    @relation(fields: [prodi_id], references: [id])
-  registrasi_mahasiswa RegistrasiMahasiswa[]
-  ekuivalensi_kelas Ekuivalensi_kelas[]
+  id                   Int                    @id @default(autoincrement())
+  prodi_id             Int?
+  nama_kelas           String?                @db.VarChar
+  ekuivalensi_kelas    Ekuivalensi_kelas[]
+  prodi                Prodi?                 @relation(fields: [prodi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  registrasi_mahasiswa registrasi_mahasiswa[]
 
   @@map("kelas")
 }
 
 model Mahasiswa {
-  nim                      String              @id
-  user_id                  Int?                @unique
-  nama                     String?
-  user                     Users?              @relation(fields: [user_id], references: [user_id])
-  registrasi_mahasiswa     RegistrasiMahasiswa[]
-  penugasan                Penugasan[]
-  ekuivalensi_kelasPenanggung Ekuivalensi_kelas[] @relation("PenanggungJawab")
-  kompen_awal              Kompen_awal[]
-  log_potong_jam           Log_potong_jam[]
+  nim                         String                 @id @db.VarChar
+  user_id                     Int?                   @unique
+  nama                        String?                @db.VarChar
+  ekuivalensi_kelasPenanggung Ekuivalensi_kelas[]    @relation("PenanggungJawab")
+  kompen_awal                 Kompen_awal[]
+  log_potong_jam              Log_potong_jam[]
+  user                        Users?                 @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  penugasan                   Penugasan[]
+  registrasi_mahasiswa        registrasi_mahasiswa[]
 
   @@map("mahasiswa")
 }
@@ -188,132 +172,158 @@ model RegistrasiMahasiswa {
 }
 
 model Staf {
-  nip              String             @id
-  user_id          Int?               @unique
-  nama             String?
-  jurisdiction_id  Int?               @map("jurusan_id")
-  tipe_staf        String?
-  user             Users?             @relation(fields: [user_id], references: [user_id])
-  jurisdiction     Jurusan?           @relation(fields: [jurisdiction_id], references: [id])
-  daftar_pekerjaan Daftar_pekerjaan[]
-  penugasan        Penugasan[]        @relation("Verifikasi")
+  nip               String              @id @db.VarChar
+  user_id           Int?                @unique
+  nama              String?             @db.VarChar
+  jurisdiction_id   Int?                @map("jurusan_id")
+  tipe_staf         String?             @db.VarChar
+  daftar_pekerjaan  Daftar_pekerjaan[]
   ekuivalensi_kelas Ekuivalensi_kelas[]
-  import_log       Import_log[]
+  import_log        Import_log[]
+  penugasan         Penugasan[]         @relation("Verifikasi")
+  jurisdiction      Jurusan?            @relation(fields: [jurisdiction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user              Users?              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("staf")
 }
 
 model Daftar_pekerjaan {
-  id                  Int       @id @default(autoincrement())
-  staf_nip            String?
-  semester_id         Int?
-  judul               String?
-  deskripsi           String?   @db.Text
-  tipe_pekerjaan_id   Int?
-  poin_jam            Float?
-  ruangan_id          Int?
-  is_aktif            Boolean   @default(true)
-  tanggal_mulai       DateTime? @db.Date
-  tanggal_selesai     DateTime? @db.Date
-  created_at          DateTime? @default(now())
-  staf                Staf?     @relation(fields: [staf_nip], references: [nip])
-  semester            Semester? @relation(fields: [semester_id], references: [id])
-  tipe_pekerjaan      ref_tipe_pekerjaan? @relation(fields: [tipe_pekerjaan_id], references: [id])
-  ruangan             Ruangan?  @relation(fields: [ruangan_id], references: [id])
-  penugasan           Penugasan[]
+  id                Int                 @id @default(autoincrement())
+  staf_nip          String?             @db.VarChar
+  semester_id       Int?
+  judul             String?             @db.VarChar
+  deskripsi         String?
+  tipe_pekerjaan_id Int?
+  poin_jam          Float?
+  kuota             Int?
+  ruangan_id        Int?
+  is_aktif          Boolean?            @default(true)
+  tanggal_mulai     DateTime?           @db.Date
+  tanggal_selesai   DateTime?           @db.Date
+  created_at        DateTime?           @default(now()) @db.Timestamp(6)
+  ruangan           Ruangan?            @relation(fields: [ruangan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  semester          Semester?           @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staf              Staf?               @relation(fields: [staf_nip], references: [nip], onDelete: NoAction, onUpdate: NoAction)
+  tipe_pekerjaan    ref_tipe_pekerjaan? @relation(fields: [tipe_pekerjaan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  penugasan         Penugasan[]
 
   @@map("daftar_pekerjaan")
 }
 
 model Import_log {
-  id                Int       @id @default(autoincrement())
-  staf_nip          String?
-  semester_id       Int?
-  nama_file         String?
-  total_baris       Int?
-  sukses_baris      Int?
-  error_details     Json?
-  status_import_id  Int?
-  created_at        DateTime? @default(now())
-  staf              Staf?     @relation(fields: [staf_nip], references: [nip])
-  semester          Semester? @relation(fields: [semester_id], references: [id])
-  status_import     ref_status_import? @relation(fields: [status_import_id], references: [id])
-  kompen_awal       Kompen_awal[]
+  id               Int                @id @default(autoincrement())
+  staf_nip         String?            @db.VarChar
+  semester_id      Int?
+  nama_file        String?            @db.VarChar
+  total_baris      Int?
+  sukses_baris     Int?
+  error_details    Json?
+  status_import_id Int?
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  semester         Semester?          @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staf             Staf?              @relation(fields: [staf_nip], references: [nip], onDelete: NoAction, onUpdate: NoAction)
+  status_import    ref_status_import? @relation(fields: [status_import_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  kompen_awal      Kompen_awal[]
 
   @@map("import_log")
 }
 
 model Ekuivalensi_kelas {
-  id                   Int       @id @default(autoincrement()) @map("id")
-  kelas_id             Int?      @map("kelas_id")
-  semester_id          Int?      @map("semester_id")
-  penanggung_jawab_nim String?   @map("penanggung_jawab_nim")
-  nota_url             String?   @map("nota_url") @db.Text
-  nominal_total        Float?    @map("nominal_total")
-  jam_diakui           Float?    @map("jam_diakui")
-  status_ekuivalensi_id Int?     @map("status_ekuivalensi_id")
-  verified_by_nip      String?   @map("verified_by_nip")
-  catatan             String?   @db.Text
-  created_at          DateTime? @default(now()) @map("created_at")
-
-  kelas               Kelas?    @relation(fields: [kelas_id], references: [id])
-  semester            Semester? @relation(fields: [semester_id], references: [id])
-  mahasiswa           Mahasiswa? @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim])
-  status_ekuivalensi  ref_status_ekuivalensi? @relation(fields: [status_ekuivalensi_id], references: [id])
-  staf_verified       Staf?     @relation(fields: [verified_by_nip], references: [nip])
-  log_potong_jam      Log_potong_jam[]
+  id                    Int                     @id @default(autoincrement()) @map("id")
+  kelas_id              Int?                    @map("kelas_id")
+  semester_id           Int?                    @map("semester_id")
+  penanggung_jawab_nim  String?                 @map("penanggung_jawab_nim") @db.VarChar
+  nota_url              String?                 @map("nota_url")
+  nominal_total         Decimal?                @map("nominal_total") @db.Decimal
+  jam_diakui            Float?                  @map("jam_diakui")
+  status_ekuivalensi_id Int?                    @map("status_ekuivalensi_id")
+  verified_by_nip       String?                 @map("verified_by_nip") @db.VarChar
+  catatan               String?
+  created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
+  kelas                 Kelas?                  @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mahasiswa             Mahasiswa?              @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
+  semester              Semester?               @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status_ekuivalensi    ref_status_ekuivalensi? @relation(fields: [status_ekuivalensi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staf_verified         Staf?                   @relation(fields: [verified_by_nip], references: [nip], onDelete: NoAction, onUpdate: NoAction)
+  log_potong_jam        Log_potong_jam[]
 
   @@map("ekuivalensi_kelas")
 }
 
 model Penugasan {
-  id                   Int       @id @default(autoincrement())
-  pekerjaan_id         Int?
-  nim                  String?
-  status_tugas_id      Int?
-  detail_pengerjaan    Json?
-  catatan_verifikasi   String?   @db.Text
-  diverifikasi_oleh_nip String?
-  waktu_verifikasi     DateTime?
-  created_at           DateTime? @default(now())
-  updated_at           DateTime?
-  pekerjaan            Daftar_pekerjaan? @relation(fields: [pekerjaan_id], references: [id])
-  mahasiswa            Mahasiswa? @relation(fields: [nim], references: [nim])
-  status_tugas         ref_status_tugas? @relation(fields: [status_tugas_id], references: [id])
-  staf_verified        Staf?      @relation("Verifikasi", fields: [diverifikasi_oleh_nip], references: [nip])
-  log_potong_jam      Log_potong_jam[]
+  id                    Int               @id @default(autoincrement())
+  pekerjaan_id          Int?
+  nim                   String?           @db.VarChar
+  status_tugas_id       Int?
+  detail_pengerjaan     Json?
+  catatan_verifikasi    String?
+  diverifikasi_oleh_nip String?           @db.VarChar
+  waktu_verifikasi      DateTime?         @db.Timestamp(6)
+  created_at            DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?         @db.Timestamp(6)
+  log_potong_jam        Log_potong_jam[]
+  staf_verified         Staf?             @relation("Verifikasi", fields: [diverifikasi_oleh_nip], references: [nip], onDelete: NoAction, onUpdate: NoAction)
+  mahasiswa             Mahasiswa?        @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
+  pekerjaan             Daftar_pekerjaan? @relation(fields: [pekerjaan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status_tugas          ref_status_tugas? @relation(fields: [status_tugas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("penugasan")
 }
 
 model Kompen_awal {
-  id             Int       @id @default(autoincrement())
-  nim            String?
-  semester_id    Int?
-  import_id      Int?
+  id              Int         @id @default(autoincrement())
+  nim             String?     @db.VarChar
+  semester_id     Int?
+  import_id       Int?
   total_jam_wajib Float?
-  created_at     DateTime? @default(now())
-  mahasiswa      Mahasiswa? @relation(fields: [nim], references: [nim])
-  semester       Semester?  @relation(fields: [semester_id], references: [id])
-  import_log     Import_log? @relation(fields: [import_id], references: [id])
+  created_at      DateTime?   @default(now()) @db.Timestamp(6)
+  import_log      Import_log? @relation(fields: [import_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mahasiswa       Mahasiswa?  @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
+  semester        Semester?   @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("kompen_awal")
 }
 
 model Log_potong_jam {
-  id              Int       @id @default(autoincrement())
-  nim             String?
-  semester_id     Int?
-  penugasan_id    Int?
-  ekuivalensi_id  Int?
-  jam_dikurangi   Float?
-  keterangan      String?   @db.Text
-  created_at      DateTime? @default(now())
-  updated_at      DateTime?
-  mahasiswa       Mahasiswa? @relation(fields: [nim], references: [nim])
-  semester        Semester?  @relation(fields: [semester_id], references: [id])
-  penugasan       Penugasan? @relation(fields: [penugasan_id], references: [id])
-  ekuivalensi     Ekuivalensi_kelas? @relation(fields: [ekuivalensi_id], references: [id])
+  id             Int                @id @default(autoincrement())
+  nim            String?            @db.VarChar
+  semester_id    Int?
+  penugasan_id   Int?
+  ekuivalensi_id Int?
+  jam_dikurangi  Float?
+  keterangan     String?
+  created_at     DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?          @db.Timestamp(6)
+  ekuivalensi    Ekuivalensi_kelas? @relation(fields: [ekuivalensi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mahasiswa      Mahasiswa?         @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
+  penugasan      Penugasan?         @relation(fields: [penugasan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  semester       Semester?          @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("log_potong_jam")
+}
+
+model registrasi_mahasiswa {
+  id          Int        @id @default(autoincrement())
+  nim         String?    @db.VarChar
+  semester_id Int?
+  kelas_id    Int?
+  status      String?    @default("Aktif") @db.VarChar
+  kelas       Kelas?     @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mahasiswa   Mahasiswa? @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
+  semester    Semester?  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([nim, semester_id], map: "registrasi_mahasiswa_unique")
+}
+
+model menus {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique @db.VarChar
+  label       String    @db.VarChar
+  icon        String?   @db.VarChar
+  path        String    @db.VarChar
+  urutan      Int?      @default(0)
+  parent_id   Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  menus       menus?    @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus menus[]   @relation("menusTomenus")
 }
