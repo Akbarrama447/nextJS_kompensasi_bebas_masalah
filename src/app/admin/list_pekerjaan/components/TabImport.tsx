@@ -138,36 +138,49 @@ export default function TabImport() {
             <div className="flex justify-end mb-3">
                 <button
                     onClick={handleImportClick}
-                    className="px-4 py-2 border border-gray-200 text-gray-700 font-medium text-sm rounded-lg hover:bg-gray-50 transition-colors bg-white shadow-sm focus:outline-none"
+                    className="px-5 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg bg-white hover:border-gray-300 hover:text-gray-800 transition-colors focus:outline-none"
                 >
                     Import Excel
                 </button>
             </div>
 
-            {/* Table */}
+
+            {/* Table Preview */}
             <div className="border border-gray-200 rounded-lg overflow-hidden">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
                         <tr className="border-b border-gray-200">
-                            <th className="px-4 py-3">Nama</th>
+                            <th className="px-4 py-3">Mahasiswa</th>
                             <th className="px-4 py-3 text-center">NIM</th>
                             <th className="px-4 py-3 text-center">Kelas</th>
                             <th className="px-4 py-3 text-center">Jam Kompen</th>
+                            <th className="px-4 py-3 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        <tr className="hover:bg-gray-50/50 transition-colors">
-                            <td className="px-4 py-3 text-gray-800 font-medium">Andi Simukto</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">3.34.24.2.09</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">IK-2C</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">2 jam</td>
-                        </tr>
-                        <tr className="hover:bg-gray-50/50 transition-colors">
-                            <td className="px-4 py-3 text-gray-800 font-medium">Dini Cantika</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">3.34.24.2.17</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">IK-2C</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">6 jam</td>
-                        </tr>
+                        {students.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="px-4 py-10 text-center text-gray-400 text-sm">
+                                    Belum ada data. Upload file Excel untuk melihat preview.
+                                </td>
+                            </tr>
+                        ) : (
+                            students.map((s, i) => (
+                                <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-4 py-3">
+                                        <p className="font-medium text-gray-800">{s.nama}</p>
+                                    </td>
+                                    <td className="px-4 py-3 text-gray-600 text-center">{s.nim}</td>
+                                    <td className="px-4 py-3 text-gray-600 text-center">{s.kelas}</td>
+                                    <td className="px-4 py-3 text-gray-600 text-center">{s.jam} jam</td>
+                                    <td className="px-4 py-3 text-center">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 rounded-md text-xs font-medium">
+                                            Siap Import
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

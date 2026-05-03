@@ -1,1032 +1,1132 @@
 [
   {
-    "nim": "3.34.25.0.01",
-    "nama": "ACHMAD NAUFAL ADIB PUTRA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.01",
+    "nama": "Aisa Reta Lestari",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.02",
-    "nama": "AFANIN MUSFIDA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.02",
+    "nama": "ANDRIAN AMIRUDIN RAHMANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.03",
-    "nama": "ANDIKA FAJAR DWI PRASETYARDI",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.03",
+    "nama": "ANNISA NUR FARIKHA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.04",
-    "nama": "ANGGA AL MUIS",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.04",
+    "nama": "CHOIRUL RAISSA PASHA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.05",
-    "nama": "Ayudya Lintang Karestunan",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.05",
+    "nama": "CHRISTYAN FABIANO YEHEZKIEL",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.06",
-    "nama": "Dea Fransisca",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.06",
+    "nama": "DASI HAYU PERMANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.07",
-    "nama": "DENNIS FALERIAN",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.07",
+    "nama": "DIMAS BAYU PRATAMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.08",
-    "nama": "FADHIIL NUR SYAHYEKTI",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.08",
+    "nama": "DZIDAN ADRIAN FIRMANSYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.09",
-    "nama": "FATHIR FERDIANSYAH",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.09",
+    "nama": "HERDIN SAVIRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.10",
-    "nama": "FRIDANUAR ARYA ASHIDQI",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.10",
+    "nama": "IRSYAD ZAKI RAMDHANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.11",
-    "nama": "HERMAWAN PANDU UTAMA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.11",
+    "nama": "KAVINDRA VABRIANANDA PUTRA MAHESWARA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.12",
-    "nama": "JAVIN GI CANDRANE PATMONOBO",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.12",
+    "nama": "KYLA CHAVELA EVANGELISTA WANGET",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.13",
-    "nama": "MARCEL DARDA ADIKA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.13",
+    "nama": "MIKHAEL SURYA ADEPUTRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.14",
-    "nama": "MUH. ALIF ALFIQRAM",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.14",
+    "nama": "MOH FAREL AGUSTIN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.15",
-    "nama": "MUHAMMAD ABDUL AZIZ",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.15",
+    "nama": "MUHAMMAD FAIQ AUDAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.16",
-    "nama": "MUHAMMAD GIGA ATHALLAH",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.16",
+    "nama": "MUHAMMAD FAIZ FIRMANSYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.17",
-    "nama": "MUHAMMAD KHOIRULANAMI IZZA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.17",
+    "nama": "MUHAMMAD FAQIH RAMADHAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.18",
-    "nama": "MUHAMMAD MALIK ADLUL LATHIF",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.18",
+    "nama": "NUR AINI WIDIYANTI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.19",
-    "nama": "MUHAMMAD RAMZI RO`IF",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.19",
+    "nama": "PRANAJA LUTHFI BELIAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.20",
-    "nama": "NABILLA FAUSTA MARZALIA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.20",
+    "nama": "RAFAEL MARCELLO DWI NANDA BORO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.21",
-    "nama": "RADITYA YOGA PRATAMA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.21",
+    "nama": "RASYA NAUFAL HARLIANDRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.22",
-    "nama": "RIZKI WAHYU NUGRAHA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.22",
+    "nama": "RIKI ULIR NIAM",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.23",
-    "nama": "SABIL FAVIAN MITARSO",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.23",
+    "nama": "SEANIRMA AIDA CANDRAWATI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.24",
-    "nama": "VINCENTIUS DEVANO VERSANANDA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.24",
+    "nama": "TEGAR BAGUS SATRIA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.0.25",
-    "nama": "ZAHRA AULIYA",
-    "error": "Kelas \"IK-1A\" tidak terdaftar di database."
+    "nim": "4.33.25.0.25",
+    "nama": "VICTOR ABDIEL KURNIAWAN RARES",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.01",
-    "nama": "ACHMAD HANAFI VEGA SETIAWAN",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.01",
+    "nama": "AHMAD FAJRIL FALAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.02",
-    "nama": "ADIKA GUSTIAWAN",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.02",
+    "nama": "ALIFANDI AHMAD SURYAWAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.03",
-    "nama": "AHMAD AIDAN NOVETRA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.03",
+    "nama": "ANISA AULIA NURUSYIFA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.04",
-    "nama": "ANISA AULIA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.04",
+    "nama": "ARINDA LUSYANA DEWI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.05",
-    "nama": "DANIEL ARVIN GEOVANI",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.05",
+    "nama": "BIMO RADYNDRA PRAMASARA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.06",
-    "nama": "DENNY KRISNA MASSA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.06",
+    "nama": "DAFFA ARMADHAN HIDMI MA'ARIF",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.07",
-    "nama": "FAIZAH MUFIDAH",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.07",
+    "nama": "DARRYLL MARCHIAND MUCHAMMAD NAUVAL I",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.08",
-    "nama": "FARREL DEKA CAHYONO",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.08",
+    "nama": "DEA CANTIKA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.09",
-    "nama": "FERRA AYU ANGGAINI",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.09",
+    "nama": "GALIH VIRGI PRAMUDYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.10",
-    "nama": "GALLANT AZIZURRAHIM",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.10",
+    "nama": "INAYAH CIKAL NURSHABRINA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.11",
-    "nama": "HAQQI RAYA SYACHPUTRA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.11",
+    "nama": "IVAN SIGIT SANTOSO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.12",
-    "nama": "JIZDAN YUFLIKH RACHMAT",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.12",
+    "nama": "KURNIA ANGGA DIMAS PRATAMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.13",
-    "nama": "KAFKA NAFISA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.13",
+    "nama": "LUKMAN ARIF WICAKSONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.14",
-    "nama": "LABIB FAUZI KHOIRUL ANAM",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.14",
+    "nama": "MAULIDYA NURUL MUHARROMAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.15",
-    "nama": "MUHAMMAD AZIZ RANGGA PAMUNGKAS",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.15",
+    "nama": "MUHAMMAD ARYA BIMA SURYA PRATAMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.16",
-    "nama": "MUHAMMAD BURHANUDDIN",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.16",
+    "nama": "MUHAMMAD DZAKYY AN NAFI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.17",
-    "nama": "MUHAMMAD RAFID ASYRAFA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.17",
+    "nama": "Muhammad Irfan",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.18",
-    "nama": "MUHAMMAD TSAQIF SATRIA FIRMANSYAH",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.18",
+    "nama": "MUHAMMAD RHAFI HAIRY MUSLIM",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.19",
-    "nama": "NANDA BAGAS SAPUTRA",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.19",
+    "nama": "MUKHLISH PRATAMA MULYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.20",
-    "nama": "NAZRIEL FARRAS KHAIRIYA PUTRA SISWORO",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.20",
+    "nama": "RAHMA APRILLIANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.21",
-    "nama": "NOVERICO DAFA PUTRA SETIAWAN",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.21",
+    "nama": "RASYA PANDU WICAKSONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.22",
-    "nama": "RAFFAEL DEANNOVA INSAN FIRDAUS",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.22",
+    "nama": "REVO SETYO KINASIH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.23",
-    "nama": "ROSALINA AZZURA BUDIYANTI",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.23",
+    "nama": "RIDHO ARSYIL HAKIM",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.24",
-    "nama": "SECIO DECO TAHAPARY",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.24",
+    "nama": "RITA YULIA SARI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.1.25",
-    "nama": "STEVEN HERMAWAN",
-    "error": "Kelas \"IK-1B\" tidak terdaftar di database."
+    "nim": "4.33.25.1.25",
+    "nama": "RIZKY ADITYA WIJAYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.01",
-    "nama": "AKHDAN BRILIANT",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.1.26",
+    "nama": "VANNISA ALDIRA KIRANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.02",
-    "nama": "ALFI FADHIL AHMAD",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.01",
+    "nama": "AANG KUNADI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.03",
-    "nama": "ARUNDINA SAFIRA ZULRIZKA",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.02",
+    "nama": "ALVIAN REZA MAHARDIKA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.04",
-    "nama": "DANIEL EDGARD CHRISTIANO",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.03",
+    "nama": "AMANDA CHRISTINA SITUMORANG",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.05",
-    "nama": "DIMAS AJI MIRZA HAKIM",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.04",
+    "nama": "AZKA GALUH BASUKI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.06",
-    "nama": "DINDA PUTRI SUSANTI",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.05",
+    "nama": "BAGAS IDDEN LISTIYANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.07",
-    "nama": "FAQIH IZZULHAQ",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.06",
+    "nama": "CHEETAH AMRULLAH SWASTIKA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.08",
-    "nama": "Fikri Dias Ekacipta",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.07",
+    "nama": "DELA FAJAR MULIA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.09",
-    "nama": "GHAALIB FARRAS MA'RUF",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.08",
+    "nama": "EVAN OCTAVIAN RAMADHAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.10",
-    "nama": "ILHAM SYAHRUR RAHMAN",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.09",
+    "nama": "HADZIQ VINU MUFIDANY",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.11",
-    "nama": "JOERDAN MAHESWARA AL HIKAM WK",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.10",
+    "nama": "IRGI AKBAR FAHLEVI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.12",
-    "nama": "LINTAR WAHYU PRAMUDYA",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.11",
+    "nama": "JATMIKO SATRIO WIBOWO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.13",
-    "nama": "MAULANA IBRAHIM PUTRA SUSANTO",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.12",
+    "nama": "LAKSAMANA AGUNG HADI NUGROHO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.14",
-    "nama": "MEIRALUNA LINANTY",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.13",
+    "nama": "MILADIYAH ARINAL HAQ",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.15",
-    "nama": "MUHAMMAD FIRDAUS",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.14",
+    "nama": "MUHAMMAD BARUNA SAYLENDRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.16",
-    "nama": "MUHAMMAD IHYA ARAMIL ISLAM",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.15",
+    "nama": "MUHAMMAD FADHIL",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.17",
-    "nama": "MUHAMMAD IKHSAN FAUZI",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.16",
+    "nama": "NAUFAL AZKA FADHLILLAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.18",
-    "nama": "MUHAMMAD JEFFRY AL IRSYAD",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.17",
+    "nama": "NAZIFA CITRA NURVIANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.19",
-    "nama": "MUHAMMAD RAIHAN NAIM",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.18",
+    "nama": "NIA SELVIA MAHDALENA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.20",
-    "nama": "NAILA FATHIN ZUHROTUN NISWAH",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.19",
+    "nama": "REIGZA NASYA PRATITHA RINGGIANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.21",
-    "nama": "NAUFAL MAGITA PRANATA",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.20",
+    "nama": "RIZKY AKBAR ARDIANSYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.22",
-    "nama": "RAHMAN AGHNAN FAUZI",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.21",
+    "nama": "SATRIA HATIM MARRENTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.23",
-    "nama": "REFFY ANNAS KAHAYA",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.22",
+    "nama": "THOMAS ANDROMEDA ELANG BUANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.24",
-    "nama": "RICKY AGUSTA ROCHIANDIKA",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.23",
+    "nama": "ULFAN NAYAKA DIPTA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.2.25",
-    "nama": "YORDAN ASERAMA LUTURYALI",
-    "error": "Kelas \"IK-1C\" tidak terdaftar di database."
+    "nim": "4.33.25.2.24",
+    "nama": "YUSUF RICKY HARTONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.01",
-    "nama": "ABDUL GHOFUR",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.25.2.25",
+    "nama": "ZIYAUL FALAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.02",
-    "nama": "ALISSYA ZAHRA SENDITYA",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.01",
+    "nama": "ABIMANYU GILAR WALUYO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.03",
-    "nama": "ARYANI MUKHAROMAH",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.02",
+    "nama": "AHMAD CHOMSIN SYAHFRUDDIN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.04",
-    "nama": "DHIYA ZAYDAN AGARA",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.03",
+    "nama": "AISY TSABITA AMRU",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.05",
-    "nama": "DZULFIKAR NUR ANAM",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.04",
+    "nama": "AKBAR HAKIM MUZAKY",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.06",
-    "nama": "FAIRUZ IMANULHAQ",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.05",
+    "nama": "ALFIN ROZZAQ NIRWANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.07",
-    "nama": "FARREL LUTFI PRANOWO",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.06",
+    "nama": "ANISA NURWAHIDAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.08",
-    "nama": "FEBRIAN NUR FAUZAN",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.07",
+    "nama": "BASITH ANUGRAH YAFI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.09",
-    "nama": "HANIF HENING PUTRANTO",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.08",
+    "nama": "BENAYYA NOHAN ADMIRALDO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.10",
-    "nama": "IKFINA ARZAQI NAFI'AH",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.09",
+    "nama": "DANISH MAHDI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.11",
-    "nama": "LUTHFI ADITYA RETMAENDRA",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.10",
+    "nama": "EGIE AMILIA VELISDIONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.12",
-    "nama": "MARCEL SURYA PUTRA KUS SUWARDIYONO",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.11",
+    "nama": "FEBY YUANGGI PUTRI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.13",
-    "nama": "MIRZA FAUZAN SEPTAYOEDA",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.12",
+    "nama": "HANIF ALBANA ROZAD",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.14",
-    "nama": "MUHAMAD GHAHILAN ATHIR",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.13",
+    "nama": "INDRA WIJAYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.15",
-    "nama": "MUHAMMAD BAHRUL QOLBI SHUFI",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.14",
+    "nama": "JONATHAN EDWARD SINAGA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.16",
-    "nama": "MUHAMMAD FAREL ALDEERA R",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.15",
+    "nama": "KATRINA AGNI HARTANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.17",
-    "nama": "MUHAMMAD GHULAM HILMY AL FARRAS",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.16",
+    "nama": "MUHAMMAD ALMAHDI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.18",
-    "nama": "MUHAMMAD MIRZA RASYID",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.17",
+    "nama": "MUHAMMAD FAISAL REZA MUSTOFA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.19",
-    "nama": "MUHAMMAD RAKHA' WIDIANTORO",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.18",
+    "nama": "MUHAMMAD RIZKY FADHILA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.20",
-    "nama": "PUTRI ALFINTA KHOIRI",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.19",
+    "nama": "MUHAMMAD SYAUQI ALGHIFARI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.21",
-    "nama": "RAFFA FATHIRAWAN",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.20",
+    "nama": "NABILA RAMADANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.22",
-    "nama": "RIFQI AMRI BAIHAQI",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.21",
+    "nama": "NANDA ARIFIA CHOERUNISA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.23",
-    "nama": "RUDY NUR ROKHIM",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.22",
+    "nama": "RAFIF ALI FAHREZI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.24",
-    "nama": "SHAFIRA HASNA FAUZI",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.23",
+    "nama": "RAKI ABHISTA PRAKOSO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.25",
-    "nama": "YUSUF ARIFTA BIHARJUNA",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.24",
+    "nama": "SALMA ZAHRA RAMADHANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.3.26",
-    "nama": "ZAIDAN MILLATA ARKAN",
-    "error": "Kelas \"IK-1D\" tidak terdaftar di database."
+    "nim": "4.33.24.0.25",
+    "nama": "SATRIO ADZI PRIAMBODO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.9.01",
-    "nama": "A'MALUL BILAD KHORIJUL ADAD",
-    "error": "Kelas \"IK-1E\" tidak terdaftar di database."
+    "nim": "4.33.24.0.26",
+    "nama": "VIAN MAULANA RAMADHAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.25.9.02",
-    "nama": "MUHAMMAD NUR ALAMSYAH",
-    "error": "Kelas \"IK-1E\" tidak terdaftar di database."
+    "nim": "4.33.24.1.01",
+    "nama": "ANISA FARCHA NOVIANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.01",
-    "nama": "AHMAD FAHROZI",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.02",
+    "nama": "ARJUNA NATHA PRATISENA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.02",
-    "nama": "ANINTYA OKTAVIA PAWESTRI",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.03",
+    "nama": "ARYODIMAS DZAKI WITRYAWAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.03",
-    "nama": "ARI PRABOWO",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.04",
+    "nama": "AZKA BARIQLANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.04",
-    "nama": "AULIA FATIHUL IHSAN",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.05",
+    "nama": "CAHYO GADHANG PUTRO BASKORO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.05",
-    "nama": "BIGES GUMILANG",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.06",
+    "nama": "CANTIKA ALIFIA MAHARANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.06",
-    "nama": "CIPTA NINGRUM",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.07",
+    "nama": "DEWANGGA RADITYA NUGROHO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.07",
-    "nama": "EU KHARISTIA BANUREA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.08",
+    "nama": "EIREN WIBI HIDAYAT",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.08",
-    "nama": "FATHUR ADHI RHIANANG",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.09",
+    "nama": "GANANG SYAIFULLAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.09",
-    "nama": "GEMA ADMAJA ABI ISKANDAR",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.10",
+    "nama": "HAFIZH IMAN WICAKSONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.10",
-    "nama": "HALIMA HADI ALFINA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.11",
+    "nama": "KENCANA IKHSANUN NADJA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.12",
-    "nama": "MADANIA ALDANITA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.12",
+    "nama": "KHANSA INTANIA UTOMO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.13",
-    "nama": "MILDA AULIA RAHMA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.13",
+    "nama": "MI. AULIA KURNIA WIDYARANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.14",
-    "nama": "MUHAMAD IRFAN RAMADHAN",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.14",
+    "nama": "MUHAMMAD ASDIF AFADA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.15",
-    "nama": "MUHAMMAD ANDHIKA MAULANA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.15",
+    "nama": "MUHAMMAD BINTANG SATRIO UTOMO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.16",
-    "nama": "NAUFAL DZAKI MU'AAFII",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.16",
+    "nama": "MUHAMMAD ILHAM RIJAL THAARIQ",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.17",
-    "nama": "NAUFAL GIAN DA'I ARSYAD",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.17",
+    "nama": "MUHAMMAD MUMTAZA AL AFKAR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.18",
-    "nama": "NURJIHAN NABILA MUNTAZ",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.18",
+    "nama": "NAJWA RAHMA HAPSARI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.19",
-    "nama": "RAVIE ARYA SYAH JAHAN",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.19",
+    "nama": "PANDU SETYA NUGRAHA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.20",
-    "nama": "RAYYA AKBAR PAMUNGKAS",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.20",
+    "nama": "PUTRI LEVINA AGATHA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.21",
-    "nama": "SALMA ADINDA AISHELLA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.21",
+    "nama": "RAUL HARYO FAUZIAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.22",
-    "nama": "SHEVA ZANUAR PRATAMA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.22",
+    "nama": "RAY EGANS PRAMUDYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.23",
-    "nama": "SHOFI TIASAMARA AQILA",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.23",
+    "nama": "RIKO ADITYA ZAKI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.24",
-    "nama": "UMMI IMAROH",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.24",
+    "nama": "SENDI PRASETYO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.25",
-    "nama": "WISDOM WAHYU AJI",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.25",
+    "nama": "SEPTIA ISNAENI SALSABILA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.0.26",
-    "nama": "ZAHWA HERDAN RAHMADI",
-    "error": "Kelas \"IK-2A\" tidak terdaftar di database."
+    "nim": "4.33.24.1.26",
+    "nama": "YUSUF FADHLIH FIRMANSYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.01",
-    "nama": "ABIYYU DAFFA HIDASTYA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.01",
+    "nama": "ABYAN FAZA NARISWANGGA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.02",
-    "nama": "ADLI HAKIMARZUQ SABEKTI",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.02",
+    "nama": "ADILA DIMAZ BUWANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.03",
-    "nama": "ALIF HAKIM GHIFARI PRAMUDIANTO",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.03",
+    "nama": "ANNISA NAELIL IZATI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.04",
-    "nama": "AULIA RADZAKY ARIA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.04",
+    "nama": "BAGASKARA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.05",
-    "nama": "DAVID MAZMURENO",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.05",
+    "nama": "CEZAR NARESWARA RESPATI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.06",
-    "nama": "ELVETTA YUMNA WIDYA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.06",
+    "nama": "DEVI IBNU NABILA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.07",
-    "nama": "FAIQ IRFAN FADHLURROHIM",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.07",
+    "nama": "DIAH DWI ASTUTI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.08",
-    "nama": "FAUZAN DARMAWAN",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.08",
+    "nama": "DIMAS ADHIE NUGROHO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.09",
-    "nama": "HASNA RAMADHANI SALIM",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.10",
+    "nama": "GHUFRON AINUN NAJIB",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.10",
-    "nama": "ILHAM DWIPANGGA SUNARKO PUTRA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.11",
+    "nama": "IZZA BAGHUZ SYAFI'I MA'ARIF",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.11",
-    "nama": "IS'AD SABDA PUTRA MUJIONO",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.12",
+    "nama": "M. OKSA SETYARSO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.12",
-    "nama": "MARIEN PUTRI AQILA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.13",
+    "nama": "MUHAMMAD HIKMAL ALFARIDZY BACHTIAR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.13",
-    "nama": "MAULANA AZKA RIFKI SAPUTRA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.14",
+    "nama": "MUHAMMAD IBRAHIM",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.14",
-    "nama": "MUHAMAD IHSANUL LABIB",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.15",
+    "nama": "MUHAMMAD RAFA ENRICO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.15",
-    "nama": "MUHAMMAD BAGAS NUR HAFIDZ",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.16",
+    "nama": "NABILA AZ ZAHRA MUNIR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.16",
-    "nama": "NOVIA NASTITI AULIANISA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.17",
+    "nama": "PAULUS ALE KRISTIAWAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.17",
-    "nama": "NYDIA LUCYTA JATI",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.18",
+    "nama": "RAJABA HAMIM MAUDUDI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.18",
-    "nama": "RAHMA NUR AULIA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.19",
+    "nama": "RIZTIKA MERISTA INDRIANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.19",
-    "nama": "RAIHAN ATA PUTRA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.20",
+    "nama": "ROIHAN SAPUTRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.20",
-    "nama": "REVANANDA ISLAMI PASHA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.21",
+    "nama": "SITI MIFTAHUS SA'DIYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.21",
-    "nama": "ROBBY CANDRA MAKUTA RAMA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.22",
+    "nama": "SRI PUJANGGA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.22",
-    "nama": "SITI HALIMATUN NISAK",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.23",
+    "nama": "TERRA SURYA NEGARI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.23",
-    "nama": "WAHYU PRASETYO WIBOWO",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.24",
+    "nama": "ZALFA AZ ZAHRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.24",
-    "nama": "YOSAN SONJAYA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.24.2.25",
+    "nama": "ZULFIKRI ARYA PUTRA ISMAIL",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.25",
-    "nama": "ZALFA MUTIA ANWAR",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.23.0.01",
+    "nama": "ADRIANSYAH ALFARISYI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.1.26",
-    "nama": "ZIDANE PUTRA BUANA",
-    "error": "Kelas \"IK-2B\" tidak terdaftar di database."
+    "nim": "4.33.23.0.02",
+    "nama": "AGUNG HADI ASTANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.01",
-    "nama": "ADINDA MASSA MERAH LAWAN TIRANI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.03",
+    "nama": "AHMAD FARKHANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.02",
-    "nama": "AKBAR RAMADHAN",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.04",
+    "nama": "ANINDHA CAHYA MULIA SALIM",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.03",
-    "nama": "AMELIA DYAH PRAMESTI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.05",
+    "nama": "ARIF KURNIA RAHMAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.04",
-    "nama": "ARIEF NUGROHO SAPUTRO",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.06",
+    "nama": "ATHAYA PANDU MARENO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.05",
-    "nama": "ARRIJAL AZZAM ROSYID",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.07",
+    "nama": "DANIEL ADI PRATAMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.06",
-    "nama": "ATHA DHIYAHUL HAQ",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.08",
+    "nama": "DAVIN ALIFIANDA ADYTIA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.07",
-    "nama": "DIMAS ARIF PRABOWO",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.09",
+    "nama": "FAJAR DWI FIRMANSYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.08",
-    "nama": "DIXCY SADEWA",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.10",
+    "nama": "FITRIANA NAYLA NOVIANTI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.09",
-    "nama": "FARREL SHEVA BASUDEWA",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.11",
+    "nama": "GILANG MAULANATA PRAMUDYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.10",
-    "nama": "FAUZAN DIMAS PRASETYO JUNIOR",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.13",
+    "nama": "ILHAM TARUPRASETYO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.11",
-    "nama": "HANIFAH YUMNA ZAHIRA",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.14",
+    "nama": "IRMA INNAYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.12",
-    "nama": "IKA LUTFIANI RIZQI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.15",
+    "nama": "KHILDA SALSABILA AZKA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.13",
-    "nama": "JEFFREY SUGIARTO",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.16",
+    "nama": "MARVELLINA DEVI WURDHANING",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.14",
-    "nama": "M. HAIKAL ZACKI AL AWALY",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.17",
+    "nama": "MAULANA FAJAR ROHMANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.15",
-    "nama": "M. NAUFAL ARIFKI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.18",
+    "nama": "MILA ROSITA DEWI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.16",
-    "nama": "MOCHAMAD FAQIH ARDIANSYAH",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.19",
+    "nama": "MUHAMAD HAYDAR AYDIN ALHAMDANI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.17",
-    "nama": "MUHAMMAD FARHAN RABBANI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.20",
+    "nama": "MUHAMMAD SYAUQI MAULANA ANANSYAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.18",
-    "nama": "MUHAMMAD FIKRI NADHIF",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.21",
+    "nama": "MUHAMMAD ZAKIY FADHLULLAH AZHAR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.19",
-    "nama": "MUHAMMAD SYIFA' ARKAN",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.22",
+    "nama": "RACHMAD YOGO DWIYANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.20",
-    "nama": "RAFLY FIRMANSYAH",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.23",
+    "nama": "RAFI ARTHAYANA PUTRA DERIZMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.21",
-    "nama": "RIVAN DWI CAHYANTO",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.0.26",
+    "nama": "TUBAGUS PRATAMA JULIANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.22",
-    "nama": "SALMA NURUL FAUZIYAH",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.22.1.25",
+    "nama": "TITO WAHYU PRATAMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.23",
-    "nama": "SELVI RAHMASARI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.1.01",
+    "nama": "AHMAD RIZKIADI BUDI WIRAWAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.24",
-    "nama": "WAIS ALQURNI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.1.02",
+    "nama": "AKSOBHYA SAMATHA VARGA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.25",
-    "nama": "WIKA DWI APRILIA",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.1.03",
+    "nama": "ANINDITA NAJWA EKA SABRINA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.2.26",
-    "nama": "ZAKIA PUSPARANI",
-    "error": "Kelas \"IK-2C\" tidak terdaftar di database."
+    "nim": "4.33.23.1.04",
+    "nama": "ATSIILA ARYA NABIIH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.22.2.10",
-    "nama": "JHOY MARICE SEPTIANI OHEE",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.05",
+    "nama": "AZANI FATTUR FADHIKA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.01",
-    "nama": "AHMAD ARIFUDIN",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.06",
+    "nama": "DANU ALAMSYAH PUTRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.02",
-    "nama": "ARYA ZAIDAN ZIDNA FANN",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.07",
+    "nama": "FAISHAL ANANDA RACHMAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.03",
-    "nama": "ATHA RENATA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.08",
+    "nama": "FAJAR WAHYU SURYAPUTRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.04",
-    "nama": "CINDY AMELIA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.09",
+    "nama": "HANIF ABDUSY SYAKUR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.05",
-    "nama": "DELON TRI SAPUTRA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.10",
+    "nama": "HELSA CHRISTABEL HARSONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.06",
-    "nama": "DIMAS DWI LAKSONO",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.11",
+    "nama": "IBRAHIM ARYAN FARIDZI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.07",
-    "nama": "FARHAN ABID PRATAMA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.12",
+    "nama": "IVAN RAKHA ADINATA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.08",
-    "nama": "FATHMA MAYANG FARKHANI",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.13",
+    "nama": "JONATHAN ORDRICK EDRA WIJAYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.09",
-    "nama": "HAFIID AMINUDIN",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.15",
+    "nama": "MIFTACHUSSURUR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.10",
-    "nama": "HAIKAL UTOMO PUTRA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.16",
+    "nama": "MUHAMAD RIFKI SURYA PRATAMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.11",
-    "nama": "IRINE LUTHFIA DANI",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.17",
+    "nama": "MUHAMMAD FATWA SYAIKHONI",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.12",
-    "nama": "KRISNA SURYANINGSIH",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.18",
+    "nama": "MUHAMMAD RAFIF PASYA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.13",
-    "nama": "M. NADIEF DHIAULHAQ",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.19",
+    "nama": "NICHOLAS ERNESTO ANAK AGUNG",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.14",
-    "nama": "MOH HAIDAR FADHIL AUFA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.20",
+    "nama": "RAHMALYANA AYUNINGTYAS",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.15",
-    "nama": "MUHAMMAD SYAFIQ ULINNUHA ALADZIM",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.21",
+    "nama": "RASYAD TANZILUR RAHMAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.16",
-    "nama": "NATHANIEL ANDYNO GUNAWAN",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.22",
+    "nama": "ROHIMATUN NURIN NADHIFAH",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.17",
-    "nama": "NAUFAL AMMAR MAULANA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.23",
+    "nama": "TARISHA NAILA ANGELIN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.18",
-    "nama": "RAMADHANI RULIANO",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.24",
+    "nama": "TRISTAN EKA WIRANATA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.19",
-    "nama": "SHEVA PADHISTA PUTRI SANNY",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.1.25",
+    "nama": "WARSENO BAMBANG SETYONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.20",
-    "nama": "SYAHRIL DANUFASHA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.2.01",
+    "nama": "ADINDA RAHIMAH AZZAHRA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.21",
-    "nama": "YUDHISTIRA ALKAUTSAR SUSILO",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.2.02",
+    "nama": "ADJIE RADHITYA KUSSENA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.3.22",
-    "nama": "ZULYTHA DWI SANTIKHA",
-    "error": "Kelas \"IK-2D\" tidak terdaftar di database."
+    "nim": "4.33.23.2.03",
+    "nama": "ADNAN BIMA ADHI NUGRAHA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.9.01",
-    "nama": "ACHMAD ZACKY RAMADHAN",
-    "error": "Kelas \"IK-2E\" tidak terdaftar di database."
+    "nim": "4.33.23.2.04",
+    "nama": "ALDO RAMADHANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.9.02",
-    "nama": "AMMAAR FAHDLURROHMAN DYZAN ABDILAH",
-    "error": "Kelas \"IK-2E\" tidak terdaftar di database."
+    "nim": "4.33.23.2.05",
+    "nama": "AMMAR LUQMAN ARIFIN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   },
   {
-    "nim": "3.34.24.9.04",
-    "nama": "KHUMAIRA YULIAZZAHRA",
-    "error": "Kelas \"IK-2E\" tidak terdaftar di database."
+    "nim": "4.33.23.2.06",
+    "nama": "ANINDITA RAHMA AZALIA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.07",
+    "nama": "AZKA NUR FADEL",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.08",
+    "nama": "BAGUS SADEWA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.09",
+    "nama": "CHALLISTA RISKIANA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.10",
+    "nama": "DIRGA PRIYANTO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.11",
+    "nama": "FAIZ AKMAL NURHAKIM",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.12",
+    "nama": "FATHURRAFI NADIO BUSONO",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.13",
+    "nama": "GHAFARI ARIF JABBAR",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.14",
+    "nama": "HASNA RUMAISHA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.15",
+    "nama": "ILHAM AJI IRAWAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.16",
+    "nama": "ILHAM INDRA ATMAJA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.17",
+    "nama": "MUHAMAD ZA'IM SETYAWAN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.18",
+    "nama": "MUHAMMAD DZAKY JAMALUDDIN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.19",
+    "nama": "MUHAMMAD HAIDAR ALY",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.20",
+    "nama": "MUHAMMAD IMAM MUSTOFA KAMAL",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.21",
+    "nama": "MUHAMMAD JANUAR RIFQI NANDA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.22",
+    "nama": "MUHAMMAD ROOZIQIN",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.23",
+    "nama": "PRABASWARA SHAFA AZARIOMA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.24",
+    "nama": "SAHARDIAN PUTRA WIGUNA",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.25",
+    "nama": "SALWA SALSABILA DAFFA'ATULHAQ",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
+  },
+  {
+    "nim": "4.33.23.2.26",
+    "nama": "ZULVIKAR KHARISMA NUR MUHAMMAD",
+    "error": "Cannot read properties of undefined (reading 'findFirst')"
   }
 ]

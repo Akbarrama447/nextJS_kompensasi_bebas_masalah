@@ -157,20 +157,6 @@ model Mahasiswa {
   @@map("mahasiswa")
 }
 
-model RegistrasiMahasiswa {
-  id          Int       @id @default(autoincrement())
-  nim         String?
-  semester_id Int?
-  kelas_id    Int?
-  status      String?   @default("Aktif")
-  mahasiswa   Mahasiswa? @relation(fields: [nim], references: [nim])
-  semester    Semester? @relation(fields: [semester_id], references: [id])
-  kelas       Kelas?    @relation(fields: [kelas_id], references: [id])
-
-  @@unique([nim, semester_id])
-  @@map("registrasi_mahasiswa")
-}
-
 model Staf {
   nip               String              @id @db.VarChar
   user_id           Int?                @unique
