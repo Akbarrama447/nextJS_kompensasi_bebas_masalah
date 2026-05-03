@@ -51,8 +51,8 @@ export default function LoginPage() {
             </h2>
           </div>
           <p className="text-slate-400 text-sm tracking-wide leading-relaxed">
-            Platform managemen kompensasi <br />
-            mahasiswa Politeknik Negeri Semarang
+            Platform Managemen Kompensasi <br />
+            Mahasiswa Politeknik Negeri Semarang
           </p>
         </div>
       </div>

@@ -7,7 +7,11 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+<<<<<<< Updated upstream
     seed: "npx dotenv -e .env.local -- tsx prisma/seed.ts",
+=======
+    seed: "npx tsx prisma/seed.ts",
+>>>>>>> Stashed changes
   },
   datasource: {
     url: process.env["DATABASE_URL"],
