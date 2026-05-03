@@ -57,35 +57,35 @@ export default function TabImport() {
             <div className="flex justify-end mb-4">
                 <button 
                     onClick={handleImportClick}
-                    className="px-4 py-2 border border-gray-200 text-gray-700 font-medium text-sm rounded-lg hover:bg-gray-50 transition-colors bg-white shadow-sm focus:outline-none"
+                    className="px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 text-gray-700 font-medium text-xs md:text-sm rounded-lg hover:bg-gray-50 transition-colors bg-white shadow-sm focus:outline-none whitespace-nowrap"
                 >
                     Import Excel
                 </button>
             </div>
 
             {/* Table */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
+            <div className="border border-gray-200 rounded-lg overflow-x-auto">
+                <table className="w-full text-xs md:text-sm text-left">
+                    <thead className="bg-gray-50 text-gray-600 text-[10px] md:text-xs uppercase font-medium">
                         <tr className="border-b border-gray-200">
-                            <th className="px-4 py-3">Nama</th>
-                            <th className="px-4 py-3 text-center">NIM</th>
-                            <th className="px-4 py-3 text-center">Kelas</th>
-                            <th className="px-4 py-3 text-center">Jam Kompen</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3">Nama</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center">NIM</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center hidden md:table-cell">Kelas</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center">Jam Kompen</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         <tr className="hover:bg-gray-50/50 transition-colors">
-                            <td className="px-4 py-3 text-gray-800 font-medium">Andi Simukto</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">3.34.24.2.09</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">IK-2C</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">2 jam</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-800 font-medium text-xs md:text-sm">Andi Simukto</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center text-xs">3.34.24.2.09</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center hidden md:table-cell text-xs">IK-2C</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center text-xs">2 jam</td>
                         </tr>
                         <tr className="hover:bg-gray-50/50 transition-colors">
-                            <td className="px-4 py-3 text-gray-800 font-medium">Dini Cantika</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">3.34.24.2.17</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">IK-2C</td>
-                            <td className="px-4 py-3 text-gray-600 text-center">6 jam</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-800 font-medium text-xs md:text-sm">Dini Cantika</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center text-xs">3.34.24.2.17</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center hidden md:table-cell text-xs">IK-2C</td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center text-xs">6 jam</td>
                         </tr>
                     </tbody>
                 </table>

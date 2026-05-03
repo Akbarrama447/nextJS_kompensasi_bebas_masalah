@@ -95,56 +95,62 @@ export default function TabKelola() {
     return (
         <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4" suppressHydrationWarning>
             {/* Action Bar */}
-            <div className="flex justify-end items-center mb-4">
-                <div className="flex gap-3">
-                    <button className="px-4 py-2 border border-gray-200 text-gray-700 font-medium text-sm rounded-lg hover:bg-gray-50 transition-colors bg-white shadow-sm focus:outline-none">
-                        Generate Plotting
-                    </button>
-                    <button 
-                        onClick={handleOpenModal}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-[var(--color-primary)] text-white font-medium text-sm rounded-lg hover:opacity-90 transition-opacity shadow-sm focus:outline-none"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Tambah Manual
-                    </button>
-                </div>
+            <div className="flex flex-col sm:flex-row justify-end items-center gap-2 md:gap-3 mb-4">
+                <button className="w-full sm:w-auto px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 text-gray-700 font-medium text-xs md:text-sm rounded-lg hover:bg-gray-50 transition-colors bg-white shadow-sm focus:outline-none whitespace-nowrap">
+                    Generate Plotting
+                </button>
+                <button 
+                    onClick={handleOpenModal}
+                    className="w-full sm:w-auto flex items-center justify-center gap-1 md:gap-1.5 px-3 md:px-4 py-1.5 md:py-2 bg-[var(--color-primary)] text-white font-medium text-xs md:text-sm rounded-lg hover:opacity-90 transition-opacity shadow-sm focus:outline-none whitespace-nowrap"
+                >
+                    <Plus className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>Tambah Manual</span>
+                </button>
             </div>
 
             {/* Table */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
+            <div className="border border-gray-200 rounded-lg overflow-x-auto">
+                <table className="w-full text-xs md:text-sm text-left">
+                    <thead className="bg-gray-50 text-gray-600 text-[10px] md:text-xs uppercase font-medium">
                         <tr className="border-b border-gray-200">
-                            <th className="px-4 py-3">Pekerjaan</th>
-                            <th className="px-4 py-3 text-center">Tipe</th>
-                            <th className="px-4 py-3 text-center">Poin</th>
-                            <th className="px-4 py-3 text-center">Kuota Sisa</th>
-                            <th className="px-4 py-3 text-center">Tanggal Selesai</th>
-                            <th className="px-4 py-3 text-center">Status</th>
-                            <th className="px-4 py-3 text-center">Aksi</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3">Pekerjaan</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center hidden sm:table-cell">Tipe</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center hidden md:table-cell">Poin</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center hidden lg:table-cell">Kuota</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center hidden xl:table-cell">Tgl Selesai</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center">Status</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {dataPekerjaan.map((item) => (
                             <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                                <td className="px-4 py-3 text-gray-800 font-medium">{item.pekerjaan}</td>
-                                <td className="px-4 py-3 text-center">
-                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium text-white ${item.tipe === 'Internal' ? 'bg-[var(--color-primary)]' : 'bg-orange-500'}`}>
+                                <td className="px-2 md:px-4 py-2 md:py-3">
+                                    <p className="text-gray-800 font-medium text-xs md:text-sm">{item.pekerjaan}</p>
+                                    <div className="flex gap-2 mt-1 md:hidden">
+                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium text-white ${item.tipe === 'Internal' ? 'bg-[var(--color-primary)]' : 'bg-orange-500'}`}>
+                                            {item.tipe}
+                                        </span>
+                                        <span className="text-[9px] text-gray-600">{item.poin}j</span>
+                                    </div>
+                                </td>
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-center hidden sm:table-cell">
+                                    <span className={`inline-flex items-center px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full text-[9px] md:text-xs font-medium text-white ${item.tipe === 'Internal' ? 'bg-[var(--color-primary)]' : 'bg-orange-500'}`}>
                                         {item.tipe}
                                     </span>
                                 </td>
-                                <td className="px-4 py-3 text-gray-600 text-center">{item.poin} jam</td>
-                                <td className="px-4 py-3 text-gray-600 text-center">{item.kuotaSisa}/{item.kuotaTotal}</td>
-                                <td className="px-4 py-3 text-gray-600 text-center">{formatDate(item.tanggalSelesai)}</td>
-                                <td className="px-4 py-3 text-center">
-                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--color-primary)] text-white rounded-full text-xs font-medium">
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center hidden md:table-cell text-xs">{item.poin} jam</td>
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center hidden lg:table-cell text-xs">{item.kuotaSisa}/{item.kuotaTotal}</td>
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-center hidden xl:table-cell text-xs">{formatDate(item.tanggalSelesai)}</td>
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                                    <span className="inline-flex items-center gap-0.5 md:gap-1.5 px-1.5 md:px-2.5 py-0.5 md:py-1 bg-[var(--color-primary)] text-white rounded-full text-[9px] md:text-xs font-medium">
                                         {item.status}
-                                        <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                                        <span className="w-1 h-1 md:w-1.5 md:h-1.5 bg-white rounded-full"></span>
                                     </span>
                                 </td>
-                                <td className="px-4 py-3 text-center">
-                                    <button className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
-                                        <EyeOff className="w-4 h-4 mx-auto" />
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                                    <button className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none p-1">
+                                        <EyeOff className="w-3 h-3 md:w-4 md:h-4 mx-auto" />
                                     </button>
                                 </td>
                             </tr>
@@ -152,7 +158,7 @@ export default function TabKelola() {
                         
                         {dataPekerjaan.length === 0 && (
                             <tr>
-                                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                                <td colSpan={7} className="px-4 py-8 text-center text-gray-500 text-xs md:text-sm">
                                     Belum ada data pekerjaan.
                                 </td>
                             </tr>

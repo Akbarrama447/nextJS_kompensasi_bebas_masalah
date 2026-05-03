@@ -80,6 +80,7 @@ model Semester {
   is_aktif        Boolean              @default(false)
   mulai           DateTime?            @db.Date
   selesai         DateTime?            @db.Date
+  registrasi_mahasiswa RegistrasiMahasiswa[]
   daftar_pekerjaan Daftar_pekerjaan[]
   ekuivalensi_kelas Ekuivalensi_kelas[]
   import_log      Import_log[]
@@ -152,7 +153,7 @@ model Kelas {
   prodi_id   Int?
   nama_kelas String?
   prodi      Prodi?    @relation(fields: [prodi_id], references: [id])
-  mahasiswa  Mahasiswa[]
+  registrasi_mahasiswa RegistrasiMahasiswa[]
   ekuivalensi_kelas Ekuivalensi_kelas[]
 
   @@map("kelas")
@@ -162,15 +163,28 @@ model Mahasiswa {
   nim                      String              @id
   user_id                  Int?                @unique
   nama                     String?
-  kelas_id                 Int?
   user                     Users?              @relation(fields: [user_id], references: [user_id])
-  kelas                    Kelas?              @relation(fields: [kelas_id], references: [id])
+  registrasi_mahasiswa     RegistrasiMahasiswa[]
   penugasan                Penugasan[]
   ekuivalensi_kelasPenanggung Ekuivalensi_kelas[] @relation("PenanggungJawab")
   kompen_awal              Kompen_awal[]
   log_potong_jam           Log_potong_jam[]
 
   @@map("mahasiswa")
+}
+
+model RegistrasiMahasiswa {
+  id          Int       @id @default(autoincrement())
+  nim         String?
+  semester_id Int?
+  kelas_id    Int?
+  status      String?   @default("Aktif")
+  mahasiswa   Mahasiswa? @relation(fields: [nim], references: [nim])
+  semester    Semester? @relation(fields: [semester_id], references: [id])
+  kelas       Kelas?    @relation(fields: [kelas_id], references: [id])
+
+  @@unique([nim, semester_id])
+  @@map("registrasi_mahasiswa")
 }
 
 model Staf {
