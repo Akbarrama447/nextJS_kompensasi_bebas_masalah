@@ -11,15 +11,97 @@ Fitur Import Data Kompensasi via Excel telah dirombak dan dinyatakan **100% Sele
 
 ---
 
-## ⏳ TAHAP SELANJUTNYA: 3 TAB TERSISA
-Proses pengembangan selanjutnya akan berfokus untuk menyempurnakan dan menghubungkan 3 (tiga) tab yang tersisa di halaman List Pekerjaan:
+## ✅ TAHAP 2 SELESAI: TAB KELOLA (Daftar Pekerjaan & Generate Plotting)
 
-1. **[ ] Tab Kelola (Daftar Pekerjaan)**
-   - Fokus: Mengelola pekerjaan kompensasi secara manual (CRUD).
-   - Target: Menghubungkan fungsi tambah, edit, dan hapus ke tabel `daftar_pekerjaan` di database.
-2. **[ ] Tab Penugasan**
-   - Fokus: Menerima *submission* mahasiswa, memverifikasi hasil kerja, dan foto bukti.
-   - Target: Mengimplementasikan sistem persetujuan/penolakan yang akan meng-update tabel `penugasan` dan `kompen_awal`.
-3. **[ ] Tab Riwayat**
-   - Fokus: Menampilkan log/history.
-   - Target: Menarik data dari tabel `import_log` atau log lainnya agar admin bisa melacak rekam jejak aktivitas sistem.
+### Files yang Dibuat:
+| File | Keterangan |
+|------|-----------|
+| `types/index.ts` | TypeScript interfaces (PekerjaanForm, PekerjaanRow, OptionsData, PlottingConfig, dll) |
+| `actions/options.ts` | Server action untuk fetch dropdown options |
+| `actions/pekerjaan.ts` | Server actions: CRUD pekerjaan |
+| `actions/plotting.ts` | Server action: generate plotting |
+
+### Files yang Diperbarui:
+| File | Keterangan |
+|------|-----------|
+| `components/TabKelola.tsx` | Full integration dengan server actions |
+
+---
+
+### Fitur yang Diimplementasikan:
+
+#### 1. Tambah Pekerjaan (Create)
+- **Endpoint:** `createPekerjaan(data)`
+- **Input:** judul, deskripsi, tipe_pekerjaan_id, poin_jam, quota, tanggal_mulai, tanggal_selesai, ruangan_id
+- **Validasi:**
+  - Auto-detect semester aktif jika null
+  - Auto-detect staf jika null
+  - Validasi tipe_pekerjaan_id exists
+  - Validasi ruangan_id exists (jika ada)
+- **Output:** `{ success: true, id }` atau `{ success: false, error }`
+- **DB:** `prisma.daftar_pekerjaan.create()`
+
+#### 2. Lihat Daftar Pekerjaan (Read)
+- **Endpoint:** `getDaftarPekerjaan(filters?)`
+- **Input:** `{ semester_id?, is_aktif? }`
+- **Output:** Array `PekerjaanRow[]` dengan fields:
+  - id, judul, tipe, poin, kuotatersisa, kuotatotal, tanggal_mulai, tanggal_selesai, is_aktif
+  - Relations: staf, ruangan, tipe_pekerjaan
+- **DB:** `prisma.daftar_pekerjaan.findMany()` + hitung kuotatersisa dari count penugasan aktif
+
+#### 3. Hapus Pekerjaan (Delete)
+- **Endpoint:** `deletePekerjaan(id)`
+- **Validasi:** Cek apakah ada penugasan aktif
+- **Output:** `{ success: true }` atau `{ success: false, error }`
+- **DB:** Soft delete (`is_aktif = false`)
+
+#### 4. Generate Plotting (Auto-Distribusi)
+- **Endpoint:** `generatePlotting(config?)`
+- **Input:** `{ semester_id?, maxJamPerHari?: 8, sortBy?: 'nim' | 'jam_kompen' }`
+- **Algoritma Distribusi:**
+  1. Fetch pekerjaan dengan `is_aktif=true` dan `kuota_sisa > 0`
+  2. Fetch mahasiswa dengan `total_jam_wajib > 0` dan belum punya penugasan aktif
+  3. Hitung `jam_sisa = total_jam_wajib - jam_sudah_dapat`
+  4. Urutkan: NIM asc ATAU terkecil jam kompen
+  5. Distribusi per pekerjaan:
+     - Bagi poin_jam ke beberapa mahasiswa dengan integer division
+     - Sisa (remainder) diberikan ke mahasiswa terakhir
+     - Jika mhs sudah penuh/maxJam, lanjut ke mhs berikutnya
+  6. Insert ke tabel Penugasan
+- **Output:** `{ success: true, processedCount, assignmentCount, results[] }`
+- **DB:** `prisma.penugasan.create()` (per mahasiswa)
+
+---
+
+### Auto-Provisioning:
+- Tipe pekerjaan "Internal" dan "Eksternal" akan otomatis dibuat jika tabel `ref_tipe_pekerjaan` kosong
+
+---
+
+### Fields di Form:
+| Field | Tipe | Required | Keterangan |
+|-------|-----|----------|-----------|
+| Nama Pekerjaan | text | ✅ | Judul pekerjaan |
+| Tipe Pekerjaan | select | ✅ | Dari ref_tipe_pekerjaan |
+| Poin (Jam Kompen) | number | ✅ | Float, min 1 |
+| Total Kuota | number | ✅ | Jumlah mahasiswa |
+| Ruangan | select | - | Dari Ruangan |
+| Tanggal Mulai | date | - | Optional |
+| Tanggal Selesai | date | ✅ | Batas akhir |
+| Deskripsi | textarea | - | Optional |
+
+---
+
+### Tabel Database yang Tershubung:
+| Tabel | Relasi |
+|-------|-------|
+| `daftar_pekerjaan` | Pekerjaan utama |
+| `ref_tipe_pekerjaan` | Lookup tipe (Internal/Eksternal) |
+| `ruangan` | Lokasi pekerjaan |
+| `semester` | Periode |
+| `staf` | Pembuat |
+| `penugasan` | Hasil plotting (mahasiswa yang ditugaskan) |
+
+---
+
+## ⏳ TAHAP SELANJUTNYA: 3 TAB TERSISA

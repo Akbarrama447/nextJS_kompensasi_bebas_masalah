@@ -48,7 +48,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen" suppressHydrationWarning>
       {/* Kolom Kiri - Branding */}
       <div className="hidden lg:flex flex-col w-1/2 bg-[#0F172A] items-center justify-center p-12">
         <div className="max-w-md text-center space-y-6">
@@ -64,11 +64,11 @@ export default function LoginPage() {
       </div>
 
       {/* Kolom Kanan - Form Login */}
-      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-sm bg-white rounded-3xl shadow-lg p-8 md:p-10 border border-slate-100">
-          <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-2xl font-black text-slate-800 mb-2">Welcome Back!</h2>
-            <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Silahkan masuk ke akun anda</p>
+      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-8">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-10" suppressHydrationWarning>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang</h2>
+            <p className="text-sm text-gray-500">Masuk ke akun anda untuk melanjutkan</p>
           </div>
 
           {error && (
@@ -77,9 +77,11 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-2">NIM / Email</label>
+          <form onSubmit={handleLogin} className="space-y-5" suppressHydrationWarning>
+            <div suppressHydrationWarning>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                NIM
+              </label>
               <input
                 type="text"
                 value={identifier}
@@ -87,11 +89,14 @@ export default function LoginPage() {
                 className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all text-sm"
                 placeholder="Contoh: 3.34.24.2.02"
                 required
+                suppressHydrationWarning
               />
             </div>
 
-            <div>
-              <label className="block text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-2">Password</label>
+            <div suppressHydrationWarning>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
@@ -99,13 +104,15 @@ export default function LoginPage() {
                 className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all text-sm"
                 placeholder="••••••••"
                 required
+                suppressHydrationWarning
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white text-sm font-bold py-4 rounded-2xl transition-all shadow-lg disabled:opacity-50"
+              className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors mt-4 disabled:opacity-50"
+              suppressHydrationWarning
             >
               {loading ? 'Memproses...' : 'Sign In'}
             </button>

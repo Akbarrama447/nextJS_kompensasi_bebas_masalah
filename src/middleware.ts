@@ -3,12 +3,16 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
-  
-  // Ambil cookie 'token' yang kita set di API login
-  const token = req.cookies.get('token')?.value
-  const isAuthenticated = !!token
+  const nim = req.cookies.get('nim')?.value
+  const nip = req.cookies.get('nip')?.value
+  const isAuthenticated = !!(nim || nip)
 
-  // 1. Kalau akses root atau dashboard tanpa login, lempar ke login
+  // Allow login and API routes to pass through
+  if (pathname === '/login' || pathname.startsWith('/api/')) {
+    return NextResponse.next()
+  }
+
+  // Root, /user, /admin pages
   if (pathname === '/' || pathname === '/user' || pathname === '/admin') {
     if (isAuthenticated) {
       // Untuk sementara kita default ke user dashboard kalau login sukses
@@ -18,15 +22,25 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // 2. Proteksi folder /user dan /admin
-  // Jika mencoba masuk tapi tidak ada token, tendang ke login
-  if ((pathname.startsWith('/user') || pathname.startsWith('/admin')) && !isAuthenticated) {
+  // Protect /user/* routes
+  if (pathname.startsWith('/user') && !nim) {
     return NextResponse.redirect(new URL('/login', req.url))
+  }
+
+  // Auto-create demo admin cookie (no redirect needed)
+  if (pathname.startsWith('/admin') && !nip) {
+    const res = NextResponse.next()
+    res.cookies.set('nip', 'ADMIN_DEMO', {
+      httpOnly: true,
+      path: '/',
+      maxAge: 60 * 60 * 24,
+    })
+    return res
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/', '/user/:path*', '/admin/:path*'],
-};
+  matcher: ['/', '/user', '/user/:path*', '/admin', '/admin/:path*', '/login', '/api/:path*'],
+}

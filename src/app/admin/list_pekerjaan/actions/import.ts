@@ -29,6 +29,7 @@ const IMPORT_STATUS = {
   PROSES: 1,
   SELESAI: 2,
   GAGAL: 3,
+  PARTIAL: 4,
 } as const;
 
 // ─────────────────────────────────────────
@@ -137,11 +138,30 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
   const kelasMap = new Map(kelasList.map((k) => [normalizeKelas(k.nama_kelas ?? ''), k.id]));
 
   // ── 3. Fetch role mahasiswa sekali ──────────────────────────────────────
-  // Cari role mahasiswa — nama di DB diharapkan lowercase
-  const mhsRole = await prisma.roles.findFirst({
-    where: { nama: { equals: 'mahasiswa' } },
+  // Cari role mahasiswa — case insensitive
+  let mhsRole = await prisma.roles.findFirst({
+    where: { nama: { equals: 'mahasiswa', mode: 'insensitive' } },
     select: { id: true },
   });
+
+  // Fallback: jika role 'mahasiswa' nggak ada, pake role pertama yang tersedia
+  if (!mhsRole) {
+    mhsRole = await prisma.roles.findFirst({
+      select: { id: true },
+      orderBy: { id: 'asc' },
+    });
+  }
+
+  // Jika masih nggak ada role sama sekali, buat role mahasiswa
+  if (!mhsRole) {
+    mhsRole = await prisma.roles.create({
+      data: {
+        id: 1,
+        nama: 'mahasiswa',
+      },
+      select: { id: true },
+    });
+  }
 
   const defaultPassword = process.env.DEFAULT_STUDENT_PASSWORD ?? 'Polines123!';
   const hashedPassword = await bcrypt.hash(defaultPassword, 10);
@@ -188,7 +208,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
           data: {
             email: defaultEmail,
             kata_sandi: hashedPassword,
-            role_id: mhsRole?.id ?? 5,
+            role_id: mhsRole.id,
           },
           select: { user_id: true },
         });
@@ -265,13 +285,13 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
     } catch (err) {}
   }
 
-  // Status: SELESAI jika ada >=1 sukses, GAGAL jika 0 sukses total
+  // Status: GAGAL jika 0 sukses, PARTIAL jika ada error + ada sukses, SELESAI jika tanpa error
   const finalStatus =
     successCount === 0
       ? IMPORT_STATUS.GAGAL
-      : errors.length === 0
-        ? IMPORT_STATUS.SELESAI
-        : IMPORT_STATUS.SELESAI; // partial success → tetap selesai tapi error_details terisi
+      : errors.length > 0
+        ? IMPORT_STATUS.PARTIAL
+        : IMPORT_STATUS.SELESAI;
 
   // Untuk field Json? nullable, Prisma butuh Prisma.JsonNull (bukan JS null)
   await prisma.import_log.update({

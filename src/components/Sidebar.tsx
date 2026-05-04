@@ -67,7 +67,7 @@ export default async function Sidebar({ role, activePath, children }: SidebarPro
 
   return (
     <div className="flex min-h-screen bg-[#f1f5f9] font-sans antialiased text-slate-900">
-      <aside className="w-64 bg-[#2e5299] text-white flex flex-col shadow-lg">
+      <aside className="hidden md:flex w-64 bg-[#2e5299] text-white flex-col shadow-lg">
         <div className="flex items-center gap-2.5 p-6 mb-2">
           <img src="/LOGO-POLITEKNIK-NEGERI-SEMARANG-2.png" alt="Logo" className="w-6 h-6 object-contain" />
           <div className="flex flex-col">
