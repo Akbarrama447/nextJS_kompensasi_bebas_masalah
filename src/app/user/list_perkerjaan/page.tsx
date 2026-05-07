@@ -48,7 +48,7 @@ export default async function PekerjaanSayaPage() {
   }
 
   return (
-    <Sidebar role="mahasiswa" activePath="/user/list_pekerjaan">
+    <Sidebar role="mahasiswa" activePath="/user/pekerjaan">
       <UserHeader user={userData} />
       {/* Lempar data ke Client Component */}
       <PekerjaanSayaClient initialData={penugasanSaya} user={userData} />

@@ -4,22 +4,36 @@ import { compare } from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   try {
-    const { nim, password } = await req.json()
+    const body = await req.json()
+    const identifier = body.identifier || body.nim
+    const { password } = body
 
-    if (!nim || !password) {
-      return NextResponse.json({ error: 'NIM dan password wajib diisi' }, { status: 400 })
+    if (!identifier || !password) {
+      return NextResponse.json({ error: 'NIM/Email dan password wajib diisi' }, { status: 400 })
     }
 
-    const mahasiswa = await prisma.mahasiswa.findUnique({
-      where: { nim },
-      include: { user: true },
-    })
+    let user = null
+    let mahasiswa = null
 
-    if (!mahasiswa) {
-      return NextResponse.json({ error: 'NIM tidak ditemukan' }, { status: 401 })
+    if (identifier.includes('@')) {
+      user = await prisma.users.findUnique({
+        where: { email: identifier },
+        include: { mahasiswa: true },
+      })
+      mahasiswa = user?.mahasiswa
+    } else {
+      mahasiswa = await prisma.mahasiswa.findUnique({
+        where: { nim: identifier },
+        include: { user: true },
+      })
+      user = mahasiswa?.user
     }
 
-    const isValidPassword = await compare(password, mahasiswa.user?.kata_sandi || '')
+    if (!user || !mahasiswa) {
+      return NextResponse.json({ error: 'NIM atau Email tidak ditemukan' }, { status: 401 })
+    }
+
+    const isValidPassword = await compare(password, user.kata_sandi || '')
     if (!isValidPassword) {
       return NextResponse.json({ error: 'Password salah' }, { status: 401 })
     }
@@ -30,7 +44,7 @@ export async function POST(req: NextRequest) {
       nama: mahasiswa.nama,
     })
 
-    response.cookies.set('nim', nim, {
+    response.cookies.set('nim', mahasiswa.nim, {
       httpOnly: true,
       path: '/',
       maxAge: 60 * 60 * 24,

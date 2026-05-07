@@ -6,11 +6,11 @@ import { LogOut, LucideIcon } from 'lucide-react'
 
 interface SidebarProps {
   role: 'mahasiswa' | 'admin'
-  activePath: string
+  activePath?: string
   children: React.ReactNode
 }
 
-export default async function Sidebar({ role, activePath, children }: SidebarProps) {
+export default async function Sidebar({ role, activePath = '', children }: SidebarProps) {
   const cookieStore = await cookies()
   
   let nama = 'Guest'
@@ -75,7 +75,7 @@ export default async function Sidebar({ role, activePath, children }: SidebarPro
                 }
               }
 
-              const isActive = activePath === href
+              const isActive = activePath === href || activePath === menu.path || activePath.startsWith(menu.path + '/') || (menu.key && activePath.includes(menu.key))
               return (
                 <li key={menu.id}>
                   <Link href={href}>
