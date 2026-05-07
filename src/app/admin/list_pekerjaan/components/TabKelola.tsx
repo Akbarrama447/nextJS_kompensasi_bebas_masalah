@@ -224,6 +224,7 @@ export default function TabKelola() {
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-medium">
             <tr className="border-b border-gray-200">
+              <th className="px-4 py-3 text-center w-12">No</th>
               <th className="px-4 py-3">Pekerjaan</th>
               <th className="px-4 py-3 text-center">Tipe</th>
               <th className="px-4 py-3 text-center">Poin</th>
@@ -236,23 +237,24 @@ export default function TabKelola() {
           <tbody className="divide-y divide-gray-100">
             {isLoading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                   <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
                   Memuat data...
                 </td>
               </tr>
             ) : dataPekerjaan.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                   Belum ada data pekerjaan.
                 </td>
               </tr>
             ) : (
-              dataPekerjaan.map((item) => (
+              dataPekerjaan.map((item, index) => (
                 <tr
                   key={item.id}
                   className="hover:bg-gray-50/50 transition-colors"
                 >
+                  <td className="px-4 py-3 text-center text-gray-600 font-medium">{index + 1}</td>
                   <td className="px-4 py-3 text-gray-800 font-medium">
                     {item.judul}
                   </td>
@@ -260,7 +262,7 @@ export default function TabKelola() {
                     <span
                       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium text-white ${
                         item.tipe_pekerjaan?.nama === "Internal"
-                          ? "bg-[var(--color-primary)]"
+                          ? "bg-blue-600"
                           : "bg-orange-500"
                       }`}
                     >
@@ -277,7 +279,7 @@ export default function TabKelola() {
                     {formatDate(item.tanggal_selesai)}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--color-primary)] text-white rounded-full text-xs font-medium">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-600 text-white rounded-full text-xs font-medium">
                       {item.is_aktif ? "Aktif" : "Nonaktif"}
                       <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
                     </span>

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
         ]
       },
       include: {
-        mahasiswa: true,
+        mahasiswah: true,
         role: true
       }
     })
