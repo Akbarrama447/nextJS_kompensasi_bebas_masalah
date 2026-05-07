@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff; /*warna card*/
+  --foreground: #171717; /*bawaan*/
+
+  --bg-main: #F9FAFC; /*warna background web*/
+
+  --color-primary: #2764E1; /*warna icon, background tombol, dkk*/
+  --color-primary-dark: #1D3B81; /*warna sidebar*/
+
+  --color-dark: #0F172A; /*icon yang terseleksi di sidebar*/
 }
 
 @theme inline {
