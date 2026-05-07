@@ -50,7 +50,6 @@ async function main() {
           nim: account.nim,
           user_id: user.user_id,
           nama: account.nama,
-          kelas_id: kelas?.id,
         },
       })
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { CheckCircle, XCircle, AlertCircle, FileSpreadsheet } from "lucide-react";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { CheckCircle, XCircle, AlertCircle, FileSpreadsheet, ChevronLeft, ChevronRight } from "lucide-react";
 import { parseExcelFile, type ParsedStudent } from "@/lib/excel-parser";
 import { executeImport } from "@/app/admin/list_pekerjaan/actions/import";
 
@@ -40,6 +40,18 @@ export default function TabImport() {
     const [currentFileName, setCurrentFileName] = useState("");
     const [summary, setSummary] = useState<ImportSummary | null>(null);
 
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const totalData = students.length;
+    const totalPages = Math.ceil(totalData / limit);
+    const startItem = totalData === 0 ? 0 : (page - 1) * limit + 1;
+    const endItem = Math.min(page * limit, totalData);
+
+    const paginatedStudents = useMemo(() => {
+        const start = (page - 1) * limit;
+        return students.slice(start, start + limit);
+    }, [students, page, limit]);
+
     // ── File selection ───────────────────────────────────────────────────
     const handleImportClick = () => fileInputRef.current?.click();
 
@@ -73,6 +85,7 @@ export default function TabImport() {
 
             setStudents(result.students);
             setParseErrors(result.errors);
+            setPage(1);
             setModalState("preview");
         } catch (err) {
             setErrorMessage(err instanceof Error ? err.message : "Gagal membaca file.");
@@ -121,6 +134,7 @@ export default function TabImport() {
         setSummary(null);
         setErrorMessage("");
         setCurrentFileName("");
+        setPage(1);
     };
 
     return (
@@ -165,8 +179,8 @@ export default function TabImport() {
                                 </td>
                             </tr>
                         ) : (
-                            students.map((s, i) => (
-                                <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                            paginatedStudents.map((s, i) => (
+                                <tr key={(page - 1) * limit + i} className="hover:bg-gray-50/50 transition-colors">
                                     <td className="px-4 py-3">
                                         <p className="font-medium text-gray-800">{s.nama}</p>
                                     </td>
@@ -184,6 +198,50 @@ export default function TabImport() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Pagination */}
+            {totalData > 0 && (
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Tampilkan</span>
+                        <select
+                            value={limit}
+                            onChange={(e) => {
+                                setLimit(Number(e.target.value));
+                                setPage(1);
+                            }}
+                            className="px-2 py-1 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                        </select>
+                        <span className="text-xs text-gray-500">data</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                            {startItem}-{endItem} dari {totalData}
+                        </span>
+                        <button
+                            onClick={() => setPage(page - 1)}
+                            disabled={page === 1}
+                            className="p-1 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            title="Halaman sebelumnya"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => setPage(page + 1)}
+                            disabled={page >= totalPages}
+                            className="p-1 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            title="Halaman selanjutnya"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Parse errors note */}
             {parseErrors.length > 0 && (

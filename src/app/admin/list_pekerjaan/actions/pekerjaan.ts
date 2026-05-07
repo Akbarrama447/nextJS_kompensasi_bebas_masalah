@@ -112,12 +112,25 @@ export async function createPekerjaan(
   }
 }
 
+interface PaginationParams {
+  limit?: number;
+  offset?: number;
+}
+
+interface GetDaftarPekerjaanResult {
+  data: PekerjaanRow[];
+  total: number;
+}
+
 export async function getDaftarPekerjaan(
   filters?: {
     semester_id?: number;
     is_aktif?: boolean;
-  }
-): Promise<PekerjaanRow[]> {
+  } & PaginationParams
+): Promise<GetDaftarPekerjaanResult | PekerjaanRow[]> {
+  const returnAll = filters === undefined;
+  const { limit = 10, offset = 0, ...filterRest } = filters || {};
+
   try {
     let semesterId: number | undefined;
     
@@ -141,31 +154,36 @@ export async function getDaftarPekerjaan(
       whereClause.is_aktif = filters.is_aktif;
     }
 
-    const pekerjaan = await prisma.daftar_pekerjaan.findMany({
-      where: whereClause,
-      include: {
-        staf: {
-          select: { nip: true, nama: true },
-        },
-        tipe_pekerjaan: {
-          select: { id: true, nama: true },
-        },
-        ruangan: {
-          select: { id: true, nama_ruangan: true },
-        },
-        penugasan: {
-          where: {
-            status_tugas_id: {
-              notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
-            },
+    const [pekerjaan, totalCount] = await Promise.all([
+      prisma.daftar_pekerjaan.findMany({
+        where: whereClause,
+        include: {
+          staf: {
+            select: { nip: true, nama: true },
           },
-          select: { id: true },
+          tipe_pekerjaan: {
+            select: { id: true, nama: true },
+          },
+          ruangan: {
+            select: { id: true, nama_ruangan: true },
+          },
+          penugasan: {
+            where: {
+              status_tugas_id: {
+                notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
+              },
+            },
+            select: { id: true },
+          },
         },
-      },
-      orderBy: { created_at: 'desc' },
-    });
+        orderBy: { created_at: 'desc' },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.daftar_pekerjaan.count({ where: whereClause }),
+    ]);
 
-    return pekerjaan.map((p) => ({
+    const mappedData = pekerjaan.map((p) => ({
       id: p.id,
       judul: p.judul || '',
       tipe: p.tipe_pekerjaan?.nama || 'Unknown',
@@ -184,9 +202,18 @@ export async function getDaftarPekerjaan(
         ? { id: p.tipe_pekerjaan.id, nama: p.tipe_pekerjaan.nama || '' } 
         : undefined,
     }));
+
+    if (returnAll) {
+      return mappedData;
+    }
+
+    return {
+      data: mappedData,
+      total: totalCount,
+    };
   } catch (error) {
     console.error('Error fetching daftar pekerjaan:', error);
-    return [];
+    return { data: [], total: 0 };
   }
 }
 
