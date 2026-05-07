@@ -5,37 +5,35 @@ import { compare } from 'bcryptjs'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { nim, password } = body
+    const identifier = body.identifier || body.nim
+    const { password } = body
 
-    // 1. Validasi input kosong
-    if (!nim || !password) {
-      return NextResponse.json(
-        { error: 'NIM dan password wajib diisi' }, 
-        { status: 400 }
-      )
+    if (!identifier || !password) {
+      return NextResponse.json({ error: 'NIM/Email dan password wajib diisi' }, { status: 400 })
     }
 
-    // 2. Cari mahasiswa beserta relasi usernya
-    // Pastikan nim dijadikan String untuk mencegah error type mismatch jika input berupa angka
-    const mahasiswa = await prisma.mahasiswa.findUnique({
-      where: { nim: String(nim) }, 
-      include: { 
-        user: true 
-      },
-    })
+    let user = null
+    let mahasiswa = null
 
-    // 3. Validasi keberadaan mahasiswa dan akun usernya
-    if (!mahasiswa || !mahasiswa.user) {
-      return NextResponse.json(
-        { error: 'NIM tidak ditemukan atau akun belum aktif' }, 
-        { status: 401 }
-      )
+    if (identifier.includes('@')) {
+      user = await prisma.users.findUnique({
+        where: { email: identifier },
+        include: { mahasiswa: true },
+      })
+      mahasiswa = user?.mahasiswa
+    } else {
+      mahasiswa = await prisma.mahasiswa.findUnique({
+        where: { nim: identifier },
+        include: { user: true },
+      })
+      user = mahasiswa?.user
     }
 
-    // 4. Verifikasi password dengan bcrypt
-    const hashedPassword = mahasiswa.user.kata_sandi || ''
-    const isValidPassword = await compare(password, hashedPassword)
-    
+    if (!user || !mahasiswa) {
+      return NextResponse.json({ error: 'NIM atau Email tidak ditemukan' }, { status: 401 })
+    }
+
+    const isValidPassword = await compare(password, user.kata_sandi || '')
     if (!isValidPassword) {
       return NextResponse.json(
         { error: 'Password salah' }, 
@@ -53,10 +51,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     )
 
-    // 6. Set Cookie untuk session
-    response.cookies.set({
-      name: 'nim',
-      value: String(nim),
+    response.cookies.set('nim', mahasiswa.nim, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

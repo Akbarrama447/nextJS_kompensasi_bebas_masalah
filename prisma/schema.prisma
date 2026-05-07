@@ -90,21 +90,6 @@ model Semester {
   @@map("semester")
 }
 
-model Menus {
-  id         Int       @id @default(autoincrement())
-  key        String    @unique @db.VarChar
-  label      String    @db.VarChar
-  icon       String?   @db.VarChar
-  path       String    @db.VarChar
-  urutan     Int?      @default(0)
-  parent_id  Int?
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  parent     Menus?    @relation("MenuRelation", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children   Menus[]   @relation("MenuRelation")
-
-  @@map("menus")
-}
-
 model Pengaturan_sistem {
   id         Int     @id @default(autoincrement())
   grup       String? @db.VarChar
@@ -314,4 +299,17 @@ model registrasi_mahasiswa {
   semester    Semester?  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([nim, semester_id], map: "registrasi_mahasiswa_unique")
+}
+
+model menus {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique @db.VarChar
+  label       String    @db.VarChar
+  icon        String?   @db.VarChar
+  path        String    @db.VarChar
+  urutan      Int?      @default(0)
+  parent_id   Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  menus       menus?    @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus menus[]   @relation("menusTomenus")
 }

@@ -140,10 +140,21 @@ CREATE TABLE public.mahasiswa (
     nim character varying NOT NULL,
     user_id integer UNIQUE,
     nama character varying,
-    kelas_id integer,
     CONSTRAINT mahasiswa_pkey PRIMARY KEY (nim),
-    CONSTRAINT mahasiswa_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id),
-    CONSTRAINT mahasiswa_kelas_id_fkey FOREIGN KEY (kelas_id) REFERENCES public.kelas(id)
+    CONSTRAINT mahasiswa_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id)
+);
+
+CREATE TABLE public.registrasi_mahasiswa (
+    id integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+    nim character varying,
+    semester_id integer,
+    kelas_id integer,
+    status character varying DEFAULT 'Aktif',
+    CONSTRAINT registrasi_mahasiswa_pkey PRIMARY KEY (id),
+    CONSTRAINT registrasi_mahasiswa_nim_fkey FOREIGN KEY (nim) REFERENCES public.mahasiswa(nim),
+    CONSTRAINT registrasi_mahasiswa_semester_id_fkey FOREIGN KEY (semester_id) REFERENCES public.semester(id),
+    CONSTRAINT registrasi_mahasiswa_kelas_id_fkey FOREIGN KEY (kelas_id) REFERENCES public.kelas(id),
+    CONSTRAINT registrasi_mahasiswa_unique UNIQUE (nim, semester_id)
 );
 
 -- =====================================================
@@ -263,22 +274,37 @@ CREATE TABLE public.log_potong_jam (
 -- Cek hasil: harusnya 22 tabel
 -- =====================================================
 
-create view public.v_mahasiswa_detail as
-select
-  m.nim,
-  m.nama,
-  m.user_id,
-  k.id as kelas_id,
-  k.nama_kelas,
-  p.id as prodi_id,
-  p.nama_prodi,
-  j.id as jurusan_id,
-  j.nama_jurusan
-from
-  mahasiswa m
-  join kelas k on k.id = m.kelas_id
-  join prodi p on p.id = k.prodi_id
-  join jurusan j on j.id = p.jurusan_id;
+create view public.v_mahasiswa_aktif as
+ SELECT 
+    m.nim,
+    m.nama,
+    u.email,
+    r.semester_id,
+    r.status as status_registrasi,
+    k.nama_kelas,
+    p.nama_prodi,
+    j.nama_jurusan,
+    s.is_aktif as is_semester_aktif
+   FROM public.mahasiswa m
+     JOIN public.users u ON u.user_id = m.user_id
+     JOIN public.registrasi_mahasiswa r ON r.nim = m.nim
+     JOIN public.semester s ON s.id = r.semester_id
+     JOIN public.kelas k ON k.id = r.kelas_id
+     JOIN public.prodi p ON p.id = k.prodi_id
+     JOIN public.jurusan j ON j.id = p.jurusan_id;
+
+create view public.v_status_pekerjaan as
+ SELECT 
+    dp.id as pekerjaan_id,
+    dp.judul,
+    dp.kuota,
+    dp.poin_jam,
+    dp.is_aktif,
+    count(p.id) FILTER (WHERE p.status_tugas_id != 5) AS kuota_terisi,
+    (dp.kuota - count(p.id) FILTER (WHERE p.status_tugas_id != 5)) AS sisa_slot
+   FROM public.daftar_pekerjaan dp
+     LEFT JOIN public.penugasan p ON p.pekerjaan_id = dp.id
+  GROUP BY dp.id;
 
   create view public.v_sisa_kompen as
 select
@@ -295,3 +321,44 @@ group by
   k.nim,
   k.semester_id,
   k.total_jam_wajib;
+
+-- ==========================================
+-- INSERT DATA DUMMY
+-- ==========================================
+
+-- 1. INSERT DATA JURUSAN & KELAS (DUMMY)
+INSERT INTO public.jurusan (nama_jurusan) VALUES ('Teknik Elektro');
+INSERT INTO public.prodi (jurusan_id, nama_prodi) VALUES (1, 'D3 Teknik Informatika');
+INSERT INTO public.kelas (prodi_id, nama_kelas) VALUES (1, 'IK-2C');
+
+-- 2. INSERT SEMESTER AKTIF
+INSERT INTO public.semester (nama, tahun, periode, is_aktif, mulai, selesai) 
+VALUES ('Ganjil 2025/2026', 2026, 'Ganjil', true, '2026-09-01', '2027-01-30');
+
+-- 3. INSERT USER (Password: Polines123!)
+-- Gunakan OVERRIDING SYSTEM VALUE karena user_id adalah GENERATED ALWAYS
+INSERT INTO public.users (user_id, email, kata_sandi, role_id) OVERRIDING SYSTEM VALUE VALUES
+(101, 'admin@polines.ac.id', '$2b$10$EPZ9S63mS9.vH6A.9m99u.7N.xXfH2/6P6X9.9m99u.7N.xXfH2/', 1), -- Admin
+(102, 'dosen@polines.ac.id', '$2b$10$EPZ9S63mS9.vH6A.9m99u.7N.xXfH2/6P6X9.9m99u.7N.xXfH2/', 4), -- Dosen
+(103, 'akbar@mhs.polines.ac.id', '$2b$10$EPZ9S63mS9.vH6A.9m99u.7N.xXfH2/6P6X9.9m99u.7N.xXfH2/', 3); -- Mahasiswa
+
+-- 4. INSERT PROFIL ENTITAS
+INSERT INTO public.staf (nip, user_id, nama, jurusan_id, tipe_staf) VALUES
+('198001012024011001', 101, 'Super Admin Kompen', 1, 'admin'),
+('197505052005011002', 102, 'Sir Danu Prakoso', 1, 'dosen');
+
+INSERT INTO public.mahasiswa (nim, user_id, nama) VALUES
+('33424202', 103, 'Akbar Rama');
+
+-- 5. REGISTRASI SEMESTER (Kunci agar Mahasiswa Aktif muncul di Dashboard)
+INSERT INTO public.registrasi_mahasiswa (nim, semester_id, kelas_id, status) VALUES
+('33424202', 1, 1, 'Aktif');
+
+
+
+
+
+
+
+
+12	"2372001@student.polines.ac.id"	"$2b$10$nahxFaFGgEpxGBb2iDZwBeG7a3mbEpFEAXQ.xMaJUj9C2fhZBkh4K"		"2026-04-27 23:26:57.954988"

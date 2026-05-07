@@ -6,11 +6,11 @@ import { LogOut, LucideIcon } from 'lucide-react'
 
 interface SidebarProps {
   role: 'mahasiswa' | 'admin'
-  activePath: string
+  activePath?: string
   children: React.ReactNode
 }
 
-export default async function Sidebar({ role, activePath, children }: SidebarProps) {
+export default async function Sidebar({ role, activePath = '', children }: SidebarProps) {
   const cookieStore = await cookies()
   
   let nama = 'Guest'
@@ -53,7 +53,7 @@ export default async function Sidebar({ role, activePath, children }: SidebarPro
 
   return (
     <div className="flex min-h-screen bg-[#f1f5f9] font-sans antialiased text-slate-900">
-      <aside className="w-64 bg-[#2e5299] text-white flex flex-col shadow-lg">
+      <aside className="hidden md:flex w-64 bg-[#2e5299] text-white flex-col shadow-lg">
         <div className="flex items-center gap-2.5 p-6 mb-2">
           <img src="/LOGO-POLITEKNIK-NEGERI-SEMARANG-2.png" alt="Logo" className="w-6 h-6 object-contain" />
           <div className="flex flex-col">
@@ -65,10 +65,20 @@ export default async function Sidebar({ role, activePath, children }: SidebarPro
         <nav className="flex-1">
           <ul className="space-y-1">
             {menus.map((menu) => {
-              const isActive = activePath === menu.path
+              // Menentukan path berdasarkan role
+              let href = menu.path
+              if (role === 'admin') {
+                if (menu.key === 'pekerjaan') {
+                  href = '/admin/list_pekerjaan'
+                } else {
+                  href = menu.path.replace('/user/', '/admin/')
+                }
+              }
+
+              const isActive = activePath === href || activePath === menu.path || activePath.startsWith(menu.path + '/') || (menu.key && activePath.includes(menu.key))
               return (
                 <li key={menu.id}>
-                  <Link href={menu.path}>
+                  <Link href={href}>
                     <div className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${isActive ? 'bg-[#f1f5f9] text-[#2e5299] ml-4 py-2.5 px-5 rounded-l-full shadow-lg' : 'px-9 py-3 text-white/80 hover:text-white hover:bg-white/10 hover:translate-x-1 cursor-pointer'}`}>
                       {renderMenuIcon(menu.icon || '')}
                       <span className="font-medium text-[14px]">{menu.label}</span>

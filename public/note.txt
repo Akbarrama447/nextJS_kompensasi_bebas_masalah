@@ -7,7 +7,7 @@ Database (22 Tabel)
 - Level 1: jurusan, ref_status_*, roles, semester, menus, pengaturan_sistem
 - Level 2: users, prodi, gedung
 - Level 3: staf, kelas, ruangan, mahasiswa
-- Level 4: daftar_pekerjaan, ekuivalensi_kelas, import_log
+- Level 4: daftar_pekerjaan, 65ytvalensi_kelas, import_log
 - Level 5: penugasan, kompen_awal, log_potong_jam
 Perubahan Kode (Sudah Dilakukan)
 1. src/app/user/layout.tsx - Ambil data user dari cookie nim, tampilkan nama + NIM dari database
@@ -75,3 +75,56 @@ Progress
 2. Test login: NIM 2372001, password 2372001
 3. Fix active menu detection di setiap layout
 4. Lanjut bikin page /user/pekerjaan   
+
+Modul List Pekerjaan Admin
+Membuat 4 Tab
+Tab Kelola, Tab Import, Tab Penugasan, Tab Riwayat
+Memisahkan kebutuhan server dan client
+   Tab Import didalmnya kita dapat mengimport excel dan csv 
+   1. Inisialisasi dan Tujuan Fungsi
+
+Fungsi executeImport ini adalah server-side logic yang bertugas menangani proses import data mahasiswa secara massal dari hasil parsing Excel. Karena menggunakan 'use server', seluruh eksekusi berjalan di backend Next.js, sehingga aman untuk operasi sensitif seperti akses database dan pembuatan akun. Input yang diterima berupa kumpulan mahasiswa (students), identitas semester, staf penginput, dan nama file. Outputnya berupa jumlah data yang berhasil diproses, daftar error per mahasiswa, serta ID log import sebagai jejak audit.
+
+2. Pencatatan Import (import_log)
+
+Langkah pertama yang dilakukan adalah membuat record pada tabel import_log dengan status awal “proses” (status_import_id = 1). Tujuannya adalah mencatat aktivitas import sejak awal, bahkan sebelum data diproses. Ini penting untuk tracking dan debugging jika terjadi kegagalan. Namun, pendekatan kamu masih kurang eksplisit karena menggunakan angka langsung tanpa konstanta atau enum, sehingga orang lain sulit memahami arti setiap status tanpa melihat dokumentasi tambahan.
+
+3. Optimasi Pengambilan Data Referensi
+
+Sebelum loop utama, sistem mengambil seluruh data kelas dan menyimpannya dalam struktur Map. Ini adalah langkah optimasi untuk menghindari query berulang (N+1 problem) saat memproses banyak mahasiswa. Dengan pendekatan ini, pencarian kelas_id berdasarkan nama kelas bisa dilakukan secara instan di memori. Ini keputusan yang tepat secara performa dan menunjukkan kamu sudah mulai berpikir ke arah efisiensi sistem skala besar.
+
+4. Pengambilan Role Mahasiswa
+
+Sistem mengambil role_id untuk mahasiswa dari tabel roles menggunakan pencarian berbasis nama (“mahasiswa”). Ini digunakan saat membuat akun baru. Secara konsep benar, tapi secara implementasi masih lemah karena bergantung pada string yang bisa berubah. Jika ada typo atau perubahan nama role di database, proses ini bisa gagal. Idealnya kamu gunakan identifier yang lebih stabil seperti kode unik atau ID tetap.
+
+5. Validasi dan Resolusi Kelas
+
+Untuk setiap mahasiswa, sistem pertama-tama mencocokkan nama kelas dari data Excel dengan data di database. Jika tidak ditemukan, maka mahasiswa tersebut tidak diproses dan dimasukkan ke daftar error. Ini menunjukkan bahwa sistem kamu tidak mengizinkan pembuatan kelas otomatis, yang sebenarnya bagus untuk menjaga konsistensi data. Tapi konsekuensinya, data input harus benar-benar bersih dan sinkron dengan database.
+
+6. Pengecekan Mahasiswa yang Sudah Ada
+
+Sistem kemudian mengecek apakah mahasiswa dengan NIM tersebut sudah ada di database. Jika sudah ada, maka proses pembuatan akun dilewati. Ini mencegah duplikasi data mahasiswa. Namun, yang kamu cek hanya keberadaan di tabel mahasiswa, bukan konsistensi dengan tabel users atau auth. Jadi ada potensi kondisi di mana mahasiswa ada, tapi akun auth-nya tidak sinkron.
+
+7. Auto-Provisioning Akun Mahasiswa
+
+Jika mahasiswa belum ada, sistem secara otomatis membuat akun baru. Pertama, sistem membentuk email dari NIM, lalu membuat akun di Supabase Auth dengan password default. Setelah itu, dibuat juga record di tabel users, lalu dihubungkan ke tabel mahasiswa. Ini adalah mekanisme provisioning otomatis yang mempermudah operasional karena tidak perlu input manual akun satu per satu. Namun, ini juga titik paling rawan dalam sistem karena semua akun menggunakan password default yang sama dan tidak ada mekanisme reset awal.
+
+8. Penyimpanan Data Mahasiswa
+
+Setelah akun dibuat, data mahasiswa disimpan ke tabel mahasiswa dengan relasi ke users dan kelas. Ini memisahkan antara data autentikasi (users) dan data domain (mahasiswa), yang merupakan desain yang cukup baik. Tapi kamu tidak menyimpan ID dari Supabase Auth ke dalam tabel users, sehingga hubungan antara sistem auth dan database internal tidak sepenuhnya kuat.
+
+9. Upsert Data Kompen Awal
+
+Setiap mahasiswa kemudian diproses ke tabel kompen_awal menggunakan metode upsert berdasarkan kombinasi nim dan semester_id. Artinya, jika data sudah ada maka akan diperbarui, dan jika belum maka akan dibuat baru. Ini efisien untuk kasus import karena tidak perlu cek manual apakah data sudah ada. Pendekatan ini juga memastikan tidak ada duplikasi untuk semester yang sama.
+
+10. Penanganan Error Parsial
+
+Setiap proses mahasiswa dibungkus dalam try-catch, sehingga jika satu data gagal, proses tetap lanjut ke data berikutnya. Error dicatat per mahasiswa dalam array errors. Ini adalah pendekatan yang sangat penting untuk sistem import karena memungkinkan keberhasilan sebagian (partial success), bukan gagal total hanya karena satu kesalahan.
+
+11. Finalisasi Status Import
+
+Setelah semua data diproses, sistem memperbarui import_log dengan jumlah sukses dan detail error. Status akhir ditentukan berdasarkan apakah ada error atau tidak. Namun di sini ada kelemahan logika: kondisi sukses parsial dianggap sama dengan sukses penuh, karena keduanya diberi status yang sama. Ini bisa menyesatkan saat monitoring karena tidak membedakan apakah semua data benar-benar berhasil atau hanya sebagian.
+
+12. Gambaran Besar Sistem
+
+Secara keseluruhan, sistem ini adalah kombinasi dari bulk processing, auto account provisioning, dan audit logging. Kamu sudah menerapkan beberapa praktik yang bagus seperti optimasi query, error handling per item, dan penggunaan upsert. Tapi di sisi lain, masih ada kelemahan di konsistensi data antar tabel, keamanan akun, dan kejelasan status proses.
