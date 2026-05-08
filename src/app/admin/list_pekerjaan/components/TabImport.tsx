@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useMemo } from "react";
-import { CheckCircle, XCircle, AlertCircle, FileSpreadsheet, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, FileSpreadsheet, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { parseExcelFile, type ParsedStudent } from "@/lib/excel-parser";
 import { executeImport } from "@/app/admin/list_pekerjaan/actions/import";
 
@@ -148,12 +148,21 @@ export default function TabImport() {
                 className="hidden"
             />
 
-            {/* Action Bar — tombol Import Excel */}
-            <div className="flex justify-end mb-3">
+            {/* Action Bar — tombol Import & Download Template */}
+            <div className="flex justify-end gap-3 mb-4">
+                <a
+                    href="/templates/template-import-mahasiswa.xlsx"
+                    download
+                    className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg bg-white hover:bg-gray-50 hover:text-gray-800 transition-all focus:outline-none shadow-sm"
+                >
+                    <Download className="w-4 h-4" />
+                    Unduh Template
+                </a>
                 <button
                     onClick={handleImportClick}
-                    className="px-5 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg bg-white hover:border-gray-300 hover:text-gray-800 transition-colors focus:outline-none"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-[var(--color-primary)] border border-blue-100 text-sm font-semibold rounded-lg hover:bg-[var(--color-primary)] hover:text-white transition-all focus:outline-none shadow-sm"
                 >
+                    <FileSpreadsheet className="w-4 h-4" />
                     Import Excel
                 </button>
             </div>
