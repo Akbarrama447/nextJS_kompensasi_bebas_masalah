@@ -13,12 +13,35 @@ export default async function DashboardMahasiswa() {
   })
 
   const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
-  
-  // Query sisa jam dari view v_sisa_kompen
-  // TODO: Hitung data statistik dari database dengan semester aktif
-  const sisaJam = 0
-  const totalJamSelesai = 0
-  const totalJamWajib = 0
+
+  const activeSemester = await prisma.semester.findFirst({
+    where: { is_aktif: true },
+    select: { id: true },
+  })
+
+  const kompenAwal = activeSemester
+    ? await prisma.kompen_awal.findFirst({
+        where: {
+          nim,
+          semester_id: activeSemester.id,
+        },
+        select: { total_jam_wajib: true },
+      })
+    : null
+
+  const logPotongJam = activeSemester
+    ? await prisma.log_potong_jam.aggregate({
+        where: {
+          nim,
+          semester_id: activeSemester.id,
+        },
+        _sum: { jam_dikurangi: true },
+      })
+    : null
+
+  const totalJamWajib = kompenAwal?.total_jam_wajib ?? 0
+  const totalJamSelesai = logPotongJam?._sum.jam_dikurangi ?? 0
+  const sisaJam = totalJamWajib - totalJamSelesai
 
   return (
     <Sidebar role="mahasiswa" activePath="/user/dashboard">

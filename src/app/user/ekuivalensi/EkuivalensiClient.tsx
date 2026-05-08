@@ -25,7 +25,9 @@ export default function EkuivalensiClient({
       <div className="p-10 max-w-6xl">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-0.5">Ekuivalensi</h2>
-          <p className="text-sm text-[#2e5299] font-medium opacity-80">Verifikasi pengajuan iuran kolektif dari penanggung jawab kelas</p>
+          <p className="text-sm text-[#2e5299] font-medium opacity-80">
+            Verifikasi pengajuan iuran kolektif
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -43,7 +45,7 @@ export default function EkuivalensiClient({
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{item.penanggung_jawab_nim}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{item.mahasiswa?.nama}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{item.jam_diakui} Jam</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">{item.jam_diakui} Jam</td>
                   </tr>
                 ))
               ) : (
