@@ -14,6 +14,7 @@ export default function TabPenugasan() {
     tipe_pekerjaan: [],
     ruangan: [],
     semester_aktif: null,
+    kelas: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +22,7 @@ export default function TabPenugasan() {
   const [modalState, setModalState] = useState<"closed" | "verifikasi" | "tolak">("closed");
   const [selectedData, setSelectedData] = useState<MahasiswaKompenRow | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("semua");
+  const [kelasFilter, setKelasFilter] = useState<number>(0);
   const [search, setSearch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -47,6 +49,7 @@ export default function TabPenugasan() {
           offset,
           status_filter: statusFilter,
           search: search,
+          kelas_id: kelasFilter || undefined,
         }),
         getOptions(),
       ]);
@@ -65,11 +68,11 @@ export default function TabPenugasan() {
 
   useEffect(() => {
     fetchData();
-  }, [page, limit, statusFilter, search]);
+  }, [page, limit, statusFilter, search, kelasFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, search]);
+  }, [statusFilter, search, kelasFilter]);
 
   const openVerifikasi = (data: MahasiswaKompenRow) => {
     setSelectedData(data);
@@ -205,6 +208,19 @@ export default function TabPenugasan() {
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400"
         />
+
+        <select
+          value={kelasFilter}
+          onChange={(e) => setKelasFilter(Number(e.target.value))}
+          className="px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
+        >
+          <option value={0}>Semua Kelas</option>
+          {options.kelas.map((k) => (
+            <option key={k.id} value={k.id}>
+              {k.nama_kelas}
+            </option>
+          ))}
+        </select>
 
         <div className="flex border border-gray-200 rounded-lg overflow-hidden divide-x divide-gray-200 shadow-sm">
           <button
