@@ -7,7 +7,7 @@ Database (22 Tabel)
 - Level 1: jurusan, ref_status_*, roles, semester, menus, pengaturan_sistem
 - Level 2: users, prodi, gedung
 - Level 3: staf, kelas, ruangan, mahasiswa
-- Level 4: daftar_pekerjaan, ekuivalensi_kelas, import_log
+- Level 4: daftar_pekerjaan, 65ytvalensi_kelas, import_log
 - Level 5: penugasan, kompen_awal, log_potong_jam
 Perubahan Kode (Sudah Dilakukan)
 1. src/app/user/layout.tsx - Ambil data user dari cookie nim, tampilkan nama + NIM dari database

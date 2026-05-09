@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [identifier, setIdentifier] = useState('') 
+  const [nim, setNim] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,7 +19,7 @@ export default function LoginPage() {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, password }), 
+        body: JSON.stringify({ nim, password }),
       })
 
       const data = await res.json()
@@ -80,14 +80,14 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-5" suppressHydrationWarning>
             <div suppressHydrationWarning>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
-                NIM
+                NIM / Email
               </label>
               <input
                 type="text"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all text-sm"
-                placeholder="Contoh: 3.34.24.2.02"
+                value={nim}
+                onChange={(e) => setNim(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                placeholder="Masukkan NIM"
                 required
                 suppressHydrationWarning
               />

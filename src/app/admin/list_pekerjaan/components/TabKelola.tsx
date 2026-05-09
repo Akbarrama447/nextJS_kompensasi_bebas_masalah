@@ -1,6 +1,6 @@
 "use client";
 
-import { EyeOff, Plus, X, RefreshCw, Trash2, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { EyeOff, Plus, X, RefreshCw, Trash2, Loader2, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { getOptions } from "../actions/options";
 import { getDaftarPekerjaan, createPekerjaan, deletePekerjaan } from "../actions/pekerjaan";
@@ -45,21 +45,37 @@ export default function TabKelola() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalData, setTotalData] = useState(0);
+
+  const totalPages = Math.ceil(totalData / limit);
+  const startItem = totalData === 0 ? 0 : (page - 1) * limit + 1;
+  const endItem = Math.min(page * limit, totalData);
+
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
+      const offset = (page - 1) * limit;
       const [pekerjaanData, optionsData] = await Promise.all([
-        getDaftarPekerjaan({}),
+        getDaftarPekerjaan({ limit, offset }),
         getOptions(),
       ]);
-      setDataPekerjaan(pekerjaanData);
+      
+      if ('data' in pekerjaanData) {
+        setDataPekerjaan(pekerjaanData.data);
+        setTotalData(pekerjaanData.total);
+      } else {
+        setDataPekerjaan(pekerjaanData);
+        setTotalData(pekerjaanData.length);
+      }
       setOptions(optionsData);
     } catch (err) {
       console.error("Error fetching data:", err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [page, limit]);
 
   useEffect(() => {
     fetchData();
@@ -299,6 +315,50 @@ export default function TabKelola() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalData > 0 && (
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Tampilkan</span>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="px-2 py-1 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <span className="text-xs text-gray-500">data</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">
+              {startItem}-{endItem} dari {totalData}
+            </span>
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1}
+              className="p-1 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Halaman sebelumnya"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages}
+              className="p-1 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Halaman selanjutnya"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal Tambah Manual */}
       {isModalOpen && (

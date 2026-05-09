@@ -9,6 +9,13 @@ Fitur Import Data Kompensasi via Excel telah dirombak dan dinyatakan **100% Sele
 5. **Detailed Error UI**: Perombakan modal UI untuk menampilkan daftar pesan error secara spesifik dan presisi tiap barisnya langsung dari server.
 6. **Safe Upsert Registration**: Menggunakan `findFirst` untuk mengatasi bug *unique compound index* Prisma, membuat sistem bisa menimpa maupun memperbarui data mahasiswa lama tanpa crash.
 
+
+### Tambahan untuk Tab Import
+1. **Fitur Pagination Preview**: Menambahkan pagination pada tabel preview data Excel sebelum di-import. Opsi tampilkan 10/25/50 data per halaman dengan navigasi prev/next. Sangat penting karena Import file Excel bisa berisi 250+ mahasiswa sekaligus.
+2.
+3.
+4.
+
 ---
 
 ## ✅ TAHAP 2 SELESAI: TAB KELOLA (Daftar Pekerjaan & Generate Plotting)
@@ -102,6 +109,252 @@ Fitur Import Data Kompensasi via Excel telah dirombak dan dinyatakan **100% Sele
 | `staf` | Pembuat |
 | `penugasan` | Hasil plotting (mahasiswa yang ditugaskan) |
 
+### CELAH MASALAH DALAM TAHAP 2
+#### 📌 Problem Definition
+
+Saya sedang membangun sistem kompensasi mahasiswa berbasis Next.js.
+
+Dalam sistem ini:
+
+* Mahasiswa memiliki kewajiban kompensasi dalam bentuk **jumlah jam (misalnya 8 jam, 10 jam, dll)**.
+* Admin dapat membuat pekerjaan dengan parameter:
+
+  * Nama pekerjaan
+  * Total jam kompensasi per pekerjaan
+  * Kuota maksimal orang
+  * Lokasi / ruangan
+  * Deskripsi
+
+Contoh:
+Mahasiswa:
+
+* Budi → kebutuhan kompensasi: 8 jam
+
+Pekerjaan:
+
+* Membersihkan Ruangan
+* Jam kompensasi: 10 jam
+* Kuota: 3 orang
+
 ---
 
-## ⏳ TAHAP SELANJUTNYA: 3 TAB TERSISA
+#### ⚠️ Permasalahan Utama
+
+Terdapat konflik antara:
+
+1. **Distribusi jam kompensasi**
+2. **Batas kapasitas (kuota orang dalam ruangan)**
+
+Kasus:
+
+* Jika setiap orang mendapat 10 jam penuh → mahasiswa dengan kebutuhan 8 jam akan kelebihan
+* Jika jam dibagi (parsial) → bisa muncul sisa jam
+* Jika sisa jam diberikan ke mahasiswa lain → jumlah orang bisa melebihi kuota (over capacity)
+
+Selain itu:
+
+* Sistem tidak boleh menghasilkan kondisi ruangan melebihi kapasitas
+* Sistem harus tetap mengakomodasi mahasiswa dengan kebutuhan jam kecil
+* Sistem harus meminimalkan pekerjaan yang tidak terisi
+
+---
+
+#### 🎯 Goal Sistem
+
+Membangun algoritma auto-assignment yang:
+
+* Mengalokasikan pekerjaan ke mahasiswa secara otomatis
+* Menjaga jumlah orang tidak melebihi kuota
+* Memastikan distribusi jam tetap optimal dan adil
+* Meminimalkan sisa jam yang tidak terpakai
+
+---
+
+#### 💡 Solusi yang Diinginkan
+
+Gunakan pendekatan berikut:
+
+1. **Pisahkan konsep:**
+
+   * Total jam pekerjaan (workload)
+   * Kuota orang (capacity constraint)
+
+2. **Assignment Strategy:**
+
+   * Pilih maksimal N orang sesuai kuota
+   * Distribusikan total jam ke orang-orang tersebut
+   * Jika ada sisa jam:
+     → dialokasikan ke orang yang sama (bukan menambah orang baru)
+
+3. **Aturan tambahan:**
+
+   * Mahasiswa boleh menerima jam lebih dari kebutuhannya dalam batas tertentu (misal +2 jam)
+   * Tidak boleh menambah jumlah orang melebihi kuota
+   * Prioritaskan mahasiswa dengan kebutuhan jam paling kecil terlebih dahulu agar beban mereka cepat selesai.
+
+4. **Fallback Mechanism:**
+
+   * Jika tidak ada kombinasi ideal:
+     → tetap gunakan maksimal kuota orang
+     → distribusi jam dilakukan seoptimal mungkin
+
+---
+
+#### 🧠 Expected Output dari AI Agent
+
+Tolong hasilkan:
+
+1. Desain algoritma (step-by-step)
+2. Pseudocode / implementasi logic (JavaScript / TypeScript)
+3. Struktur data yang direkomendasikan
+4. Penanganan edge case (contoh: semua mahasiswa jam kecil, atau jam tidak habis terbagi)
+5. (Opsional) Saran peningkatan sistem untuk skala besar
+
+---
+
+#### 🚫 Constraint Penting
+
+* Tidak boleh menambah jumlah orang melebihi kuota
+* Tidak boleh membiarkan pekerjaan kosong jika masih ada mahasiswa yang bisa mengisi
+* Harus mempertimbangkan real-world constraint (kapasitas ruangan)
+
+
+
+---
+
+## ⏳ TAHAP 3 (DALAM RENCANA): TAB PENUGASAN (Verifikasi & Validasi)
+
+### Overview
+Tab Penugasan berfungsi untuk memverifikasi pekerjaan mahasiswa yang sudah selesai dikerjakan. Admin dapat menyetujui (verifikasi) atau menolak penugasan dengan alasan penolakan.
+
+### Status Penugasan (dari ref_status_tugas)
+| ID | Status | Keterangan |
+|----|--------|-----------|
+| 1 | MENUNGGU | Belum mulai mengerjakan |
+| 2 | SEDANG_DIKERJAKAN | Sedang dikerjakan mahasiswa |
+| 3 | SELESAI | Selesai, menunggu verifikasi admin |
+| 4 | DIVERIFIKASI | Sudah diverifikasi dan jam kompen dipotong |
+
+### Files yang Akan Dibuat:
+| File | Keterangan |
+|------|-----------|
+| `actions/penugasan.ts` | Server actions: getDaftarPenugasan, verifyPenugasan, rejectPenugasan |
+| `types/index.ts` | Tambahkan type PenugasanRow, VerifyResult, VerifyParams, RejectParams |
+
+### Files yang Dimodifikasi:
+| File | Keterangan |
+|------|-----------|
+| `components/TabPenugasan.tsx` | Replace dummy data dengan fetch dari DB + full fitur |
+
+---
+
+### Backend: Server Actions
+
+#### 1. Get Daftar Penugasan
+- **Endpoint:** `getDaftarPenugasan(params?)`
+- **Input:** `{ semester_id?, status_filter?, limit?: 10, offset?: 0 }`
+- **Output:** `{ data: PenugasanRow[], total: number }`
+- **Filter Status:**
+  - "pending" = status_tugas_id IN (1, 2) - Belum selesai
+  - "selesai" = status_tugas_id = 3 - Menunggu verifikasi
+  - "semua" = semua status
+- **DB:** `prisma.penugasan.findMany()` dengan relations:
+  - mahasiswa (nama, nim)
+  - pekerjaan (judul, poin_jam)
+  - status_tugas (nama)
+- **Includes:** Semester aktif otomatis jika tidak ditentukan
+
+#### 2. Verify Penugasan (Setuju + Potong Jam)
+- **Endpoint:** `verifyPenugasan(id, nipStaf)`
+- **Input:** `{ penugasan_id, verifikasi_oleh_nip }`
+- **Logika:**
+  1. Fetch penugasan untuk dapat `pekerjaan.poin_jam` dan `mahasiswa.nim`
+  2. Insert ke `Log_potong_jam` (nim, semester_id, penugasan_id, jam_dikurangi)
+  3. Update `penugasan`: 
+     - `status_tugas_id` = 4 (DIVERIFIKASI)
+     - `diverifikasi_oleh_nip` = nip staf
+     - `waktu_verifikasi` = NOW()
+- **Output:** `{ success: true }` atau `{ success: false, error }`
+- **DB:** 
+  - `prisma.log_potong_jam.create()`
+  - `prisma.penugasan.update()`
+
+#### 3. Reject Penugasan (Tolak)
+- **Endpoint:** `rejectPenugasan(id, alasan)`
+- **Input:** `{ penugasan_id, catatan_verifikasi }`
+- **Logika:**
+  1. Update `penugasan`:
+     - `status_tugas_id` = 2 (SEDANG_DIKERJAKAN) - Kembalikan ke status proses
+     - `catatan_verifikasi` = alasan penolakan dari admin
+     - `diverifikasi_oleh_nip` = tetap (null)
+     - `waktu_verifikasi` = null
+- **Output:** `{ success: true }` atau `{ success: false, error }`
+- **DB:** `prisma.penugasan.update()`
+
+---
+
+### Frontend: TabPenugasan.tsx
+
+#### Fitur:
+1. **List Penugasan** - Tampilkan tabel dengan data dari DB
+2. **Filter Tabs** - Pending | Selesai | Semua
+3. **Pagination** - 10/25/50 data per halaman (sama seperti TabKelola)
+4. **Modal Verifikasi** - Preview bukti + konfirmasi setuju
+5. **Modal Tolak** - Input alasan penolakan
+
+#### UI Components:
+| Komponen | Deskripsi |
+|----------|-----------|
+| Filter Tabs | 3 tombol: Pending (bg-blue), Selesai, Semua |
+| Search | Input cari NIM/nama mahasiswa |
+| Tabel | Kolom: Mahasiswa, Pekerjaan, Jam, Tanggal, Status, Aksi |
+| Pagination | Dropdown limit + prev/next + info "Menampilkan X-Y dari Z" |
+| Modal Verifikasi | Preview foto mulai/selesai + tombol Setuju/Tolak |
+| Modal Tolak | Textarea alasan + konfirmasi |
+
+#### TypeScript Interfaces (PenugasanRow):
+```typescript
+interface PenugasanRow {
+  id: number;
+  nim: string;
+  mahasiswa_nama: string;
+  pekerjaan_id: number;
+  pekerjaan_judul: string;
+  poin_jam: number;
+  status_tugas_id: number;
+  status_nama: string;
+  created_at: string;
+  catatan_verifikasi: string | null;
+  diverifikasi_oleh_nip: string | null;
+  waktu_verifikasi: string | null;
+}
+```
+
+---
+
+### Best Practice: Logika Potong Jam
+
+```
+1. Ambil poin_jam dari pekerjaan terkait (dari relasi penugasan.pekerjaan)
+2. Ambil semester_id dari pekerjaan (dari relasi penugasan.pekerjaan.semester)
+3. Ambil nim mahasiswa dari penugasan.mahasiswa
+4. Insert Log_potong_jam:
+   { nim, semester_id, penugasan_id, jam_dikurangi: poin_jam }
+5. Update status penugasan ke DIVERIFIKASI (4)
+6. Simpan diverifikasi_oleh_nip dan waktu_verifikasi
+```
+
+---
+
+### Tabel Database yang Tershubung:
+| Tabel | Relasi |
+|-------|-------|
+| `penugasan` | Data utama penugasan |
+| `mahasiswa` | Info mahasiswa (nim, nama) |
+| `daftar_pekerjaan` | Pekerjaan yang ditugaskan (judul, poin_jam) |
+| `ref_status_tugas` | Status penugasan (1-4) |
+| `log_potong_jam` | Record pemotongan jam kompen |
+| `staf` | Siapa yang memverifikasi |
+| `semester` | Semester aktif |
+
+---

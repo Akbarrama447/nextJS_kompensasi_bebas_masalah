@@ -336,7 +336,8 @@ INSERT INTO public.semester (nama, tahun, periode, is_aktif, mulai, selesai)
 VALUES ('Ganjil 2025/2026', 2026, 'Ganjil', true, '2026-09-01', '2027-01-30');
 
 -- 3. INSERT USER (Password: Polines123!)
-INSERT INTO public.users (user_id, email, kata_sandi, role_id) VALUES
+-- Gunakan OVERRIDING SYSTEM VALUE karena user_id adalah GENERATED ALWAYS
+INSERT INTO public.users (user_id, email, kata_sandi, role_id) OVERRIDING SYSTEM VALUE VALUES
 (101, 'admin@polines.ac.id', '$2b$10$EPZ9S63mS9.vH6A.9m99u.7N.xXfH2/6P6X9.9m99u.7N.xXfH2/', 1), -- Admin
 (102, 'dosen@polines.ac.id', '$2b$10$EPZ9S63mS9.vH6A.9m99u.7N.xXfH2/6P6X9.9m99u.7N.xXfH2/', 4), -- Dosen
 (103, 'akbar@mhs.polines.ac.id', '$2b$10$EPZ9S63mS9.vH6A.9m99u.7N.xXfH2/6P6X9.9m99u.7N.xXfH2/', 3); -- Mahasiswa
@@ -352,3 +353,12 @@ INSERT INTO public.mahasiswa (nim, user_id, nama) VALUES
 -- 5. REGISTRASI SEMESTER (Kunci agar Mahasiswa Aktif muncul di Dashboard)
 INSERT INTO public.registrasi_mahasiswa (nim, semester_id, kelas_id, status) VALUES
 ('33424202', 1, 1, 'Aktif');
+
+
+
+
+
+
+
+
+12	"2372001@student.polines.ac.id"	"$2b$10$nahxFaFGgEpxGBb2iDZwBeG7a3mbEpFEAXQ.xMaJUj9C2fhZBkh4K"		"2026-04-27 23:26:57.954988"

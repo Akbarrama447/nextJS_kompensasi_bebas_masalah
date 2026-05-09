@@ -78,3 +78,83 @@ export interface DeleteResult {
   success: boolean;
   error?: string;
 }
+
+export interface PenugasanRow {
+  id: number;
+  nim: string;
+  mahasiswa_nama: string;
+  pekerjaan_id: number;
+  pekerjaan_judul: string;
+  poin_jam: number;
+  status_tugas_id: number;
+  status_nama: string;
+  created_at: string;
+  catatan_verifikasi: string | null;
+  diverifikasi_oleh_nip: string | null;
+  waktu_verifikasi: string | null;
+}
+
+export interface VerifyParams {
+  penugasan_id: number;
+  verifikasi_oleh_nip: string;
+}
+
+export interface RejectParams {
+  penugasan_id: number;
+  catatan_verifikasi: string;
+}
+
+export interface VerifyResult {
+  success: boolean;
+  error?: string;
+}
+
+export interface GetDaftarPenugasanParams {
+  semester_id?: number;
+  status_filter?: 'pending' | 'selesai' | 'semua';
+  limit?: number;
+  offset?: number;
+  search?: string;
+}
+
+export interface GetDaftarPenugasanResult {
+  data: PenugasanRow[];
+  total: number;
+}
+
+export interface MahasiswaKompenRow {
+  nim: string;
+  nama: string;
+  total_jam_wajib: number;
+  jam_sudah_dikurangi: number;
+  jam_sisa: number;
+  status_tugas_id: number | null;
+  status_nama: string | null;
+  pekerjaan_id: number | null;
+  pekerjaan_judul: string | null;
+  poin_jam: number | null;
+  penugasan_id: number | null;
+  created_at: string | null;
+  penugasans?: {
+    id: number;
+    pekerjaan_id: number | null;
+    pekerjaan_judul: string | null;
+    poin_jam: number | null;
+    status_tugas_id: number | null;
+    status_nama: string | null;
+    created_at: string | null;
+  }[];
+}
+
+export interface GetDaftarKompenParams {
+  semester_id?: number;
+  status_filter?: 'belum_ditugaskan' | 'sedang_dikerjakan' | 'selesai' | 'semua';
+  limit?: number;
+  offset?: number;
+  search?: string;
+}
+
+export interface GetDaftarKompenResult {
+  data: MahasiswaKompenRow[];
+  total: number;
+}

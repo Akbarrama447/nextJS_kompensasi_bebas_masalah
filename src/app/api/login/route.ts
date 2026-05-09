@@ -3,40 +3,44 @@ import prisma from '@/lib/prisma'
 
 export async function POST(req: NextRequest) {
   try {
-    const { identifier } = await req.json() // Kita cuekin field 'password'
+    const body = await req.json()
+    const identifier = body.identifier || body.nim
 
-    // 1. Verifikasi User: Cari berdasarkan Email atau NIM
-    const user = await prisma.users.findFirst({
-      where: {
-        OR: [
-          { email: identifier },
-          { mahasiswa: { nim: identifier } }
-        ]
-      },
-      include: {
-        mahasiswah: true,
-        role: true
-      }
-    })
-
-    // Kalau user nggak ada di database, tetep kasih tau biar gak bingung
-    if (!user) {
-      return NextResponse.json({ error: 'NIM atau Email tidak terdaftar di sistem' }, { status: 404 })
+    if (!identifier) {
+      return NextResponse.json({ error: 'NIM/Email wajib diisi' }, { status: 400 })
     }
 
-    // 2. BYPASS LOGIC: Langsung Login Berhasil
-    console.log(`--- BYPASS LOGIN SUCCESS ---`)
-    console.log(`User: ${user.email} | NIM: ${user.mahasiswa?.nim || 'N/A'}`)
+    let user = null
+    let mahasiswa = null
+
+    if (identifier.includes('@')) {
+      user = await prisma.users.findUnique({
+        where: { email: identifier },
+        include: { mahasiswa: true, role: true },
+      })
+      mahasiswa = user?.mahasiswa
+    } else {
+      mahasiswa = await prisma.mahasiswa.findUnique({
+        where: { nim: identifier },
+        include: { user: { include: { role: true } } },
+      })
+      user = mahasiswa?.user
+    }
+
+    if (!user || !mahasiswa) {
+      return NextResponse.json({ error: 'NIM atau Email tidak ditemukan' }, { status: 401 })
+    }
+
+    // Bypass password check - anyone can login
 
     const response = NextResponse.json({ 
       success: true, 
-      message: 'Login berhasil (Mode Dev)',
-      nama: user.mahasiswa?.nama || user.email,
+      message: 'Login berhasil (Mode Dev - Bypass Password)',
+      nama: mahasiswa.nama,
       role: user.role?.nama
     })
 
-    // 3. Set Cookie buat Middleware
-    response.cookies.set('token', 'bypass-token-sitama', { 
+    response.cookies.set('nim', mahasiswa.nim, {
       httpOnly: true,
       path: '/',
       maxAge: 60 * 60 * 24 // Berlaku 1 hari
