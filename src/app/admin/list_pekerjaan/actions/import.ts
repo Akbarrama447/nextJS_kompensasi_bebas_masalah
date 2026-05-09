@@ -61,7 +61,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
   // ── 0. Validasi & Fallback Staf NIP ──────────────────────────────────
   let finalStaffNip = staffNip;
   const staffExists = await prisma.staf.findUnique({ where: { nip: staffNip } });
-  
+
   if (!staffExists) {
     const fallbackStaf = await prisma.staf.findFirst({ select: { nip: true } });
     if (fallbackStaf) {
@@ -87,7 +87,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
       if (firstSemester) {
         finalSemesterId = firstSemester.id;
       } else {
-         return {
+        return {
           successCount: 0,
           errors: [{ nim: '-', nama: '-', error: 'Tidak ada data semester di database.' }],
           importLogId: null,
@@ -116,14 +116,14 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
     try {
       const fs = require('fs');
       fs.writeFileSync('last_import_error.txt', `Systemic Error (import_log.create): ${msg}`);
-    } catch (err) {}
-    
+    } catch (err) { }
+
     return {
       successCount: 0,
-      errors: [{ 
-        nim: '-', 
-        nama: '-', 
-        error: `Gagal memulai proses database. Error: ${msg}` 
+      errors: [{
+        nim: '-',
+        nama: '-',
+        error: `Gagal memulai proses database. Error: ${msg}`
       }],
       importLogId: null,
     };
@@ -172,7 +172,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
       // A. Validasi kelas & Auto-Create Kelas
       const normalizedStudentKelas = student.kelas.replace(/\s+/g, '').toLowerCase();
       let kelasId = kelasMap.get(normalizedStudentKelas);
-      
+
       if (!kelasId) {
         // Jika kelas belum ada, buat otomatis di tabel kelas
         const newKelas = await prisma.kelas.create({
@@ -180,40 +180,51 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
             nama_kelas: student.kelas.trim(), // Simpan nama asli sesuai Excel (contoh: "IK-1A")
           },
         });
-        
+
         kelasId = newKelas.id;
-        
+
         // Tambahkan ke memori (kelasMap) agar mahasiswa berikutnya di kelas yang sama tidak perlu insert ulang
         kelasMap.set(normalizedStudentKelas, kelasId);
       }
 
       // B. Cek apakah mahasiswa sudah ada (berdasarkan NIM)
+      // Gunakan uppercase untuk NIM agar konsisten
+      const normalizedNim = student.nim.trim().toUpperCase();
+
       let mhsRecord = await prisma.mahasiswa.findUnique({
-        where: { nim: student.nim },
+        where: { nim: normalizedNim },
         select: { nim: true, user_id: true },
       });
 
       if (!mhsRecord) {
         // C. AUTO-PROVISIONING — buat akun baru atau link ke user lama yang emailnya sama
-        const defaultEmail = `${student.nim.replace(/\./g, '')}@student.polines.ac.id`;
-        
-        // Cek apakah email sudah dipakai (mungkin user sudah ada tapi record mahasiswa hilang/gagal buat)
-        const existingUser = await prisma.users.findUnique({ 
-          where: { email: defaultEmail },
-          select: { user_id: true }
-        });
+        // Kita coba beberapa kemungkinan format email untuk NIM tersebut (untuk kompatibilitas data lama)
+        const dotlessNim = normalizedNim.replace(/\./g, '');
+        const emailOptions = [
+          `${dotlessNim}@mhs.polines.ac.id`, // Format baru (tanpa titik)
+          `${normalizedNim}@mhs.polines.ac.id` // Format lama (mungkin ada titik)
+        ];
+
+        let existingUser = null;
+        for (const email of emailOptions) {
+          existingUser = await prisma.users.findUnique({
+            where: { email },
+            select: { user_id: true, email: true }
+          });
+          if (existingUser) break;
+        }
 
         let targetUserId: number;
 
         if (existingUser) {
           // Jika user ada, gunakan user_id tersebut
           targetUserId = existingUser.user_id;
-          console.log(`[IMPORT] User dengan email ${defaultEmail} sudah ada, menghubungkan ke NIM ${student.nim}`);
+          console.log(`[IMPORT] User dengan email ${existingUser.email} sudah ada, menghubungkan ke NIM ${normalizedNim}`);
         } else {
-          // Jika benar-benar baru, buat record di tabel users
+          // Jika benar-benar baru, buat record di tabel users menggunakan format standar (dotless)
           const newUser = await prisma.users.create({
             data: {
-              email: defaultEmail,
+              email: emailOptions[0],
               kata_sandi: hashedPassword,
               role_id: mhsRole.id,
             },
@@ -225,7 +236,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
         // C2. Buat record mahasiswa
         mhsRecord = await prisma.mahasiswa.create({
           data: {
-            nim: student.nim,
+            nim: normalizedNim,
             nama: student.nama,
             user_id: targetUserId,
           },
@@ -236,16 +247,24 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
       // Poin 3 & Poin 2: Selalu pastikan dia terdaftar di kelas untuk semester ini (finalSemesterId)
       const existingReg = await prisma.registrasi_mahasiswa.findFirst({
         where: {
-          nim: student.nim,
+          nim: normalizedNim,
           semester_id: finalSemesterId
         }
       });
 
-      if (!existingReg) {
+      if (existingReg) {
+        // Jika sudah terdaftar tapi kelasnya berbeda (misal naik tingkat/pindah kelas), update kelasnya
+        if (existingReg.kelas_id !== kelasId) {
+          await prisma.registrasi_mahasiswa.update({
+            where: { id: existingReg.id },
+            data: { kelas_id: kelasId }
+          });
+        }
+      } else {
         await prisma.registrasi_mahasiswa.create({
           data: {
-            nim: student.nim,
-            semester_id: finalSemesterId, // Menggunakan finalSemesterId
+            nim: normalizedNim,
+            semester_id: finalSemesterId,
             kelas_id: kelasId,
             status: 'Aktif',
           },
@@ -254,7 +273,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
 
       // D. Upsert kompen_awal
       const existingKompen = await prisma.kompen_awal.findFirst({
-        where: { nim: student.nim, semester_id: finalSemesterId }, // Menggunakan finalSemesterId
+        where: { nim: normalizedNim, semester_id: finalSemesterId },
         select: { id: true },
       });
 
@@ -269,8 +288,8 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
       } else {
         await prisma.kompen_awal.create({
           data: {
-            nim: student.nim,
-            semester_id: finalSemesterId, // Menggunakan finalSemesterId
+            nim: normalizedNim,
+            semester_id: finalSemesterId,
             import_id: importLog.id,
             total_jam_wajib: student.jam,
           },
@@ -292,7 +311,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
     try {
       const fs = require('fs');
       fs.writeFileSync('last_import_error.txt', JSON.stringify(errors, null, 2));
-    } catch (err) {}
+    } catch (err) { }
   }
 
   // Status: GAGAL jika 0 sukses, PARTIAL jika ada error + ada sukses, SELESAI jika tanpa error
