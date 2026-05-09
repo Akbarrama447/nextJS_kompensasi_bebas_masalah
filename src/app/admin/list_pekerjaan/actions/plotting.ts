@@ -289,3 +289,60 @@ export async function generatePlotting(
     return { success: false, error: message };
   }
 }
+
+export async function assignMahasiswaManual(
+  pekerjaanId: number,
+  nim: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // 1. Cek pekerjaan & kuota yang tersedia
+    const job = await prisma.daftar_pekerjaan.findUnique({
+      where: { id: pekerjaanId },
+      include: {
+        penugasan: {
+          where: {
+            status_tugas_id: {
+              notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
+            },
+          },
+          select: { id: true, nim: true },
+        },
+      },
+    });
+
+    if (!job) return { success: false, error: 'Pekerjaan tidak ditemukan' };
+
+    const slotTerpakai = job.penugasan.length;
+    if (slotTerpakai >= (job.kuota || 0)) {
+      return { success: false, error: 'Kuota pekerjaan sudah penuh' };
+    }
+
+    // 2. Cek duplikasi — mahasiswa sudah terdaftar di pekerjaan ini
+    const sudahAda = job.penugasan.some((p) => p.nim === nim);
+    if (sudahAda) {
+      return { success: false, error: 'Mahasiswa sudah ditugaskan di pekerjaan ini' };
+    }
+
+    // 3. Validasi NIM mahasiswa benar-benar ada di database
+    const mhsExists = await prisma.mahasiswa.findUnique({
+      where: { nim },
+      select: { nim: true },
+    });
+    if (!mhsExists) return { success: false, error: 'NIM mahasiswa tidak ditemukan' };
+
+    // 4. Buat penugasan dengan status MENUNGGU
+    await prisma.penugasan.create({
+      data: {
+        pekerjaan_id: pekerjaanId,
+        nim,
+        status_tugas_id: STATUS_TUGAS.MENUNGGU,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error assign mahasiswa manual:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { success: false, error: `Terjadi kesalahan sistem: ${message}` };
+  }
+}

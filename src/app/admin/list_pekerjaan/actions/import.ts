@@ -187,39 +187,49 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
         kelasMap.set(normalizedStudentKelas, kelasId);
       }
 
-      // B. Cek apakah mahasiswa sudah ada
-      const existingMhs = await prisma.mahasiswa.findUnique({
+      // B. Cek apakah mahasiswa sudah ada (berdasarkan NIM)
+      let mhsRecord = await prisma.mahasiswa.findUnique({
         where: { nim: student.nim },
-        select: { nim: true },
+        select: { nim: true, user_id: true },
       });
 
-      if (!existingMhs) {
-        // C. AUTO-PROVISIONING — buat akun baru
-        let defaultEmail = `${student.nim.replace(/\./g, '')}@student.polines.ac.id`;
+      if (!mhsRecord) {
+        // C. AUTO-PROVISIONING — buat akun baru atau link ke user lama yang emailnya sama
+        const defaultEmail = `${student.nim.replace(/\./g, '')}@student.polines.ac.id`;
         
-        // Poin 4: Proteksi Bentrok Email
-        const emailExists = await prisma.users.findUnique({ where: { email: defaultEmail } });
-        if (emailExists) {
-           defaultEmail = `${student.nim.replace(/\./g, '')}_${Math.floor(Math.random() * 1000)}@student.polines.ac.id`;
-        }
-
-        // C1. Buat record di tabel users
-        const newUser = await prisma.users.create({
-          data: {
-            email: defaultEmail,
-            kata_sandi: hashedPassword,
-            role_id: mhsRole.id,
-          },
-          select: { user_id: true },
+        // Cek apakah email sudah dipakai (mungkin user sudah ada tapi record mahasiswa hilang/gagal buat)
+        const existingUser = await prisma.users.findUnique({ 
+          where: { email: defaultEmail },
+          select: { user_id: true }
         });
 
+        let targetUserId: number;
+
+        if (existingUser) {
+          // Jika user ada, gunakan user_id tersebut
+          targetUserId = existingUser.user_id;
+          console.log(`[IMPORT] User dengan email ${defaultEmail} sudah ada, menghubungkan ke NIM ${student.nim}`);
+        } else {
+          // Jika benar-benar baru, buat record di tabel users
+          const newUser = await prisma.users.create({
+            data: {
+              email: defaultEmail,
+              kata_sandi: hashedPassword,
+              role_id: mhsRole.id,
+            },
+            select: { user_id: true },
+          });
+          targetUserId = newUser.user_id;
+        }
+
         // C2. Buat record mahasiswa
-        await prisma.mahasiswa.create({
+        mhsRecord = await prisma.mahasiswa.create({
           data: {
             nim: student.nim,
             nama: student.nama,
-            user_id: newUser.user_id,
+            user_id: targetUserId,
           },
+          select: { nim: true, user_id: true }
         });
       }
 

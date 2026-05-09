@@ -61,6 +61,7 @@ export async function getDaftarKompen(
     offset = 0, 
     status_filter = 'semua',
     search = '',
+    kelas_id,
   } = params || {};
 
   try {
@@ -88,12 +89,27 @@ export async function getDaftarKompen(
       return { data: [], total: 0 };
     }
 
+    // Build where clause for kompen_awal
+    const whereClause: any = {
+      semester_id: semesterId,
+      total_jam_wajib: { gt: 0 },
+    };
+
+    // Filter by class if provided
+    if (kelas_id) {
+      whereClause.mahasiswa = {
+        registrasi_mahasiswa: {
+          some: {
+            kelas_id: kelas_id,
+            semester_id: semesterId,
+          }
+        }
+      };
+    }
+
     // Get all kompen_awal for this semester with jam kompen > 0
     const kompenData = await prisma.kompen_awal.findMany({
-      where: {
-        semester_id: semesterId,
-        total_jam_wajib: { gt: 0 }, // Only show students with jam kompen > 0
-      },
+      where: whereClause,
       include: {
         mahasiswa: {
           select: { nim: true, nama: true },

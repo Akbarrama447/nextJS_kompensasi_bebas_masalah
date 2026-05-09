@@ -1,6 +1,6 @@
 import Sidebar from '@/components/Sidebar'
 import { cookies } from 'next/headers'
-import prisma from '@/lib/prisma'
+import prisma from '@/lib/prisma' // Pastikan path ini sesuai dengan lokasi file prisma.ts kamu
 import DashboardClient from './DashboardClient'
 
 export default async function DashboardMahasiswa() {
@@ -13,12 +13,43 @@ export default async function DashboardMahasiswa() {
   })
 
   const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
-  
-  // Query sisa jam dari view v_sisa_kompen
-  // TODO: Hitung data statistik dari database dengan semester aktif
-  const sisaJam = 0
-  const totalJamSelesai = 0
-  const totalJamWajib = 0
+
+  const activeSemester = await prisma.semester.findFirst({
+    where: { is_aktif: true },
+    select: { id: true },
+  })
+
+  const kompenAwal = activeSemester
+    ? await prisma.kompen_awal.findFirst({
+        where: {
+          nim,
+          semester_id: activeSemester.id,
+        },
+        select: { total_jam_wajib: true },
+      })
+    : null
+
+  const logPotongJam = activeSemester
+    ? await prisma.log_potong_jam.aggregate({
+        where: {
+          nim,
+          semester_id: activeSemester.id,
+        },
+        _sum: { jam_dikurangi: true },
+      })
+    : null
+
+  // TAMBAHAN: Ambil data tugas aktif
+  const tugasAktif = await prisma.penugasan.count({
+    where: {
+      nim: nim,
+      status_tugas_id: 1 // Sesuaikan dengan ID status "Proses/Aktif" di database kamu
+    }
+  })
+
+  const totalJamWajib = kompenAwal?.total_jam_wajib ?? 0
+  const totalJamSelesai = logPotongJam?._sum.jam_dikurangi ?? 0
+  const sisaJam = totalJamWajib - totalJamSelesai
 
   return (
     <Sidebar role="mahasiswa" activePath="/user/dashboard">
@@ -28,6 +59,7 @@ export default async function DashboardMahasiswa() {
           sisaJam={sisaJam}
           totalJamSelesai={totalJamSelesai}
           totalJamWajib={totalJamWajib}
+          tugasAktif={tugasAktif} // <-- Lempar datanya ke sini
         />
       </main>
     </Sidebar>

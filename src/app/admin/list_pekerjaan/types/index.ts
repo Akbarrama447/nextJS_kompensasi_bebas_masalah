@@ -40,6 +40,7 @@ export interface OptionsData {
   tipe_pekerjaan: { id: number; nama: string }[];
   ruangan: { id: number; nama_ruangan: string; gedung?: string }[];
   semester_aktif: { id: number; nama: string } | null;
+  kelas: { id: number; nama_kelas: string }[];
 }
 
 export interface PlottingConfig {
@@ -152,6 +153,7 @@ export interface GetDaftarKompenParams {
   limit?: number;
   offset?: number;
   search?: string;
+  kelas_id?: number;
 }
 
 export interface GetDaftarKompenResult {

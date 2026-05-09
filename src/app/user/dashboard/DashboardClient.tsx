@@ -2,11 +2,13 @@
 
 import UserHeader from '@/components/UserHeader'
 
+// Tambahkan tugasAktif di sini
 interface DashboardClientProps {
   namaMahasiswa: string
   sisaJam: number
   totalJamSelesai: number
   totalJamWajib: number
+  tugasAktif: number // <-- Tambahan
 }
 
 export default function DashboardClient({
@@ -14,6 +16,7 @@ export default function DashboardClient({
   sisaJam,
   totalJamSelesai,
   totalJamWajib,
+  tugasAktif, // <-- Tambahan
 }: DashboardClientProps) {
   return (
     <>
@@ -25,7 +28,17 @@ export default function DashboardClient({
           <p className="text-sm text-[#2e5299] font-medium opacity-80">Berikut ringkasan aktivitas kompensasi anda</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        {/* --- KOTAK-KOTAK ANGKA DI ATAS --- */}
+        <div className="grid grid-cols-4 gap-6 mb-8"> {/* Ubah grid-cols-3 jadi grid-cols-4 jika ingin menjejerkannya */}
+          
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <p className="text-[#2e5299] font-semibold text-xs mb-3">Tugas Aktif</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-bold text-slate-800">{tugasAktif}</span> {/* <-- Tampilkan di sini */}
+              <span className="text-sm font-medium text-slate-500">Tugas</span>
+            </div>
+          </div>
+
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <p className="text-[#2e5299] font-semibold text-xs mb-3">Sisa Jam Kompen</p>
             <div className="flex items-baseline gap-1">
@@ -49,8 +62,10 @@ export default function DashboardClient({
               <span className="text-sm font-medium text-slate-500">Jam</span>
             </div>
           </div>
+
         </div>
 
+        {/* --- MENU CEK PEKERJAAN --- */}
         <div className="grid grid-cols-2 gap-6">
           <div className="bg-white p-7 rounded-2xl shadow-sm border border-slate-100 hover:border-[#2e5299]/30 transition-all cursor-pointer group">
             <h3 className="text-[#2e5299] font-bold text-lg mb-1 group-hover:text-blue-700">Cek Pekerjaan</h3>
