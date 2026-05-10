@@ -22,15 +22,37 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
       nama = mahasiswa?.nama || 'Guest'
     }
   } else {
-    const nip = cookieStore.get('nip')?.value
-    if (nip) {
-      const staf = await prisma.staf.findUnique({ where: { nip } })
+    const nipFromCookie = cookieStore.get('nip')?.value
+    if (nipFromCookie) {
+      const staf = await prisma.staf.findUnique({ where: { nip: nipFromCookie } })
       nama = staf?.nama || 'Admin'
     }
   }
 
+  let roleId: number
+  if (role === 'mahasiswa') {
+    roleId = 3
+  } else {
+    const nipVal = cookieStore.get('nip')?.value
+    const stafUser = nipVal ? await prisma.staf.findUnique({
+      where: { nip: nipVal },
+      select: { user: { select: { role_id: true } } },
+    }) : null
+    roleId = stafUser?.user?.role_id ?? 1
+  }
+
+  const allowedMenuIds = await prisma.role_has_menus.findMany({
+    where: { role_id: roleId },
+    select: { menus_id: true },
+  })
+
+  const allowedIds = allowedMenuIds.map((r) => r.menus_id).filter(Boolean)
+
   const menus = await prisma.menus.findMany({
-    where: { parent_id: null },
+    where: {
+      parent_id: null,
+      ...(allowedIds.length > 0 ? { id: { in: allowedIds } } : {}),
+    },
     orderBy: { urutan: 'asc' },
   })
 
@@ -64,28 +86,9 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
         
         <nav className="flex-1">
           <ul className="space-y-1">
-            {role === 'admin' && (
-              <li>
-                <Link href="/admin/dashboard">
-                  <div className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${activePath === '/admin/dashboard' ? 'bg-[#f1f5f9] text-[#2e5299] ml-4 py-2.5 px-5 rounded-l-full shadow-lg' : 'px-9 py-3 text-white/80 hover:text-white hover:bg-white/10 hover:translate-x-1 cursor-pointer'}`}>
-                    <Icons.LayoutDashboard size={20} />
-                    <span className="font-medium text-[14px]">Dashboard</span>
-                  </div>
-                </Link>
-              </li>
-            )}
             {menus.map((menu) => {
-              if (role === 'admin' && menu.key === 'dashboard') return null
-              let href = menu.path
-              if (role === 'admin') {
-                if (menu.key === 'pekerjaan') { 
-                  href = '/admin/list_pekerjaan'
-                } else {
-                  href = menu.path.replace('/user/', '/admin/')
-                }
-              }
-
-              const isActive = activePath === href || activePath === menu.path || activePath.startsWith(menu.path + '/') || (menu.key && activePath.includes(menu.key))
+              const href = menu.path
+              const isActive = activePath === href || activePath.startsWith(href + '/') || (menu.key && activePath.includes(menu.key))
               return (
                 <li key={menu.id}>
                   <Link href={href}>

@@ -18,13 +18,12 @@ model Jurusan {
 }
 
 model roles {
-  id            Int     @id
-  nama          String? @db.VarChar
+  id            Int              @id
+  nama          String?          @db.VarChar
   key_menu      Json?
   key_condition Json?
   users         Users[]
-
-  @@map("roles")
+  role_has_menus role_has_menus[]
 }
 
 model Users {
@@ -302,14 +301,26 @@ model registrasi_mahasiswa {
 }
 
 model menus {
-  id          Int       @id @default(autoincrement())
-  key         String    @unique @db.VarChar
-  label       String    @db.VarChar
-  icon        String?   @db.VarChar
-  path        String    @db.VarChar
-  urutan      Int?      @default(0)
-  parent_id   Int?
-  created_at  DateTime? @default(now()) @db.Timestamp(6)
-  menus       menus?    @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_menus menus[]   @relation("menusTomenus")
+  id            Int              @id @default(autoincrement())
+  key           String           @unique @db.VarChar
+  label         String           @db.VarChar
+  icon          String?          @db.VarChar
+  path          String           @db.VarChar
+  urutan        Int?             @default(0)
+  parent_id     Int?
+  created_at    DateTime?        @default(now()) @db.Timestamp(6)
+  menus         menus?           @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus   menus[]          @relation("menusTomenus")
+  role_has_menus role_has_menus[]
+}
+
+model role_has_menus {
+  id        Int                @id @default(autoincrement())
+  created_at DateTime?          @default(now()) @db.Timestamptz(6)
+  role_id   Int?
+  menus_id  Int?
+  role      roles?             @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menu      menus?             @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("role_has_menus")
 }

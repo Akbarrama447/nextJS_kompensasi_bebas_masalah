@@ -29,7 +29,7 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/user/dashboard')
+      router.push(data.role === 'admin' ? '/admin/dashboard' : '/user/dashboard')
     } catch {
       setError('Terjadi kesalahan')
     } finally {
