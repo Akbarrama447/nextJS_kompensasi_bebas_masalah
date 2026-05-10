@@ -1,29 +1,99 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserHeader from "@/components/UserHeader";
 import PopupBukti from "@/app/admin/ekuivalen/components/PopupBukti";
 import PopupTolak from "@/app/admin/ekuivalen/components/PopupTolak";
 
 export default function ClientPage() {
-  const [kelas, setKelas] = useState("IK2C");
-
-  const mahasiswa = [
-    { nama: "NADHIF DLIYAULHAQ", nim: "3.34.24.0.11", jam: 11 },
-    { nama: "NAUFAL BALBUL", nim: "3.34.24.0.14", jam: 64 },
-  ];
-
+  const [kelas, setKelas] = useState("");
+  const [classList, setClassList] = useState<any[]>([]);
+  const [mahasiswa, setMahasiswa] = useState<any[]>([]);
+  const [ekuivalensi, setEkuivalensi] = useState<any>(null);
   const [pekerjaan, setPekerjaan] = useState("");
-
-  const totalJam = mahasiswa.reduce((acc, m) => acc + m.jam, 0);
 
   const [openPopup, setOpenPopup] = useState(false);
   const [openTolak, setOpenTolak] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [status, setStatus] =
-    useState<"pending" | "ditolak" | "disetujui">("pending");
+  // Fetch Class List
+  useEffect(() => {
+    fetch("/api/kelas")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setClassList(data);
+          if (data.length > 0 && !kelas) {
+            setKelas(data[0].nama_kelas);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetch classes:", err));
+  }, []);
 
-  const [alasanTolak, setAlasanTolak] = useState("");
+  // Fetch Data by Kelas
+  useEffect(() => {
+    if (!kelas) return;
+
+    fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("API RESPONSE:", data);
+        if (data.mahasiswa) {
+          setMahasiswa(data.mahasiswa);
+        } else {
+          setMahasiswa([]);
+        }
+        setEkuivalensi(data.ekuivalensi);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setMahasiswa([]);
+        setEkuivalensi(null);
+      });
+  }, [kelas]);
+
+  const totalJam = Array.isArray(mahasiswa)
+    ? mahasiswa.reduce((acc, m) => acc + (m.jam || 0), 0)
+    : 0;
+
+  const handleVerify = async (statusId: number, catatan?: string) => {
+    if (!ekuivalensi?.id) {
+      alert("Data ekuivalensi tidak ditemukan");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ekuivalensi/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ekuivalensiId: ekuivalensi.id,
+          statusId,
+          catatan,
+        }),
+      });
+
+      if (res.ok) {
+        // Refresh data
+        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const refreshData = await refreshRes.json();
+        setMahasiswa(refreshData.mahasiswa || []);
+        setEkuivalensi(refreshData.ekuivalensi);
+        setOpenPopup(false);
+        setOpenTolak(false);
+      } else {
+        const error = await res.json();
+        alert(error.message || "Gagal melakukan verifikasi");
+      }
+    } catch (err) {
+      console.error("Verify error:", err);
+      alert("Terjadi kesalahan koneksi");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-100">
@@ -55,11 +125,11 @@ export default function ClientPage() {
               onChange={(e) => setKelas(e.target.value)}
               className="w-full sm:w-auto px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
             >
-              <option value="IK2A">IK2A</option>
-              <option value="IK2B">IK2B</option>
-              <option value="IK2C">IK2C</option>
-              <option value="IK2D">IK2D</option>
-              <option value="IK2E">IK2E</option>
+              {classList.map((k) => (
+                <option key={k.id} value={k.nama_kelas}>
+                  {k.nama_kelas}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -75,18 +145,29 @@ export default function ClientPage() {
               </thead>
 
               <tbody>
-                {mahasiswa.map((m, i) => (
-                  <tr key={i} className="border-b border-gray-200 last:border-none text-center">
-                    <td className="px-4 py-3 text-left">{m.nama}</td>
-                    <td>{m.nim}</td>
-                    <td>{m.jam}</td>
+                {mahasiswa.length > 0 ? (
+                  mahasiswa.map((m, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-gray-200 last:border-none text-center"
+                    >
+                      <td className="px-4 py-3 text-left">{m.nama}</td>
+                      <td>{m.nim}</td>
+                      <td>{m.jam}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="px-4 py-10 text-center text-gray-400">
+                      Tidak ada data mahasiswa di kelas ini.
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* HEADER (desktop only biar tidak rusak di HP) */}
+          {/* HEADER */}
           <div className="hidden sm:grid grid-cols-6 text-xs text-gray-500 font-medium mb-2 border-t-2 border-gray-300 pt-2">
             <div></div>
             <div></div>
@@ -120,7 +201,13 @@ export default function ClientPage() {
 
             {/* BUKTI */}
             <button
-              onClick={() => setOpenPopup(true)}
+              onClick={() => {
+                if (!ekuivalensi) {
+                  alert("Tidak ada pengajuan ekuivalensi untuk kelas ini.");
+                  return;
+                }
+                setOpenPopup(true);
+              }}
               className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-300 transition"
             >
               LIHAT
@@ -128,59 +215,69 @@ export default function ClientPage() {
 
             {/* STATUS */}
             <div className="w-full sm:text-center">
-              {status === "pending" && (
-                <span className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm">
-                  Pending
-                </span>
-              )}
+              {!ekuivalensi ? (
+                <span className="text-xs text-gray-400">N/A</span>
+              ) : (
+                <>
+                  {(!ekuivalensi.statusId || ekuivalensi.statusId === 1) && (
+                    <span className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm">
+                      Pending
+                    </span>
+                  )}
 
-              {status === "ditolak" && (
-                <span className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm">
-                  DITOLAK
-                </span>
-              )}
+                  {ekuivalensi.statusId === 3 && (
+                    <span className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm">
+                      DITOLAK
+                    </span>
+                  )}
 
-              {status === "disetujui" && (
-                <span className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm">
-                  DISETUJUI
-                </span>
+                  {ekuivalensi.statusId === 2 && (
+                    <span className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm">
+                      DISETUJUI
+                    </span>
+                  )}
+                </>
               )}
             </div>
           </div>
 
           {/* ALASAN TOLAK */}
-          {alasanTolak && (
+          {ekuivalensi?.catatan && (
             <div className="mt-4 p-3 border border-red-200 bg-red-50 rounded-lg">
               <p className="text-xs text-red-500 font-medium">
-                Alasan Penolakan
+                Catatan / Alasan Penolakan
               </p>
-              <p className="text-sm text-red-700">{alasanTolak}</p>
+              <p className="text-sm text-red-700">{ekuivalensi.catatan}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* POPUP BUKTI */}
-      <PopupBukti
-        open={openPopup}
-        onClose={() => setOpenPopup(false)}
-        onApprove={() => {
-          setStatus("disetujui");
-          setAlasanTolak("");
-          setOpenPopup(false);
-        }}
-        onReject={() => {
-          setOpenPopup(false);
-          setOpenTolak(true);
-        }}
-        data={{
-          kelas,
-          jam: totalJam,
-          nominal: totalJam * 2000,
-          tanggal: "19 April 2026 pukul 15.00",
-          fotoUrl: "",
-        }}
-      />
+      {ekuivalensi && (
+        <PopupBukti
+          open={openPopup}
+          onClose={() => setOpenPopup(false)}
+          onApprove={() => handleVerify(2)}
+          onReject={() => {
+            setOpenPopup(false);
+            setOpenTolak(true);
+          }}
+          data={{
+            kelas,
+            jam: ekuivalensi.jam,
+            nominal: ekuivalensi.nominal,
+            tanggal: new Date(ekuivalensi.tanggal).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            fotoUrl: ekuivalensi.notaUrl || "",
+          }}
+        />
+      )}
 
       {/* POPUP TOLAK */}
       <PopupTolak
@@ -189,12 +286,14 @@ export default function ClientPage() {
           setOpenTolak(false);
           setOpenPopup(true);
         }}
-        onSubmit={(alasan) => {
-          setAlasanTolak(alasan);
-          setStatus("ditolak");
-          setOpenTolak(false);
-        }}
+        onSubmit={(alasan) => handleVerify(3, alasan)}
       />
+
+      {loading && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-[100]">
+          <div className="bg-white p-4 rounded-lg shadow-lg">Processing...</div>
+        </div>
+      )}
     </main>
   );
 }
