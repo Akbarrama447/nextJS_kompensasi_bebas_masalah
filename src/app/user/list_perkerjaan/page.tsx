@@ -6,25 +6,29 @@ import UserHeader from '@/components/UserHeader'
 
 export default async function PekerjaanSayaPage() {
   const cookieStore = await cookies()
-  const nim = cookieStore.get('nim')?.value || 
-              cookieStore.get('NIM')?.value || 
-              cookieStore.get('user_id')?.value || 
-              '33424202'; // Fallback ke NIM lo biar PASTI MUNCUL pas demo
+  const nim = cookieStore.get('nim')?.value ||
+              cookieStore.get('NIM')?.value ||
+              cookieStore.get('user_id')?.value ||
+              '33424202'
 
-  console.log("DEBUG: NIM Aktif =", nim);
+
 
   const mhsAktif = await prisma.mahasiswa.findUnique({
     where: { nim },
     include: {
       registrasi_mahasiswa: {
         where: { status: "Aktif" },
-        include: { 
-          kelas: { 
-            include: { prodi: true } 
-          } 
+        include: {
+          kelas: {
+            include: { prodi: true }
+          }
         }
       }
     }
+  })
+
+  const allTipePekerjaan = await prisma.ref_tipe_pekerjaan.findMany({
+    orderBy: { id: 'asc' }
   })
 
   const penugasanSaya = await prisma.penugasan.findMany({
@@ -33,10 +37,11 @@ export default async function PekerjaanSayaPage() {
       pekerjaan: {
         include: {
           ruangan: true,
-          tipe_pekerjaan: true
+          tipe_pekerjaan: true,
+          semester: true
         }
       },
-      status_tugas: true 
+      status_tugas: true
     },
     orderBy: { created_at: 'desc' }
   })
@@ -48,10 +53,10 @@ export default async function PekerjaanSayaPage() {
   }
 
   return (
-    <Sidebar role="mahasiswa" activePath="/user/pekerjaan">
+    <Sidebar role="mahasiswa" activePath="/user/list_perkerjaan">
       <UserHeader nama={userData.nama} role="mahasiswa" />
       {/* Lempar data ke Client Component */}
-      <PekerjaanSayaClient initialData={penugasanSaya} user={userData} />
+      <PekerjaanSayaClient initialData={penugasanSaya} user={userData} allTipePekerjaan={allTipePekerjaan} />
     </Sidebar>
   )
 }
