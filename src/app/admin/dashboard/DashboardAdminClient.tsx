@@ -12,16 +12,18 @@ interface DashboardAdminClientProps {
   namaAdmin: string
   pekerjaanAktif: number
   statusCounts: StatusCount[]
+  semesterLabel?: string
 }
 
 export default function DashboardAdminClient({
   namaAdmin,
   pekerjaanAktif,
   statusCounts,
+  semesterLabel,
 }: DashboardAdminClientProps) {
   return (
     <>
-      <UserHeader nama={namaAdmin} role="admin" />
+      <UserHeader nama={namaAdmin} role="admin" semesterLabel={semesterLabel} />
 
       <div className="p-10 max-w-6xl">
         <div className="mb-8">

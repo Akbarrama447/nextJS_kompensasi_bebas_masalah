@@ -46,6 +46,12 @@ export default async function PekerjaanSayaPage() {
     orderBy: { created_at: 'desc' }
   })
 
+  const activeSemester = await prisma.semester.findFirst({
+    where: { is_aktif: true },
+    select: { nama: true, tahun: true },
+  })
+  const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
+
   const userData = {
     nama: mhsAktif?.nama || 'Mahasiswa',
     nim: nim || '-',
@@ -54,7 +60,7 @@ export default async function PekerjaanSayaPage() {
 
   return (
     <Sidebar role="mahasiswa" activePath="/user/list_perkerjaan">
-      <UserHeader nama={userData.nama} role="mahasiswa" />
+      <UserHeader nama={userData.nama} role="mahasiswa" semesterLabel={semesterLabel} />
       {/* Lempar data ke Client Component */}
       <PekerjaanSayaClient initialData={penugasanSaya} user={userData} allTipePekerjaan={allTipePekerjaan} />
     </Sidebar>

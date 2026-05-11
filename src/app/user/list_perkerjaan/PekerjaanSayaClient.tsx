@@ -5,7 +5,7 @@ import Webcam from 'react-webcam'
 import { 
   Camera, MapPin, X, Search, 
   RefreshCcw, MapPinned, ChevronLeft, ChevronRight, 
-  ChevronDown, Filter 
+  ChevronDown, Filter, Banknote, FileText 
 } from 'lucide-react'
 import { updateProgresTugas } from './action'
 
@@ -27,6 +27,7 @@ interface Pekerjaan {
   ruangan: Ruangan | null
   tipe_pekerjaan: TipePekerjaan | null
   semester: Semester | null
+  tipe_pekerjaan_id: number | null
 }
 
 interface StatusTugas {
@@ -319,6 +320,24 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                     {imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}
                   </button>
                 </div>
+
+                {/* Eksternal Only */}
+                {selectedTugas?.pekerjaan?.tipe_pekerjaan_id === 2 && (
+                  <div className="grid grid-cols-1 gap-5 pt-4 border-t border-slate-50 text-left animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="space-y-1.5 text-left">
+                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1 flex items-center gap-2 text-left">
+                        <Banknote size={14}/> Nominal (Tanpa Koma)
+                      </label>
+                      <input type="number" placeholder="50000" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-[#2e5299] font-bold text-slate-700 text-left" />
+                    </div>
+                    <div className="space-y-1.5 text-left">
+                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1 flex items-center gap-2 text-left">
+                        <FileText size={14}/> Keterangan / Nota
+                      </label>
+                      <textarea placeholder="Rincian..." rows={2} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-[#2e5299] resize-none font-medium text-left" />
+                    </div>
+                  </div>
+                )}
 
                 <button
                   onClick={() => updateStatus(selectedTugas.id)}

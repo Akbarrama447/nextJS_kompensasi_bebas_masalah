@@ -16,7 +16,7 @@ export default async function DashboardAdmin() {
 
   const activeSemester = await prisma.semester.findFirst({
     where: { is_aktif: true },
-    select: { id: true },
+    select: { id: true, nama: true, tahun: true },
   })
 
   const pekerjaanAktif = activeSemester
@@ -48,6 +48,8 @@ export default async function DashboardAdmin() {
       )
     : refStatusTugas.map(status => ({ id: status.id, nama: status.nama, count: 0 }))
 
+  const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
+
   return (
     <Sidebar role="admin" activePath="/admin/dashboard">
       <main className="flex-1 flex flex-col">
@@ -55,6 +57,7 @@ export default async function DashboardAdmin() {
           namaAdmin={namaAdmin}
           pekerjaanAktif={pekerjaanAktif}
           statusCounts={statusCounts}
+          semesterLabel={semesterLabel}
         />
       </main>
     </Sidebar>
