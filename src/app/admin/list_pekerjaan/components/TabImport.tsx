@@ -17,20 +17,17 @@ interface ImportSummary {
   importLogId: number | null;
 }
 
-// ─────────────────────────────────────────
-// Konstanta — sesuaikan dengan data nyata
-// ─────────────────────────────────────────
-
-// TODO: Ambil dari cookie/session admin yang login
-const STAFF_NIP = "196801011990031001";
-// TODO: Ambil dari semester aktif di DB
-const SEMESTER_ID = 1;
+interface TabImportProps {
+    staffNip: string;
+    semesterId: number;
+    onSuccess?: () => void;
+}
 
 // ─────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────
 
-export default function TabImport() {
+export default function TabImport({ staffNip, semesterId, onSuccess }: TabImportProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [modalState, setModalState] = useState<ModalState>("hidden");
@@ -102,8 +99,8 @@ export default function TabImport() {
         try {
             const result = await executeImport({
                 students,
-                semesterId: SEMESTER_ID,
-                staffNip: STAFF_NIP,
+                semesterId,
+                staffNip,
                 namaFile: currentFileName,
             });
 
@@ -128,6 +125,7 @@ export default function TabImport() {
     };
 
     const handleClose = () => {
+        const hadSuccess = summary && summary.successCount > 0;
         setModalState("hidden");
         setStudents([]);
         setParseErrors([]);
@@ -135,6 +133,9 @@ export default function TabImport() {
         setErrorMessage("");
         setCurrentFileName("");
         setPage(1);
+        if (hadSuccess && onSuccess) {
+            onSuccess();
+        }
     };
 
     return (
