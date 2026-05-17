@@ -20,27 +20,27 @@ const studentAccounts = [
 
 // Test accounts - admin & staff
 const staffAccounts = [
-  { 
-    nip: '196801011990031001', 
-    nama: 'Dr. Ahmad Fauzi, M.T.', 
+  {
+    nip: '196801011990031001',
+    nama: 'Dr. Ahmad Fauzi, M.T.',
     email: 'ahmad.fauzi@polines.ac.id',
     password: 'admin123',
     tipe_staf: 'admin',
     jurusan_id: 1,
     role_id: 3 // admin
   },
-  { 
-    nip: '197505122002121002', 
-    nama: 'Ir. Siti Aminah, M.Kom.', 
+  {
+    nip: '197505122002121002',
+    nama: 'Ir. Siti Aminah, M.Kom.',
     email: 'siti.aminah@polines.ac.id',
     password: 'password123',
     tipe_staf: 'staf',
     jurusan_id: 1,
     role_id: 2 // staf
   },
-  { 
-    nip: '198203042010012001', 
-    nama: 'Budi Raharjo, S.T.', 
+  {
+    nip: '198203042010012001',
+    nama: 'Budi Raharjo, S.T.',
     email: 'budi.raharjo@polines.ac.id',
     password: 'password123',
     tipe_staf: 'teknisi',
@@ -63,10 +63,8 @@ const refTipePekerjaan = [
 ]
 
 const refStatusImport = [
-  { id: 1, nama: 'MENUNGGU' },
-  { id: 2, nama: 'SEDANG_DIPROSES' },
-  { id: 3, nama: 'SELESAI' },
-  { id: 4, nama: 'GAGAL' },
+  { id: 1, nama: 'SELESAI' },
+  { id: 2, nama: 'GAGAL' },
 ]
 
 const refStatusEkuivalensi = [
@@ -79,7 +77,7 @@ const refStatusEkuivalensi = [
 // Menus for admin
 const adminMenus = [
   { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
-  { key: 'pekerjaan', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/pekerjaan', urutan: 2, parent_id: null },
+  { key: 'pekerjaan', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/list_pekerjaan', urutan: 2, parent_id: null },
   { key: 'laporan', label: 'Laporan', icon: 'FileText', path: '/admin/laporan', urutan: 3, parent_id: null },
   { key: 'pengaturan', label: 'Pengaturan', icon: 'Settings', path: '/admin/pengaturan', urutan: 4, parent_id: null },
 ]
@@ -96,7 +94,7 @@ const semesterData = { id: 1, nama: '2025/2026 Ganjil', tahun: 2025, periode: 'G
 
 async function seedRefStatus() {
   console.log('\n📋 Seeding reference data...')
-  
+
   // Status Tugas
   for (const status of refStatusTugas) {
     await prisma.ref_status_tugas.upsert({
@@ -175,11 +173,11 @@ async function seedSemester() {
   try {
     await prisma.semester.upsert({
       where: { id: semesterData.id },
-      update: { 
-        nama: semesterData.nama, 
-        tahun: semesterData.tahun, 
-        periode: semesterData.periode, 
-        is_aktif: semesterData.is_aktif 
+      update: {
+        nama: semesterData.nama,
+        tahun: semesterData.tahun,
+        periode: semesterData.periode,
+        is_aktif: semesterData.is_aktif
       },
       create: semesterData,
     })
@@ -194,7 +192,7 @@ async function seedStaff() {
   for (const account of staffAccounts) {
     try {
       const hashedPassword = await hash(account.password, 10)
-      
+
       const user = await prisma.users.upsert({
         where: { email: account.email },
         update: { role_id: account.role_id },
@@ -207,9 +205,9 @@ async function seedStaff() {
 
       await prisma.staf.upsert({
         where: { nip: account.nip },
-        update: { 
-          user_id: user.user_id, 
-          nama: account.nama, 
+        update: {
+          user_id: user.user_id,
+          nama: account.nama,
           tipe_staf: account.tipe_staf,
           jurisdiction_id: account.jurusan_id
         },
@@ -231,11 +229,11 @@ async function seedStaff() {
 
 async function seedStudents() {
   console.log('\n👨‍🎓 Seeding student accounts...')
-  
+
   // Get or create default kelas
   const prodi = await prisma.prodi.findFirst()
   let kelasId = null
-  
+
   if (prodi) {
     const kelas = await prisma.kelas.upsert({
       where: { id: 1 },
@@ -249,7 +247,7 @@ async function seedStudents() {
   for (const account of studentAccounts) {
     try {
       const hashedPassword = await hash(account.password, 10)
-      
+
       const user = await prisma.users.create({
         data: {
           email: `${account.nim}@student.polnes.ac.id`,
@@ -272,10 +270,10 @@ async function seedStudents() {
       const existingKompen = await prisma.kompen_awal.findFirst({
         where: { nim: account.nim },
       })
-      
+
       // Create kompen_awal for student
       const jamKompen = Math.floor(Math.random() * 16) + 8 // 8-24 jam random
-      
+
       if (!existingKompen) {
         await prisma.kompen_awal.create({
           data: {
@@ -295,12 +293,12 @@ async function seedStudents() {
 
 async function seedMenus() {
   console.log('\n📱 Seeding menus...')
-  
+
   // Clear existing menus and insert new ones
   await prisma.menus.deleteMany({ where: { parent_id: null } })
-  
+
   const menusToSeed = studentAccounts.length === 0 ? adminMenus : mahasiswaMenus
-  
+
   for (const menu of menusToSeed) {
     await prisma.menus.create({
       data: menu,
@@ -312,13 +310,13 @@ async function seedMenus() {
 async function main() {
   console.log('🌱 Starting database seeding...')
   console.log('================================')
-  
+
   await seedRefStatus()
   await seedSemester()
   await seedStaff()
   await seedStudents()
   await seedMenus()
-  
+
   console.log('\n================================')
   console.log('✅ Seeding completed successfully!\n')
 }
