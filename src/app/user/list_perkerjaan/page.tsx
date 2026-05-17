@@ -6,10 +6,10 @@ import UserHeader from '@/components/UserHeader'
 
 export default async function PekerjaanSayaPage() {
   const cookieStore = await cookies()
-  const nim = cookieStore.get('nim')?.value || 
-              cookieStore.get('NIM')?.value || 
-              cookieStore.get('user_id')?.value || 
-              '33424202'; // Fallback ke NIM lo biar PASTI MUNCUL pas demo
+  const nim = cookieStore.get('nim')?.value ||
+    cookieStore.get('NIM')?.value ||
+    cookieStore.get('user_id')?.value ||
+    '33424202'; // Fallback ke NIM lo biar PASTI MUNCUL pas demo
 
   console.log("DEBUG: NIM Aktif =", nim);
 
@@ -18,10 +18,10 @@ export default async function PekerjaanSayaPage() {
     include: {
       registrasi_mahasiswa: {
         where: { status: "Aktif" },
-        include: { 
-          kelas: { 
-            include: { prodi: true } 
-          } 
+        include: {
+          kelas: {
+            include: { prodi: true }
+          }
         }
       }
     }
@@ -36,10 +36,16 @@ export default async function PekerjaanSayaPage() {
           tipe_pekerjaan: true
         }
       },
-      status_tugas: true 
+      status_tugas: true
     },
     orderBy: { created_at: 'desc' }
   })
+
+  const activeSemester = await prisma.semester.findFirst({
+    where: { is_aktif: true },
+    select: { nama: true, tahun: true },
+  })
+  const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 
   const userData = {
     nama: mhsAktif?.nama || 'Mahasiswa',
@@ -48,8 +54,8 @@ export default async function PekerjaanSayaPage() {
   }
 
   return (
-    <Sidebar role="mahasiswa" activePath="/user/pekerjaan">
-      <UserHeader nama={userData.nama} role="mahasiswa" />
+    <Sidebar role="mahasiswa" activePath="/user/list_perkerjaan">
+      <UserHeader nama={userData.nama} role="mahasiswa" semesterLabel={semesterLabel} />
       {/* Lempar data ke Client Component */}
       <PekerjaanSayaClient initialData={penugasanSaya} user={userData} />
     </Sidebar>

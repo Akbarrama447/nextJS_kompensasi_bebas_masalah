@@ -233,9 +233,19 @@ export async function getDaftarKompen(
 export async function verifyPenugasan(
   params: VerifyParams
 ): Promise<VerifyResult> {
-  const { penugasan_id, verifikasi_oleh_nip } = params;
+  const { penugasan_id } = params;
 
   try {
+    const { cookies } = await import('next/headers')
+    const cookieStore = await cookies()
+    const nipCookie = cookieStore.get('nip')?.value
+    let verifikasi_oleh_nip: string
+
+    if (nipCookie) {
+      verifikasi_oleh_nip = nipCookie
+    } else {
+      verifikasi_oleh_nip = await getStaffNip()
+    }
     const penugasan = await prisma.penugasan.findUnique({
       where: { id: penugasan_id },
       include: {

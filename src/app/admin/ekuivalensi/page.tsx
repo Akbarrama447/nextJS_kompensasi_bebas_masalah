@@ -1,9 +1,17 @@
 import Sidebar from "@/components/Sidebar";
 import ClientPage from "@/app/admin/ekuivalensi/ClientPage";
-export default function Page() {
+import prisma from '@/lib/prisma'
+
+export default async function Page() {
+  const activeSemester = await prisma.semester.findFirst({
+    where: { is_aktif: true },
+    select: { nama: true, tahun: true },
+  })
+  const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
+
   return (
     <Sidebar role="admin" activePath="/ekuivalensi">
-      <ClientPage />
+      <ClientPage semesterLabel={semesterLabel} />
     </Sidebar>
   );
 }

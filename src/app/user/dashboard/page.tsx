@@ -16,7 +16,7 @@ export default async function DashboardMahasiswa() {
 
   const activeSemester = await prisma.semester.findFirst({
     where: { is_aktif: true },
-    select: { id: true },
+    select: { id: true, nama: true, tahun: true },
   })
 
   const kompenAwal = activeSemester
@@ -43,6 +43,8 @@ export default async function DashboardMahasiswa() {
   const totalJamSelesai = logPotongJam?._sum.jam_dikurangi ?? 0
   const sisaJam = totalJamWajib - totalJamSelesai
 
+  const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
+
   return (
     <Sidebar role="mahasiswa" activePath="/user/dashboard">
       <main className="flex-1 flex flex-col">
@@ -51,6 +53,7 @@ export default async function DashboardMahasiswa() {
           sisaJam={sisaJam}
           totalJamSelesai={totalJamSelesai}
           totalJamWajib={totalJamWajib}
+          semesterLabel={semesterLabel}
         />
       </main>
     </Sidebar>

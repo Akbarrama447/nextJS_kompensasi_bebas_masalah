@@ -100,11 +100,9 @@ export default function TabPenugasan() {
     setSuccessMsg("");
 
     try {
-      const staffNip = options.semester_aktif?.nama ? "196801011990031001" : "196801011990031001";
-
       const result = await verifyPenugasan({
         penugasan_id: selectedData.penugasan_id,
-        verifikasi_oleh_nip: staffNip,
+        verifikasi_oleh_nip: '',
       });
 
       if (result.success) {
