@@ -29,7 +29,7 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/user/dashboard')
+      router.push(data.role === 'admin' ? '/admin/dashboard' : '/user/dashboard')
     } catch {
       setError('Terjadi kesalahan')
     } finally {
@@ -40,8 +40,27 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen" suppressHydrationWarning>
       {/* Kolom Kiri - Branding */}
-      <div className="hidden lg:flex flex-col w-1/2 bg-[#0F172A] items-center justify-center p-12">
-        <div className="text-center space-y-4">
+      {/* Tambahkan 'relative' dan 'overflow-hidden' agar grid tidak keluar batas */}
+      <div className="relative hidden lg:flex flex-col w-1/2 bg-[#0F172A] items-center justify-center p-12 overflow-hidden">
+
+        {/* Elemen Animasi Background Grid */}
+        <div className="absolute inset-0 bg-grid-pattern animate-grid" />
+
+        {/* (Opsional) Efek Gradient Mask agar grid terlihat memudar secara elegan ke arah pinggir */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#0F172A_80%)]" />
+
+        {/* Elemen Kotak-Kotak Melayang */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="floating-square" style={{ left: '10%', width: '80px', height: '80px', animationDelay: '0s', animationDuration: '18s' }} />
+          <div className="floating-square" style={{ left: '25%', width: '40px', height: '40px', animationDelay: '2s', animationDuration: '12s' }} />
+          <div className="floating-square" style={{ left: '40%', width: '120px', height: '120px', animationDelay: '4s', animationDuration: '22s' }} />
+          <div className="floating-square" style={{ left: '60%', width: '60px', height: '60px', animationDelay: '1s', animationDuration: '15s' }} />
+          <div className="floating-square" style={{ left: '75%', width: '90px', height: '90px', animationDelay: '5s', animationDuration: '20s' }} />
+          <div className="floating-square" style={{ left: '90%', width: '50px', height: '50px', animationDelay: '3s', animationDuration: '14s' }} />
+        </div>
+
+        {/* Konten Teks - Tambahkan 'relative' dan 'z-10' agar posisi teks tetap di depan animasi */}
+        <div className="relative z-10 text-center space-y-4">
           <div>
             <h1 className="text-2xl font-bold text-white">
               Sistem Kompensasi dan Bebas Masalah
@@ -50,7 +69,7 @@ export default function LoginPage() {
               Politeknik Negeri Semarang
             </h2>
           </div>
-          <p className="text-slate-400 text-sm tracking-wide leading-relaxed">
+          <p className="text-slate-400 text-sm tracking-[4px] leading-relaxed">
             Platform managemen kompensasi <br />
             mahasiswa Politeknik Negeri Semarang
           </p>
