@@ -21,6 +21,15 @@ const studentAccounts = [
 // Test accounts - admin & staff
 const staffAccounts = [
   {
+    nip: 'admin',
+    nama: 'Super Admin',
+    email: 'admin@admin.com',
+    password: 'admin123',
+    tipe_staf: 'admin',
+    jurusan_id: 1,
+    role_id: 3 // admin
+  },
+  {
     nip: '196801011990031001',
     nama: 'Dr. Ahmad Fauzi, M.T.',
     email: 'ahmad.fauzi@polines.ac.id',
@@ -247,13 +256,22 @@ async function seedStudents() {
   for (const account of studentAccounts) {
     try {
       const hashedPassword = await hash(account.password, 10)
+      const email = `${account.nim}@student.polnes.ac.id`
 
-      const user = await prisma.users.create({
-        data: {
-          email: `${account.nim}@student.polnes.ac.id`,
-          kata_sandi: hashedPassword,
-        },
+      // Cari atau buat User agar aman dari duplikasi email
+      let user = await prisma.users.findUnique({
+        where: { email }
       })
+
+      if (!user) {
+        user = await prisma.users.create({
+          data: {
+            email,
+            kata_sandi: hashedPassword,
+            role_id: 1 // mahasiswa
+          }
+        })
+      }
 
       await prisma.mahasiswa.upsert({
         where: { nim: account.nim },
