@@ -31,13 +31,19 @@ export async function updateProgresTugas(formData: FormData) {
     }
 
     // 3. Update Database via Prisma
+    const nominalRaw = formData.get('nominal')
+    const nominal = nominalRaw ? Number(nominalRaw) : null
+
     await prisma.penugasan.update({
       where: { id: penugasanId },
       data: {
         status_tugas_id: nextStatus,
         // Asumsi kolom di DB lo namanya 'detail_pengerjaan' untuk nyimpen nama file
         // Atau sesuaikan dengan kolom foto yang ada di schema lo
-        detail_pengerjaan: fileName ? { fileName } : undefined, 
+        detail_pengerjaan: {
+          ...(fileName ? { fileName } : {}),
+          ...(nominal !== null ? { nominal } : {})
+        }, 
         updated_at: new Date()
       }
     })

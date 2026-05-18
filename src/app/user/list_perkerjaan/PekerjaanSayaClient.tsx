@@ -18,6 +18,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
   const [imgSrc, setImgSrc] = useState<string | null>(null)
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [address, setAddress] = useState<string>("")
+  const [nominal, setNominal] = useState<string>("")
 
   // --- STATE FILTER & PAGINATION ---
   const [searchTerm, setSearchTerm] = useState("")
@@ -71,6 +72,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
 
   const handleAction = (tugas: any) => {
     setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); getLocation(); setIsModalOpen(true);
+    setNominal("");
   }
 
   const capture = useCallback(() => {
@@ -84,6 +86,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
     formData.append('id', id.toString())
     formData.append('status_tugas_id', selectedTugas.status_tugas_id.toString())
     if (imgSrc) formData.append('image', imgSrc)
+    formData.append('nominal', nominal)
 
     const result = await updateProgresTugas(formData)
     if (result.success) {
@@ -235,7 +238,31 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                    {imgSrc ? <img src={imgSrc} className="w-full h-full object-cover"/> : <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />}
                    <button onClick={imgSrc ? () => setImgSrc(null) : capture} className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}</button>
                 </div>
-                <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all">Kirim Laporan</button>
+                 
+                 {/* Nominal Input Field */}
+                 <div className="flex flex-col gap-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                     Nominal Kompensasi
+                     {selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && (
+                       <span className="text-red-500 font-bold">*</span>
+                     )}
+                   </label>
+                   <div className="relative group">
+                     <input 
+                       type="text" 
+                       value={nominal}
+                       onChange={(e) => setNominal(e.target.value.replace(/[^0-9]/g, ""))}
+                       placeholder={selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' ? "Wajib diisi (contoh: 50000)" : "Opsional (contoh: 50000)"} 
+                       className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#2e5299] transition-all"
+                     />
+                     <Banknote className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#2e5299] transition-colors" size={18} />
+                   </div>
+                   <p className="text-[10px] text-slate-400 italic">
+                     * Catatan: jangan pake koma dan harus angka.
+                   </p>
+                 </div>
+
+                 <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc || (selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && !nominal)} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all">Kirim Laporan</button>
              </div>
           </div>
         </div>
