@@ -68,17 +68,20 @@ export async function GET(req: NextRequest) {
       orderBy: { created_at: 'desc' },
     })
 
-    const jamDiakui = ekuivalensi?.jam_diakui || 0
-    const totalMhs = registrations.length
-    const jamPerMhs = totalMhs > 0 && jamDiakui > 0 ? Math.round((jamDiakui / totalMhs) * 100) / 100 : 0
+    if (!ekuivalensi) {
+      return NextResponse.json({ mahasiswa: [], ekuivalensi: null })
+    }
 
     const mahasiswa = registrations
       .map((r) => {
-        const nim = r.nim || ''
+        const studentNim = r.nim || ''
+        const totalJam = r.mahasiswa?.kompen_awal[0]?.total_jam_wajib || 0
+        const jamSelesai = jamSelesaiMap.get(studentNim) || 0
+        const sisaJam = Math.max(0, totalJam - jamSelesai)
         return {
           nama: r.mahasiswa?.nama || '',
-          nim,
-          jam: jamPerMhs,
+          nim: studentNim,
+          jam: sisaJam,
         }
       })
       .filter((m) => m.jam > 0)

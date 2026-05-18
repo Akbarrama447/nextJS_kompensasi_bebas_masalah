@@ -85,11 +85,7 @@ export async function POST(req: NextRequest) {
       return acc + Math.max(0, totalJam - jamSelesai)
     }, 0)
 
-    const setting = await prisma.pengaturan_sistem.findFirst({
-      where: { key: 'poin_per_jam' },
-    })
-    const rate = setting?.value ? parseInt(setting.value) : 10000
-    const nominalTotal = totalSisaJam * rate
+    const nominalTotal = totalSisaJam * 2000
 
     const ekuivalensi = await prisma.ekuivalensi_kelas.create({
       data: {

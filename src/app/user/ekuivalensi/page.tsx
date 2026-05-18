@@ -109,6 +109,8 @@ export default async function EkuivalensiPage() {
           catatan: ekuivalensiData.catatan || '',
           penanggung_jawab_nim: ekuivalensiData.penanggung_jawab_nim || '',
         }
+      } else {
+        students = []
       }
     }
   }

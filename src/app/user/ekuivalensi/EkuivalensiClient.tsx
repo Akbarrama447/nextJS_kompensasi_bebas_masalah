@@ -158,6 +158,7 @@ export default function EkuivalensiClient({
                 <table className="min-w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50">
                     <tr>
+                      <th className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-12">No</th>
                       <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nama</th>
                       <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">NIM</th>
                       <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Sisa Jam</th>
@@ -166,6 +167,7 @@ export default function EkuivalensiClient({
                   <tbody className="bg-white divide-y divide-slate-100">
                     {students.map((s, i) => (
                       <tr key={i} className="hover:bg-slate-50/50 transition">
+                        <td className="px-6 py-4 text-center text-sm text-slate-400">{i + 1}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">{s.nama}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-500">{s.nim}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-700">{s.jam}</td>
@@ -259,7 +261,7 @@ export default function EkuivalensiClient({
             </>
           ) : (
             <div className="border border-dashed border-slate-200 rounded-xl py-12 text-center text-sm text-slate-400">
-              {namaKelas !== '-' ? 'Semua mahasiswa sudah lunas jam kompen.' : 'Kamu belum terdaftar di kelas manapun.'}
+              {!ekuivalensi ? 'Belum ada pengajuan ekuivalensi untuk kelas ini.' : namaKelas !== '-' ? 'Semua mahasiswa sudah lunas jam kompen.' : 'Kamu belum terdaftar di kelas manapun.'}
             </div>
           )}
         </div>

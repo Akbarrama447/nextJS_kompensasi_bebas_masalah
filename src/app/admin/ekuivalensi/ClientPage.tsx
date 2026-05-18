@@ -15,6 +15,8 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
   const [openPopup, setOpenPopup] = useState(false);
   const [openTolak, setOpenTolak] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [autoLoading, setAutoLoading] = useState(false);
+  const [autoMsg, setAutoMsg] = useState("");
 
   // Fetch Class List
   useEffect(() => {
@@ -56,6 +58,31 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
   const totalJam = Array.isArray(mahasiswa)
     ? mahasiswa.reduce((acc, m) => acc + (m.jam || 0), 0)
     : 0;
+
+  const handleAutoAssign = async () => {
+    setAutoLoading(true);
+    setAutoMsg("");
+    try {
+      const res = await fetch("/api/ekuivalensi/auto-assign", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        setAutoMsg(`✅ ${data.created} class ter-create, ${data.skipped} class di-skip`);
+      } else {
+        setAutoMsg("❌ " + (data.message || "Gagal"));
+      }
+    } catch {
+      setAutoMsg("❌ Gagal connect");
+    } finally {
+      setAutoLoading(false);
+      // Refresh current class
+      if (kelas) {
+        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const refreshData = await refreshRes.json();
+        setMahasiswa(refreshData.mahasiswa || []);
+        setEkuivalensi(refreshData.ekuivalensi);
+      }
+    }
+  };
 
   const handleVerify = async (statusId: number, catatan?: string) => {
     if (!ekuivalensi?.id) {
@@ -114,7 +141,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
         {/* CARD */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
 
-          {/* PILIH KELAS */}
+          {/* PILIH KELAS + AUTO ASSIGN */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
             <label className="text-sm font-medium text-gray-700">
               Pilih Kelas
@@ -132,6 +159,18 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                 </option>
               ))}
             </select>
+
+            <button
+              onClick={handleAutoAssign}
+              disabled={autoLoading}
+              className="ml-auto px-4 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white text-xs font-bold rounded-lg transition"
+            >
+              {autoLoading ? "Proses..." : "Auto Assign Ekuivalensi"}
+            </button>
+
+            {autoMsg && (
+              <span className="text-xs font-medium text-gray-600">{autoMsg}</span>
+            )}
           </div>
 
           {/* TABLE */}
@@ -139,6 +178,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
             <table className="min-w-[500px] w-full text-sm text-left">
               <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
                 <tr>
+                  <th className="px-4 py-3 text-center w-12">No</th>
                   <th className="px-4 py-3">Nama</th>
                   <th className="px-4 py-3 text-center">NIM</th>
                   <th className="px-4 py-3 text-center">Jam</th>
@@ -152,6 +192,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                       key={i}
                       className="border-b border-gray-200 last:border-none text-center"
                     >
+                      <td className="px-4 py-3 text-gray-400">{i + 1}</td>
                       <td className="px-4 py-3 text-left">{m.nama}</td>
                       <td>{m.nim}</td>
                       <td>{m.jam}</td>
@@ -159,7 +200,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="px-4 py-10 text-center text-gray-400">
+                    <td colSpan={4} className="px-4 py-10 text-center text-gray-400">
                       Tidak ada data mahasiswa di kelas ini.
                     </td>
                   </tr>
