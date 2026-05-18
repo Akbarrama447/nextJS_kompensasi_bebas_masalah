@@ -200,6 +200,7 @@ model Import_log {
   staf_nip         String?            @db.VarChar
   semester_id      Int?
   nama_file        String?            @db.VarChar
+  file_hash        String?            @db.VarChar
   total_baris      Int?
   sukses_baris     Int?
   error_details    Json?

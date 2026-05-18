@@ -69,9 +69,9 @@ export default function LoginPage() {
               Politeknik Negeri Semarang
             </h2>
           </div>
-          <p className="text-slate-400 text-sm tracking-[4px] leading-relaxed">
-            Platform managemen kompensasi <br />
-            mahasiswa Politeknik Negeri Semarang
+          <p className="text-slate-400 text-sm tracking-[6px] leading-relaxed">
+            Platform managemen kompensasi mahasiswa <br />
+            Politeknik Negeri Semarang
           </p>
         </div>
       </div>

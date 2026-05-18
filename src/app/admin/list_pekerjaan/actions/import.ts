@@ -18,6 +18,7 @@
 
 import prisma, { Prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import type { ParsedStudent } from '@/lib/excel-parser';
 
 // ─────────────────────────────────────────
@@ -94,6 +95,36 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
     }
   }
 
+  // ── 0.2 Validasi Hash File (Mencegah Duplikasi Upload) ──────────────
+  const dataString = JSON.stringify(students);
+  const fileHash = crypto.createHash('sha256').update(dataString).digest('hex');
+
+  const existingImport = await prisma.import_log.findFirst({
+    where: {
+      file_hash: fileHash,
+      status_import_id: IMPORT_STATUS.SELESAI
+    },
+    include: {
+      staf: { select: { nama: true } }
+    }
+  });
+
+  if (existingImport) {
+    const tanggalImport = existingImport.created_at 
+      ? new Date(existingImport.created_at).toLocaleString('id-ID')
+      : 'waktu tidak diketahui';
+      
+    return {
+      successCount: 0,
+      errors: [{
+        nim: '-',
+        nama: '-',
+        error: `File ini sudah pernah di-import sukses oleh ${existingImport.staf?.nama || 'Staf'} pada ${tanggalImport}.`
+      }],
+      importLogId: null
+    };
+  }
+
   // ── 1. Buat record import_log (status: proses) ──────────────────────────
   let importLog: { id: number };
   try {
@@ -102,6 +133,7 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
         staf_nip: finalStaffNip,
         semester_id: finalSemesterId,
         nama_file: namaFile,
+        file_hash: fileHash,
         total_baris: students.length,
         sukses_baris: 0,
       },
