@@ -3,83 +3,38 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import Webcam from 'react-webcam'
 import { 
-  Camera, MapPin, X, Search, 
-  RefreshCcw, MapPinned, ChevronLeft, ChevronRight, 
-  ChevronDown, Filter, Banknote, FileText 
+  Camera, MapPin, X, Scan, Banknote, FileText, Search, 
+  RefreshCcw, MapPinned, ListFilter, ChevronLeft, ChevronRight, 
+  ChevronDown, Filter 
 } from 'lucide-react'
 import { updateProgresTugas } from './action'
 
-interface Ruangan {
-  nama_ruangan: string | null
-}
-
-interface TipePekerjaan {
-  nama: string | null
-}
-
-interface Semester {
-  nama: string | null
-}
-
-interface Pekerjaan {
-  judul: string | null
-  poin_jam: number | null
-  ruangan: Ruangan | null
-  tipe_pekerjaan: TipePekerjaan | null
-  semester: Semester | null
-  tipe_pekerjaan_id: number | null
-}
-
-interface StatusTugas {
-  nama: string | null
-}
-
-interface TipePekerjaanItem {
-  id: number
-  nama: string | null
-}
-
-interface Penugasan {
-  id: number
-  status_tugas_id: number | null
-  pekerjaan: Pekerjaan | null
-  status_tugas: StatusTugas | null
-}
-
-interface UserData {
-  nama: string
-  nim: string
-  info: unknown
-}
-
-interface Props {
-  initialData: Penugasan[]
-  user: UserData
-  allTipePekerjaan: TipePekerjaanItem[]
-}
-
-export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaan }: Props) {
+export default function PekerjaanSayaClient({ initialData, user }: any) {
   const webcamRef = useRef<Webcam>(null)
   
-  const [dataTugas, setDataTugas] = useState<Penugasan[]>(initialData || [])
+  const [dataTugas, setDataTugas] = useState(initialData || [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedTugas, setSelectedTugas] = useState<Penugasan | null>(null)
+  const [selectedTugas, setSelectedTugas] = useState<any>(null)
   const [imgSrc, setImgSrc] = useState<string | null>(null)
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [address, setAddress] = useState<string>("")
+  const [nominal, setNominal] = useState<string>("")
 
+  // --- STATE FILTER & PAGINATION ---
   const [searchTerm, setSearchTerm] = useState("")
   const [filterTipe, setFilterTipe] = useState("Semua")
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
+  // 1. Ambil List Tipe Pekerjaan secara Dinamis
   const listTipe = useMemo(() => {
-    const types = allTipePekerjaan.map((t) => t.nama).filter((n): n is string => n !== null)
-    return ["Semua", ...types]
-  }, [allTipePekerjaan])
+    const types = dataTugas.map((t: any) => t.pekerjaan?.tipe_pekerjaan?.nama).filter(Boolean)
+    return ["Semua", ...Array.from(new Set(types))]
+  }, [dataTugas])
 
+  // 2. Logic Filtering
   const filteredData = useMemo(() => {
-    return dataTugas.filter((t) => {
+    return dataTugas.filter((t: any) => {
       const matchSearch = (t.pekerjaan?.judul?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           t.pekerjaan?.ruangan?.nama_ruangan?.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchTipe = filterTipe === "Semua" || t.pekerjaan?.tipe_pekerjaan?.nama === filterTipe;
@@ -87,6 +42,7 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
     })
   }, [searchTerm, filterTipe, dataTugas])
 
+  // 3. Logic Pagination
   const totalPages = Math.ceil(filteredData.length / rowsPerPage)
   const startIndex = (currentPage - 1) * rowsPerPage
   const currentRows = filteredData.slice(startIndex, startIndex + rowsPerPage)
@@ -103,34 +59,20 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
           const lng = pos.coords.longitude
           setLocation({ lat, lng })
           try {
-            const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), 5000)
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-              { signal: controller.signal }
-            )
-            clearTimeout(timeoutId)
-            if (!response.ok) throw new Error("Gagal ambil lokasi")
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
             const data = await response.json()
-            const loc = data.address?.village || data.address?.suburb || data.address?.city || data.address?.town || "Lokasi Terdeteksi"
+            const loc = data.address.village || data.address.suburb || data.address.city || "Lokasi Terdeteksi"
             setAddress(loc)
-          } catch {
-            setAddress(`${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-          }
+          } catch { setAddress("Koordinat Terkunci") }
         },
-        () => setAddress("Akses lokasi ditolak")
+        (err) => console.error(err)
       )
-    } else {
-      setAddress("Geolocation tidak didukung")
     }
   }
 
-  const handleAction = (tugas: Penugasan) => {
-    setSelectedTugas(tugas)
-    setImgSrc(null)
-    setAddress("Mencari lokasi...")
-    getLocation()
-    setIsModalOpen(true)
+  const handleAction = (tugas: any) => {
+    setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); getLocation(); setIsModalOpen(true);
+    setNominal("");
   }
 
   const capture = useCallback(() => {
@@ -142,27 +84,28 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
     if (!selectedTugas) return
     const formData = new FormData()
     formData.append('id', id.toString())
-    formData.append('status_tugas_id', String(selectedTugas.status_tugas_id ?? 1))
+    formData.append('status_tugas_id', selectedTugas.status_tugas_id.toString())
     if (imgSrc) formData.append('image', imgSrc)
+    formData.append('nominal', nominal)
 
     const result = await updateProgresTugas(formData)
     if (result.success) {
-      const updated = dataTugas.map((t) => t.id === id ? { ...t, status_tugas_id: result.nextStatus ?? t.status_tugas_id } : t)
+      const updated = dataTugas.map((t: any) => t.id === id ? { ...t, status_tugas_id: result.nextStatus } : t)
       setDataTugas(updated)
       setIsModalOpen(false)
     }
   }
 
-  const isAkhiri = selectedTugas?.status_tugas_id === 2
-
   return (
     <div className="w-full flex flex-col min-h-screen bg-white font-sans text-slate-800">
       
+      {/* Header Title */}
       <div className="px-6 md:px-10 py-8 bg-white border-b border-slate-100">
         <h1 className="text-2xl font-black text-slate-900 tracking-tight">Pekerjaan Saya</h1>
         <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Sistem Kompensasi Mahasiswa</p>
       </div>
 
+      {/* FILTER BOX - Inline Table Style */}
       <div className="px-4 md:px-10 py-6">
         <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/30">
@@ -221,7 +164,7 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                 </tr>
               </thead>
               <tbody className="text-sm font-medium text-slate-600">
-                {currentRows.map((t, index) => (
+                {currentRows.map((t: any, index: number) => (
                   <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
                     <td className="px-4 py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
                     <td className="px-8 py-6 text-left">
@@ -247,20 +190,11 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                         {t.status_tugas?.nama || 'Menunggu'}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right whitespace-nowrap">
-                      {t.status_tugas_id !== null && t.status_tugas_id <= 2 ? (
+                    <td className="px-8 py-6 text-right">
+                      {t.status_tugas_id <= 2 && (
                         <button onClick={() => handleAction(t)} className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 ${t.status_tugas_id === 1 ? 'bg-[#2e5299] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}>
                           {t.status_tugas_id === 1 ? 'Mulai' : 'Akhiri'}
                         </button>
-                      ) : (
-                        <span className={`inline-flex px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight ${
-                          t.status_tugas_id === 3 ? 'bg-green-50 text-green-700' :
-                          t.status_tugas_id === 4 ? 'bg-blue-50 text-blue-700' :
-                          t.status_tugas_id === 5 ? 'bg-red-50 text-red-600' :
-                          'bg-slate-50 text-slate-400'
-                        }`}>
-                          {t.status_tugas?.nama || '-'}
-                        </span>
                       )}
                     </td>
                   </tr>
@@ -269,6 +203,7 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
             </table>
           </div>
 
+          {/* PAGINATION FOOTER */}
           <div className="p-6 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
               Total {filteredData.length} Pekerjaan
@@ -286,66 +221,48 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
         </div>
       </div>
 
-      {isModalOpen && selectedTugas && (
+      {/* MODAL (Tetap Sesuai Layout Sebelumnya) */}
+      {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/20 backdrop-blur-sm p-0 md:p-4 text-left">
           <div className="bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-300">
-             <div className="px-8 py-6 flex justify-between items-center border-b border-slate-50">
-               <div className="text-left">
-                 <h3 className="text-lg font-bold">{isAkhiri ? 'Upload Bukti' : 'Konfirmasi Mulai'}</h3>
-                 <p className="text-[10px] text-slate-400 font-bold uppercase">{selectedTugas.pekerjaan?.judul}</p>
-               </div>
-               <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-50 rounded-full text-slate-300"><X size={20}/></button>
+             {/* ... (Konten Modal Sama dengan Sebelumnya) ... */}
+              <div className="px-8 py-6 flex justify-between items-center border-b border-slate-50">
+                <div className="text-left"><h3 className="text-lg font-bold">Verifikasi Progres</h3><p className="text-[10px] text-slate-400 font-bold uppercase">{selectedTugas?.pekerjaan?.judul}</p></div>
+                <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-50 rounded-full text-slate-300"><X size={20}/></button>
              </div>
              <div className="p-8 space-y-6">
                 <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 flex items-center gap-4">
-                  <MapPinned className="text-[#2e5299] shrink-0"/>
-                  <div className="text-left min-w-0">
-                    <p className="text-sm font-bold text-slate-800 truncate">{address}</p>
-                    <p className="text-[11px] font-mono text-slate-400 italic">
-                      {location ? `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}` : '-'}
-                    </p>
-                  </div>
+                  <MapPinned className="text-[#2e5299]"/><div className="text-left"><p className="text-sm font-bold text-slate-800">{address}</p><p className="text-[11px] font-mono text-slate-400 italic">{location?.lat.toFixed(6)}, {location?.lng.toFixed(6)}</p></div>
                 </div>
-
                 <div className="aspect-video bg-slate-50 rounded-[1.5rem] relative overflow-hidden border border-slate-100 shadow-inner group">
-                  {imgSrc ? (
-                    <img src={imgSrc} alt="Bukti" className="w-full h-full object-cover"/>
-                  ) : (
-                    <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />
-                  )}
-                  <button
-                    onClick={imgSrc ? () => setImgSrc(null) : capture}
-                    className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all"
-                  >
-                    {imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}
-                  </button>
+                   {imgSrc ? <img src={imgSrc} className="w-full h-full object-cover"/> : <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />}
+                   <button onClick={imgSrc ? () => setImgSrc(null) : capture} className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}</button>
                 </div>
+                 
+                 {/* Nominal Input Field */}
+                 <div className="flex flex-col gap-2">
+                   <label className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                     Nominal Kompensasi
+                     {selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && (
+                       <span className="text-red-500 font-bold">*</span>
+                     )}
+                   </label>
+                   <div className="relative group">
+                     <input 
+                       type="text" 
+                       value={nominal}
+                       onChange={(e) => setNominal(e.target.value.replace(/[^0-9]/g, ""))}
+                       placeholder={selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' ? "Wajib diisi (contoh: 50000)" : "Opsional (contoh: 50000)"} 
+                       className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#2e5299] transition-all"
+                     />
+                     <Banknote className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#2e5299] transition-colors" size={18} />
+                   </div>
+                   <p className="text-[10px] text-slate-400 italic">
+                     * Catatan: jangan pake koma dan harus angka.
+                   </p>
+                 </div>
 
-                {/* Eksternal Only */}
-                {selectedTugas?.pekerjaan?.tipe_pekerjaan_id === 2 && (
-                  <div className="grid grid-cols-1 gap-5 pt-4 border-t border-slate-50 text-left animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="space-y-1.5 text-left">
-                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1 flex items-center gap-2 text-left">
-                        <Banknote size={14}/> Nominal (Tanpa Koma)
-                      </label>
-                      <input type="number" placeholder="50000" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-[#2e5299] font-bold text-slate-700 text-left" />
-                    </div>
-                    <div className="space-y-1.5 text-left">
-                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1 flex items-center gap-2 text-left">
-                        <FileText size={14}/> Keterangan / Nota
-                      </label>
-                      <textarea placeholder="Rincian..." rows={2} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-[#2e5299] resize-none font-medium text-left" />
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => updateStatus(selectedTugas.id)}
-                  disabled={isAkhiri && !imgSrc}
-                  className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all"
-                >
-                  {isAkhiri ? 'Kirim Laporan' : 'Mulai Pekerjaan'}
-                </button>
+                 <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc || (selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && !nominal)} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all">Kirim Laporan</button>
              </div>
           </div>
         </div>

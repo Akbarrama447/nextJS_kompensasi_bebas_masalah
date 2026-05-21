@@ -150,6 +150,7 @@ export async function getDaftarKompen(
           status_tugas_id: p.status_tugas?.id || null,
           status_nama: p.status_tugas?.nama || null,
           created_at: p.created_at?.toISOString() || null,
+          detail_pengerjaan: p.detail_pengerjaan as Record<string, unknown> | null,
         });
       }
     }
@@ -208,13 +209,21 @@ export async function getDaftarKompen(
       );
     }
 
-    // Apply status filter
+    // Apply status filter — check across ALL penugasans, not just the first
     if (status_filter === 'belum_ditugaskan') {
-      filteredData = filteredData.filter(d => d.penugasan_id === null);
+      filteredData = filteredData.filter(d => !d.penugasans || d.penugasans.length === 0);
     } else if (status_filter === 'sedang_dikerjakan') {
-      filteredData = filteredData.filter(d => d.status_tugas_id !== null && d.status_tugas_id !== 3 && d.status_tugas_id !== 4);
+      filteredData = filteredData.filter(d =>
+        d.penugasans && d.penugasans.some(p =>
+          p.status_tugas_id !== null && p.status_tugas_id !== 3 && p.status_tugas_id !== 4
+        )
+      );
     } else if (status_filter === 'selesai') {
-      filteredData = filteredData.filter(d => d.status_tugas_id === 3);
+      filteredData = filteredData.filter(d =>
+        d.penugasans && d.penugasans.some(p =>
+          p.status_tugas_id === 3 || p.status_tugas_id === 4
+        )
+      );
     }
 
     const totalCount = filteredData.length;

@@ -462,34 +462,66 @@ export default function TabPenugasan() {
                 </div>
               </div>
 
-              {/* Photos Grid - Placeholder */}
-              <div className="grid grid-cols-2 gap-6 mb-2">
-                <div>
-                  <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Mulai</h4>
-                  <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Belum ada foto</span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
-                    <div className="flex items-center gap-2 text-gray-600 text-sm">
-                      <Clock className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span>{formatDate(selectedData.created_at || "")}</span>
+              {/* Photos Grid */}
+              {(() => {
+                const currentPenugasan = selectedData.penugasans?.find(p => p.id === selectedData.penugasan_id);
+                let fotoMulai: string | undefined;
+                let fotoSelesai: string | undefined;
+                try {
+                  const dp = currentPenugasan?.detail_pengerjaan;
+                  if (dp && typeof dp === 'object' && !Array.isArray(dp)) {
+                    const obj = dp as Record<string, unknown>;
+                    fotoMulai = obj.foto_mulai as string | undefined;
+                    fotoSelesai = obj.foto_selesai as string | undefined;
+                    // backward compat: data lama pake format { fileName }
+                    if (!fotoMulai && !fotoSelesai && obj.fileName) {
+                      const statusId = currentPenugasan?.status_tugas_id;
+                      if (statusId === 2) {
+                        fotoMulai = obj.fileName as string;
+                      } else {
+                        fotoSelesai = obj.fileName as string;
+                      }
+                    }
+                  }
+                } catch {}
+                return (
+                  <div className="grid grid-cols-2 gap-6 mb-2">
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Mulai</h4>
+                      <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
+                        {fotoMulai ? (
+                          <img src={`/uploads/${fotoMulai}`} alt="Foto Mulai" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-400 text-sm">Tidak tersedia</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <Clock className="w-4 h-4 shrink-0 text-gray-400" />
+                          <span>{formatDate(selectedData.created_at || "")}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                <div>
-                  <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Selesai</h4>
-                  <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Belum ada foto</span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
-                    <div className="flex items-center gap-2 text-gray-600 text-sm">
-                      <Clock className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span>{formatDate(selectedData.created_at || "")}</span>
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Selesai</h4>
+                      <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
+                        {fotoSelesai ? (
+                          <img src={`/uploads/${fotoSelesai}`} alt="Foto Selesai" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-400 text-sm">Belum ada foto</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <Clock className="w-4 h-4 shrink-0 text-gray-400" />
+                          <span>{formatDate(selectedData.created_at || "")}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()}
             </div>
 
             {/* Footer / Actions */}

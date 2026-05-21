@@ -46,7 +46,7 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
     select: { menus_id: true },
   })
 
-  const allowedIds = allowedMenuIds.map((r) => r.menus_id).filter(Boolean)
+  const allowedIds = allowedMenuIds.map((r) => r.menus_id).filter((id): id is number => id !== null)
 
   const menus = await prisma.menus.findMany({
     where: {
