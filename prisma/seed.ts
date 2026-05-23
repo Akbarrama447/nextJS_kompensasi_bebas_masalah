@@ -83,7 +83,7 @@ const refStatusEkuivalensi = [
   { id: 4, nama: 'DITOLAK' },
 ]
 
-// Menus for admin
+// Menus for admin (key berbeda dari mahasiswa agar unique)
 const adminMenus = [
   { key: 'dashboard_admin', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
   { key: 'pekerjaan_admin', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/list_pekerjaan', urutan: 2, parent_id: null },
@@ -312,12 +312,12 @@ async function seedStudents() {
 async function seedMenus() {
   console.log('\n📱 Seeding menus...')
 
-  // Clear existing menus and insert new ones
+  // Clear existing menus and insert new ones (both admin + mahasiswa)
   await prisma.menus.deleteMany({ where: { parent_id: null } })
 
-  const menusToSeed = studentAccounts.length === 0 ? adminMenus : mahasiswaMenus
+  const allMenus = [...adminMenus, ...mahasiswaMenus]
 
-  for (const menu of menusToSeed) {
+  for (const menu of allMenus) {
     await prisma.menus.create({
       data: menu,
     })
@@ -328,8 +328,10 @@ async function seedMenus() {
 async function seedRoleHasMenus() {
   console.log('\n🔗 Seeding role_has_menus...')
 
+  // Hapus semua data lama
   await prisma.role_has_menus.deleteMany()
 
+  // Mapping role → key menu
   const roleMenuMap: { role_id: number; keys: string[] }[] = [
     { role_id: 1, keys: ['dashboard', 'pekerjaan', 'ekuivalensi'] },
     { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin'] },
