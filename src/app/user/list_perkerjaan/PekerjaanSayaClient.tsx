@@ -128,7 +128,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                   className="appearance-none pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:border-[#2e5299] cursor-pointer"
                 >
                   {listTipe.map((tipe) => (
-                    <option key={tipe} value={tipe}>{tipe}</option>
+                    <option key={String(tipe)} value={String(tipe)}>{String(tipe)}</option>
                   ))}
                 </select>
                 <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />

@@ -97,6 +97,8 @@ export async function GET(req: NextRequest) {
             tanggal: ekuivalensi.created_at,
             notaUrl: ekuivalensi.nota_url || '',
             catatan: ekuivalensi.catatan || '',
+            noTelepon: ekuivalensi.no_telepon || '',
+            noTeleponChangeCount: ekuivalensi.no_telepon_change_count ?? 0,
           }
         : null,
     })

@@ -4,10 +4,14 @@ import prisma from '@/lib/prisma'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { nim } = body
+    const { nim, noTelepon } = body
 
     if (!nim) {
       return NextResponse.json({ message: 'NIM diperlukan' }, { status: 400 })
+    }
+
+    if (!noTelepon) {
+      return NextResponse.json({ message: 'Nomor telepon perwakilan harus diisi' }, { status: 400 })
     }
 
     const activeSemester = await prisma.semester.findFirst({
@@ -95,6 +99,7 @@ export async function POST(req: NextRequest) {
         jam_diakui: totalSisaJam,
         nominal_total: nominalTotal,
         status_ekuivalensi_id: 1,
+        no_telepon: noTelepon,
       },
     })
 
@@ -104,6 +109,8 @@ export async function POST(req: NextRequest) {
         id: ekuivalensi.id,
         jam: ekuivalensi.jam_diakui,
         nominal: Number(ekuivalensi.nominal_total),
+        noTelepon: ekuivalensi.no_telepon,
+        noTeleponChangeCount: ekuivalensi.no_telepon_change_count,
       },
     })
   } catch (error) {
