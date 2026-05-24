@@ -85,10 +85,10 @@ const refStatusEkuivalensi = [
 
 // Menus for admin
 const adminMenus = [
-  { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
-  { key: 'pekerjaan', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/list_pekerjaan', urutan: 2, parent_id: null },
-  { key: 'laporan', label: 'Laporan', icon: 'FileText', path: '/admin/laporan', urutan: 3, parent_id: null },
-  { key: 'pengaturan', label: 'Pengaturan', icon: 'Settings', path: '/admin/pengaturan', urutan: 4, parent_id: null },
+  { key: 'dashboard_admin', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
+  { key: 'pekerjaan_admin', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/list_pekerjaan', urutan: 2, parent_id: null },
+  // { key: 'laporan', label: 'Laporan', icon: 'FileText', path: '/admin/laporan', urutan: 3, parent_id: null },
+  // { key: 'pengaturan', label: 'Pengaturan', icon: 'Settings', path: '/admin/pengaturan', urutan: 4, parent_id: null },
 ]
 
 // Menus for mahasiswa
