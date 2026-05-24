@@ -7,11 +7,11 @@ import UserHeader from '@/components/UserHeader'
 export default async function PekerjaanSayaPage() {
   const cookieStore = await cookies()
   const nim = cookieStore.get('nim')?.value ||
-              cookieStore.get('NIM')?.value ||
-              cookieStore.get('user_id')?.value ||
-              '33424202'
+    cookieStore.get('NIM')?.value ||
+    cookieStore.get('user_id')?.value ||
+    '33424202'; // Fallback ke NIM lo biar PASTI MUNCUL pas demo
 
-
+  console.log("DEBUG: NIM Aktif =", nim);
 
   const mhsAktif = await prisma.mahasiswa.findUnique({
     where: { nim },
@@ -27,18 +27,13 @@ export default async function PekerjaanSayaPage() {
     }
   })
 
-  const allTipePekerjaan = await prisma.ref_tipe_pekerjaan.findMany({
-    orderBy: { id: 'asc' }
-  })
-
   const penugasanSaya = await prisma.penugasan.findMany({
     where: { nim },
     include: {
       pekerjaan: {
         include: {
           ruangan: true,
-          tipe_pekerjaan: true,
-          semester: true
+          tipe_pekerjaan: true
         }
       },
       status_tugas: true
@@ -62,7 +57,7 @@ export default async function PekerjaanSayaPage() {
     <Sidebar role="mahasiswa" activePath="/user/list_perkerjaan">
       <UserHeader nama={userData.nama} role="mahasiswa" semesterLabel={semesterLabel} />
       {/* Lempar data ke Client Component */}
-      <PekerjaanSayaClient initialData={penugasanSaya} user={userData} allTipePekerjaan={allTipePekerjaan} />
+      <PekerjaanSayaClient initialData={penugasanSaya} user={userData} />
     </Sidebar>
   )
 }

@@ -1,17 +1,19 @@
 'use client'
 
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Webcam from 'react-webcam'
 import { 
   Camera, MapPin, X, Scan, Banknote, FileText, Search, 
   RefreshCcw, MapPinned, ListFilter, ChevronLeft, ChevronRight, 
   ChevronDown, Filter 
+
 } from 'lucide-react'
 import { updateProgresTugas } from './action'
 
 export default function PekerjaanSayaClient({ initialData, user }: any) {
   const webcamRef = useRef<Webcam>(null)
   
+
   const [dataTugas, setDataTugas] = useState(initialData || [])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTugas, setSelectedTugas] = useState<any>(null)
@@ -58,41 +60,60 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
           const lat = pos.coords.latitude
           const lng = pos.coords.longitude
           setLocation({ lat, lng })
+
           try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            )
             const data = await response.json()
-            const loc = data.address.village || data.address.suburb || data.address.city || "Lokasi Terdeteksi"
-            setAddress(loc)
-          } catch { setAddress("Koordinat Terkunci") }
+            const displayLoc = data.address.village || data.address.suburb || data.address.city_district || data.address.city || "Lokasi Terdeteksi"
+            setAddress(displayLoc)
+          } catch (error) {
+            setAddress("Koordinat Terkunci")
+          }
         },
-        (err) => console.error(err)
+        (err) => console.error("Gagal ambil GPS:", err)
+>>>>>>> origin/listadmin
       )
     }
   }
 
   const handleAction = (tugas: any) => {
-    setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); getLocation(); setIsModalOpen(true);
-    setNominal("");
+    setSelectedTugas(tugas)
+    setImgSrc(null)
+    setAddress("Mencari lokasi...")
+    getLocation()
+    setIsModalOpen(true)
+    setNominal("")
   }
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot()
-    if (imageSrc) { setImgSrc(imageSrc); getLocation(); }
+    if (imageSrc) {
+      setImgSrc(imageSrc)
+      getLocation()
+    }
   }, [webcamRef])
 
   const updateStatus = async (id: number) => {
     if (!selectedTugas) return
+
     const formData = new FormData()
     formData.append('id', id.toString())
     formData.append('status_tugas_id', selectedTugas.status_tugas_id.toString())
-    if (imgSrc) formData.append('image', imgSrc)
+    if (imgSrc) {
+      formData.append('image', imgSrc)
+    }
     formData.append('nominal', nominal)
 
     const result = await updateProgresTugas(formData)
+
     if (result.success) {
       const updated = dataTugas.map((t: any) => t.id === id ? { ...t, status_tugas_id: result.nextStatus } : t)
       setDataTugas(updated)
       setIsModalOpen(false)
+    } else {
+      alert("Gagal simpan ke DB. Pastikan folder public/uploads sudah ada.")
     }
   }
 
@@ -221,11 +242,10 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
         </div>
       </div>
 
-      {/* MODAL (Tetap Sesuai Layout Sebelumnya) */}
+      {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/20 backdrop-blur-sm p-0 md:p-4 text-left">
           <div className="bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-300">
-             {/* ... (Konten Modal Sama dengan Sebelumnya) ... */}
               <div className="px-8 py-6 flex justify-between items-center border-b border-slate-50">
                 <div className="text-left"><h3 className="text-lg font-bold">Verifikasi Progres</h3><p className="text-[10px] text-slate-400 font-bold uppercase">{selectedTugas?.pekerjaan?.judul}</p></div>
                 <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-50 rounded-full text-slate-300"><X size={20}/></button>
@@ -238,7 +258,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                    {imgSrc ? <img src={imgSrc} className="w-full h-full object-cover"/> : <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />}
                    <button onClick={imgSrc ? () => setImgSrc(null) : capture} className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}</button>
                 </div>
-                 
+                  
                  {/* Nominal Input Field */}
                  <div className="flex flex-col gap-2">
                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
