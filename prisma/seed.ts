@@ -325,6 +325,35 @@ async function seedMenus() {
   }
 }
 
+async function seedRoleHasMenus() {
+  console.log('\n🔗 Seeding role_has_menus...')
+
+  await prisma.role_has_menus.deleteMany()
+
+  const roleMenuMap: { role_id: number; keys: string[] }[] = [
+    { role_id: 1, keys: ['dashboard', 'pekerjaan', 'ekuivalensi'] },
+    { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin'] },
+    { role_id: 3, keys: ['dashboard_admin', 'pekerjaan_admin', 'laporan', 'pengaturan'] },
+  ]
+
+  for (const entry of roleMenuMap) {
+    const menusData = await prisma.menus.findMany({
+      where: { key: { in: entry.keys } },
+      select: { id: true, key: true },
+    })
+
+    for (const menu of menusData) {
+      await prisma.role_has_menus.create({
+        data: {
+          role_id: entry.role_id,
+          menus_id: menu.id,
+        },
+      })
+      console.log(`  ✓ role_has_menus: role_id=${entry.role_id} → menu_key=${menu.key}`)
+    }
+  }
+}
+
 async function main() {
   console.log('🌱 Starting database seeding...')
   console.log('================================')
@@ -334,6 +363,7 @@ async function main() {
   await seedStaff()
   await seedStudents()
   await seedMenus()
+  await seedRoleHasMenus()
 
   console.log('\n================================')
   console.log('✅ Seeding completed successfully!\n')
