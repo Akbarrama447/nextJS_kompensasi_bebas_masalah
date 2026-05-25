@@ -87,7 +87,15 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
         <nav className="flex-1">
           <ul className="space-y-1">
             {menus.map((menu) => {
-              const href = menu.path
+              let href = menu.path
+              if (role === 'admin') {
+                if (menu.key === 'pekerjaan' || menu.key === 'dashboard') {
+                  href = '/admin/list_pekerjaan'
+                } else {
+                  href = menu.path.replace('/user/', '/admin/')
+                }
+              }
+
               const isActive = activePath === href || activePath.startsWith(href + '/') || (menu.key && activePath.includes(menu.key))
               return (
                 <li key={menu.id}>

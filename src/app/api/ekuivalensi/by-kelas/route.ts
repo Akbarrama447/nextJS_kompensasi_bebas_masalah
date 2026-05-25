@@ -41,7 +41,6 @@ export async function GET(req: Request) {
         // Ada Penanggung Jawab (dari pengajuan user)
         studentList = [{
           nama: ekuivalensi.mahasiswa.nama,
-          nama: ekuivalensi.mahasiswa.nama,
           nim: ekuivalensi.mahasiswa.nim,
           jam: Math.floor(ekuivalensi.jam_diakui || 0),
         }];
@@ -108,6 +107,7 @@ export async function GET(req: Request) {
         jam: Math.floor(ekuivalensi.jam_diakui || 0),
         catatan: ekuivalensi.catatan || '',
         keterangan_pekerjaan: ekuivalensi.keterangan_pekerjaan || '',
+        link_barang: ekuivalensi.link_barang || '',
         noTelepon: ekuivalensi.no_telepon || '',
         noTeleponChangeCount: ekuivalensi.no_telepon_change_count ?? 0,
         tanggal: ekuivalensi.created_at

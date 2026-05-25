@@ -238,10 +238,11 @@ model Ekuivalensi_kelas {
   status_ekuivalensi_id Int?                    @map("status_ekuivalensi_id")
   verified_by_nip       String?                 @map("verified_by_nip") @db.VarChar
   catatan               String?
-  keterangan_pekerjaan  String?
   created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
   no_telepon            String?                 @map("no_telepon") @db.VarChar
   no_telepon_change_count Int?                  @default(0) @map("no_telepon_change_count")
+  keterangan_pekerjaan  String?
+  link_barang           String?
   kelas                 Kelas?                  @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa             Mahasiswa?              @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   semester              Semester?               @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
