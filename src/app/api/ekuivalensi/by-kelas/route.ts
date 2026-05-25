@@ -57,6 +57,7 @@ export async function GET(req: Request) {
         nominal: (ekuivalensi.jam_diakui || 0) * 2000,
         jam: ekuivalensi.jam_diakui || 0,
         catatan: ekuivalensi.catatan || '',
+        keterangan_pekerjaan: ekuivalensi.keterangan_pekerjaan || '',
         tanggal: ekuivalensi.created_at
       } : null
     });
