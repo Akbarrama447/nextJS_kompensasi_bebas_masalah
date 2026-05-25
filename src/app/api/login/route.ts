@@ -10,16 +10,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'NIM dan password wajib diisi' }, { status: 400 })
     }
 
+    // Try to find in mahasiswa first
+    let userRecord = null;
+    let isStaf = false;
+
     const mahasiswa = await prisma.mahasiswa.findUnique({
       where: { nim },
       include: { user: true },
     })
 
-    if (!mahasiswa) {
-      return NextResponse.json({ error: 'NIM tidak ditemukan' }, { status: 401 })
+    if (mahasiswa) {
+      userRecord = mahasiswa;
+    } else {
+      // Try to find in staf
+      const staf = await prisma.staf.findUnique({
+        where: { nip: nim },
+        include: { user: true },
+      })
+      if (staf) {
+        userRecord = staf;
+        isStaf = true;
+      }
     }
 
-    const isValidPassword = await compare(password, mahasiswa.user?.kata_sandi || '')
+    if (!userRecord) {
+      return NextResponse.json({ error: 'NIM atau NIP tidak ditemukan' }, { status: 401 })
+    }
+
+    const isValidPassword = await compare(password, userRecord.user?.kata_sandi || '')
     if (!isValidPassword) {
       return NextResponse.json({ error: 'Password salah' }, { status: 401 })
     }
@@ -27,18 +45,29 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ 
       success: true, 
       message: 'Login berhasil',
-      nama: mahasiswa.nama,
+      nama: userRecord.nama,
+      role: isStaf ? 'admin' : 'mahasiswa',
     })
 
-    response.cookies.set('nim', nim, {
-      httpOnly: true,
-      path: '/',
-      maxAge: 60 * 60 * 24,
-    })
+    if (isStaf) {
+      response.cookies.delete('nim')
+      response.cookies.set('nip', nim, {
+        httpOnly: true,
+        path: '/',
+        maxAge: 60 * 60 * 24,
+      })
+    } else {
+      response.cookies.delete('nip')
+      response.cookies.set('nim', nim, {
+        httpOnly: true,
+        path: '/',
+        maxAge: 60 * 60 * 24,
+      })
+    }
 
     return response
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 })
   }
-}
+}

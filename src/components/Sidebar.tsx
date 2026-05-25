@@ -68,7 +68,7 @@ export default async function Sidebar({ role, activePath, children }: SidebarPro
               // Menentukan path berdasarkan role
               let href = menu.path
               if (role === 'admin') {
-                if (menu.key === 'pekerjaan') {
+                if (menu.key === 'pekerjaan' || menu.key === 'dashboard') {
                   href = '/admin/list_pekerjaan'
                 } else {
                   href = menu.path.replace('/user/', '/admin/')

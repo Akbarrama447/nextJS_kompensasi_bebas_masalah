@@ -29,7 +29,11 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/user/dashboard')
+      if (data.role === 'admin') {
+        router.push('/admin/list_pekerjaan')
+      } else {
+        router.push('/user/dashboard')
+      }
     } catch {
       setError('Terjadi kesalahan')
     } finally {

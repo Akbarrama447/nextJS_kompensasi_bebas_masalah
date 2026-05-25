@@ -58,6 +58,7 @@ export async function GET(req: Request) {
         jam: ekuivalensi.jam_diakui || 0,
         catatan: ekuivalensi.catatan || '',
         keterangan_pekerjaan: ekuivalensi.keterangan_pekerjaan || '',
+        link_barang: ekuivalensi.link_barang || '',
         tanggal: ekuivalensi.created_at
       } : null
     });
