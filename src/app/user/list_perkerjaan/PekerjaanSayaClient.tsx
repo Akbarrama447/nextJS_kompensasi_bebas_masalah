@@ -15,7 +15,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
   const [dataTugas, setDataTugas] = useState(initialData || [])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTugas, setSelectedTugas] = useState<any>(null)
-  const [imgSrc, setImgSrc] = useState<string | null>(null)
+  const [imgSrc, setImgSrc] = useState<{ blob: Blob; preview: string } | null>(null)
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [address, setAddress] = useState<string>("")
   const [nominal, setNominal] = useState<string>("")
@@ -29,7 +29,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
   // 1. Ambil List Tipe Pekerjaan secara Dinamis
   const listTipe = useMemo(() => {
     const types = dataTugas.map((t: any) => t.pekerjaan?.tipe_pekerjaan?.nama).filter(Boolean)
-    return ["Semua", ...Array.from(new Set(types))]
+    return ["Semua", ...Array.from(new Set(types))] as string[]
   }, [dataTugas])
 
   // 2. Logic Filtering
@@ -76,8 +76,16 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
   }
 
   const capture = useCallback(() => {
-    const imageSrc = webcamRef.current?.getScreenshot()
-    if (imageSrc) { setImgSrc(imageSrc); getLocation(); }
+    const canvas = webcamRef.current?.getCanvas()
+    if (canvas) {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const preview = URL.createObjectURL(blob)
+          setImgSrc({ blob, preview })
+          getLocation()
+        }
+      }, 'image/jpeg', 0.9)
+    }
   }, [webcamRef])
 
   const updateStatus = async (id: number) => {
@@ -85,13 +93,15 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
     const formData = new FormData()
     formData.append('id', id.toString())
     formData.append('status_tugas_id', selectedTugas.status_tugas_id.toString())
-    if (imgSrc) formData.append('image', imgSrc)
+    if (imgSrc) formData.append('image', imgSrc.blob, 'screenshot.jpg')
     formData.append('nominal', nominal)
 
     const result = await updateProgresTugas(formData)
     if (result.success) {
       const updated = dataTugas.map((t: any) => t.id === id ? { ...t, status_tugas_id: result.nextStatus } : t)
       setDataTugas(updated)
+      if (imgSrc?.preview) URL.revokeObjectURL(imgSrc.preview)
+      setImgSrc(null)
       setIsModalOpen(false)
     }
   }
@@ -235,8 +245,8 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                   <MapPinned className="text-[#2e5299]"/><div className="text-left"><p className="text-sm font-bold text-slate-800">{address}</p><p className="text-[11px] font-mono text-slate-400 italic">{location?.lat.toFixed(6)}, {location?.lng.toFixed(6)}</p></div>
                 </div>
                 <div className="aspect-video bg-slate-50 rounded-[1.5rem] relative overflow-hidden border border-slate-100 shadow-inner group">
-                   {imgSrc ? <img src={imgSrc} className="w-full h-full object-cover"/> : <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />}
-                   <button onClick={imgSrc ? () => setImgSrc(null) : capture} className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}</button>
+                   {imgSrc ? <img src={imgSrc.preview} className="w-full h-full object-cover"/> : <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />}
+                   <button onClick={imgSrc ? () => { if (imgSrc.preview) URL.revokeObjectURL(imgSrc.preview); setImgSrc(null) } : capture} className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}</button>
                 </div>
                  
                  {/* Nominal Input Field */}

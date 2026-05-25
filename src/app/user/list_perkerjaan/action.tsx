@@ -7,7 +7,7 @@ import { join } from 'path'
 export async function updateProgresTugas(formData: FormData) {
   const penugasanId = Number(formData.get('id'))
   const statusSekarang = Number(formData.get('status_tugas_id'))
-  const imageBase64 = formData.get('image') as string
+  const imageFile = formData.get('image') as File | null
   
   // 1. Tentukan Status Berikutnya
   // 1 (Menunggu) -> 2 (Proses), 2 (Proses) -> 3 (Selesai)
@@ -17,10 +17,9 @@ export async function updateProgresTugas(formData: FormData) {
     let fileName = null
 
     // 2. Handle Upload Gambar jika ada
-    if (imageBase64) {
-      // Decode base64
-      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "")
-      const buffer = Buffer.from(base64Data, 'base64')
+    if (imageFile) {
+      // Langsung convert Blob to Buffer (no base64 decoding needed)
+      const buffer = Buffer.from(await imageFile.arrayBuffer())
       
       // Buat nama file unik (Pake ID & Timestamp)
       fileName = `bukti_${penugasanId}_${Date.now()}.jpg`

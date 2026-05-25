@@ -35,8 +35,9 @@ export default function LoginPage() {
           router.push('/user/dashboard');
         } else if (userRole === 'Admin') {
           router.push('/admin/dashboard');
+        } else if (userRole === 'Superadmin') {
+          router.push('/superadmin/dashboard');
         } else {
-          // Fallback jika role tidak terdefinisi
           window.location.href = '/'; 
         }
       } else {

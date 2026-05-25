@@ -38,9 +38,30 @@ export function middleware(req: NextRequest) {
     return res
   }
 
+  // Auto-create demo superadmin cookie
+  if (pathname.startsWith('/superadmin') && !req.cookies.get('superadmin')?.value) {
+    const res = NextResponse.next()
+    res.cookies.set('superadmin', 'SUPERADMIN_DEMO', {
+      httpOnly: true,
+      path: '/',
+      maxAge: 60 * 60 * 24,
+    })
+    return res
+  }
+
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/', '/user', '/user/:path*', '/admin', '/admin/:path*', '/login', '/api/:path*'],
+  matcher: [
+    '/', 
+    '/user', 
+    '/user/:path*', 
+    '/admin', 
+    '/admin/:path*', 
+    '/superadmin', 
+    '/superadmin/:path*', 
+    '/login', 
+    '/api/:path*'
+  ],
 }

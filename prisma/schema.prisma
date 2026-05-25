@@ -78,15 +78,6 @@ model ref_tipe_pekerjaan {
   @@map("ref_tipe_pekerjaan")
 }
 
-model Roles {
-  id            Int     @id
-  nama          String? @db.VarChar
-  key_menu      Json?
-  key_condition Json?
-  users         Users[]
-
-  @@map("roles")
-}
 
 model Semester {
   id                   Int                    @id @default(autoincrement())
@@ -121,18 +112,6 @@ model Pengaturan_sistem {
 // LEVEL 2: Dependent on Level 1
 // =====================================================
 
-model Users {
-  user_id    Int       @id @default(autoincrement())
-  email      String?   @unique @db.VarChar
-  kata_sandi String?   @db.VarChar
-  role_id    Int?
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  role       Roles?    @relation(fields: [role_id], references: [id])
-  staf       Staf?
-  mahasiswa  Mahasiswa?
-
-  @@map("users")
-}
 
 model Prodi {
   id              Int      @id @default(autoincrement())
@@ -176,16 +155,6 @@ model Kelas {
   @@map("kelas")
 }
 
-model Ruangan {
-  id               Int               @id @default(autoincrement())
-  gedung_id        Int?
-  nama_ruangan     String?           @db.VarChar
-  kode_ruangan     String?           @db.VarChar
-  gedung           Gedung?           @relation(fields: [gedung_id], references: [id])
-  daftar_pekerjaan DaftarPekerjaan[]
-
-  @@map("ruangan")
-}
 
 model Mahasiswa {
   nim                         String                 @id @db.VarChar

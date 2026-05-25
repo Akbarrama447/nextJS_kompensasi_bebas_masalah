@@ -17,6 +17,15 @@ export default async function DashboardMahasiswa() {
     select: { id: true, nama: true, tahun: true, periode: true, mulai: true, selesai: true }
   })
 
+  const activeSemesterMapped = activeSemester ? {
+    id: activeSemester.id,
+    nama: activeSemester.nama || '',
+    tahun: activeSemester.tahun || undefined,
+    periode: activeSemester.periode || undefined,
+    mulai: activeSemester.mulai,
+    selesai: activeSemester.selesai
+  } : null
+
   const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
 
   // Query sisa jam dari view v_sisa_kompen
@@ -33,7 +42,7 @@ export default async function DashboardMahasiswa() {
           sisaJam={sisaJam}
           totalJamSelesai={totalJamSelesai}
           totalJamWajib={totalJamWajib}
-          activeSemester={activeSemester}
+          activeSemester={activeSemesterMapped}
         />
       </main>
     </Sidebar>

@@ -23,9 +23,9 @@ export default async function EkuivalensiPage() {
           namaMahasiswa={namaMahasiswa}
           ekuivalensi={ekuivalensi.map((item) => ({
             id: item.id,
-            penanggung_jawab_nim: item.penanggung_jawab_nim,
-            mahasiswa: item.mahasiswa ? { nama: item.mahasiswa.nama } : undefined,
-            jam_diakui: item.jam_diakui,
+            penanggung_jawab_nim: item.penanggung_jawab_nim || '',
+            mahasiswa: item.mahasiswa ? { nama: item.mahasiswa.nama || '' } : undefined,
+            jam_diakui: item.jam_diakui || 0,
           }))}
         />
       </main>
