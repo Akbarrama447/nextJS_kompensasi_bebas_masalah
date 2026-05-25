@@ -47,6 +47,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
           setMahasiswa([]);
         }
         setEkuivalensi(data.ekuivalensi);
+        setPekerjaan(data.ekuivalensi?.keterangan_pekerjaan || "");
       })
       .catch((err) => {
         console.error("Fetch error:", err);
@@ -116,6 +117,42 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
       }
     } catch (err) {
       console.error("Verify error:", err);
+      alert("Terjadi kesalahan koneksi");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePekerjaan = async () => {
+    if (!pekerjaan.trim()) {
+      alert("Pekerjaan tidak boleh kosong");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ekuivalensi/pekerjaan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ekuivalensiId: ekuivalensi?.id,
+          keterangan_pekerjaan: pekerjaan,
+          kelas: kelas,
+        }),
+      });
+
+      if (res.ok) {
+        alert("Pekerjaan berhasil disimpan");
+        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const refreshData = await refreshRes.json();
+        setEkuivalensi(refreshData.ekuivalensi);
+        setPekerjaan(refreshData.ekuivalensi?.keterangan_pekerjaan || "");
+      } else {
+        const error = await res.json();
+        alert(error.message || "Gagal menyimpan pekerjaan");
+      }
+    } catch (err) {
+      console.error("Save pekerjaan error:", err);
       alert("Terjadi kesalahan koneksi");
     } finally {
       setLoading(false);
@@ -237,15 +274,22 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
             </div>
 
             {/* PEKERJAAN */}
-            <div className="sm:col-span-2 w-full">
+            <div className="sm:col-span-2 w-full relative">
               <input
                 type="text"
                 value={pekerjaan}
                 onChange={(e) => setPekerjaan(e.target.value)}
                 placeholder="Input pekerjaan..."
                 suppressHydrationWarning
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full pl-3 pr-20 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <button
+                onClick={handleSavePekerjaan}
+                disabled={loading}
+                className="absolute right-1 top-1 bottom-1 bg-blue-600 text-white px-3 text-xs font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Simpan
+              </button>
             </div>
 
             {/* BUKTI */}

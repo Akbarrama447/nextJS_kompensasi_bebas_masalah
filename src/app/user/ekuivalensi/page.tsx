@@ -107,6 +107,7 @@ export default async function EkuivalensiPage() {
           nominal: Number(ekuivalensiData.nominal_total || 0),
           notaUrl: ekuivalensiData.nota_url || '',
           catatan: ekuivalensiData.catatan || '',
+          keterangan_pekerjaan: ekuivalensiData.keterangan_pekerjaan || '',
           penanggung_jawab_nim: ekuivalensiData.penanggung_jawab_nim || '',
           noTelepon: ekuivalensiData.no_telepon || '',
           noTeleponChangeCount: ekuivalensiData.no_telepon_change_count ?? 0,
