@@ -11,7 +11,13 @@ import TabRiwayat from "@/app/admin/list_pekerjaan/components/TabRiwayat";
 
 type Tab = "import" | "kelola" | "penugasan" | "riwayat";
 
-export default function ClientPage() {
+interface ClientPageProps {
+    semesterLabel?: string;
+    staffNip: string;
+    semesterId: number;
+}
+
+export default function ClientPage({ semesterLabel, staffNip, semesterId }: ClientPageProps) {
     const [activeTab, setActiveTab] = useState<Tab>("penugasan");
 
     const tabs = [
@@ -23,7 +29,14 @@ export default function ClientPage() {
 
     const renderTab = () => {
         switch (activeTab) {
-            case "import": return <TabImport />;
+            case "import": 
+                return (
+                    <TabImport 
+                        staffNip={staffNip} 
+                        semesterId={semesterId} 
+                        onSuccess={() => setActiveTab("riwayat")} 
+                    />
+                );
             case "kelola": return <TabKelola />;
             case "penugasan": return <TabPenugasan />;
             case "riwayat": return <TabRiwayat />;
@@ -32,7 +45,7 @@ export default function ClientPage() {
 
     return (
         <main className="flex-1 flex flex-col" suppressHydrationWarning>
-            <UserHeader nama="Admin" role="admin" />
+            <UserHeader nama="Admin" role="admin" semesterLabel={semesterLabel} />
 
             <div className="p-6 max-w-6xl mx-auto w-full" suppressHydrationWarning>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">

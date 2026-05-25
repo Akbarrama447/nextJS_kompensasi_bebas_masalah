@@ -61,6 +61,7 @@ export async function getDaftarKompen(
     offset = 0, 
     status_filter = 'semua',
     search = '',
+    kelas_id,
   } = params || {};
 
   try {
@@ -88,12 +89,27 @@ export async function getDaftarKompen(
       return { data: [], total: 0 };
     }
 
+    // Build where clause for kompen_awal
+    const whereClause: any = {
+      semester_id: semesterId,
+      total_jam_wajib: { gt: 0 },
+    };
+
+    // Filter by class if provided
+    if (kelas_id) {
+      whereClause.mahasiswa = {
+        registrasi_mahasiswa: {
+          some: {
+            kelas_id: kelas_id,
+            semester_id: semesterId,
+          }
+        }
+      };
+    }
+
     // Get all kompen_awal for this semester with jam kompen > 0
     const kompenData = await prisma.kompen_awal.findMany({
-      where: {
-        semester_id: semesterId,
-        total_jam_wajib: { gt: 0 }, // Only show students with jam kompen > 0
-      },
+      where: whereClause,
       include: {
         mahasiswa: {
           select: { nim: true, nama: true },
@@ -134,6 +150,7 @@ export async function getDaftarKompen(
           status_tugas_id: p.status_tugas?.id || null,
           status_nama: p.status_tugas?.nama || null,
           created_at: p.created_at?.toISOString() || null,
+          detail_pengerjaan: p.detail_pengerjaan as Record<string, unknown> | null,
         });
       }
     }
@@ -192,13 +209,21 @@ export async function getDaftarKompen(
       );
     }
 
-    // Apply status filter
+    // Apply status filter — check across ALL penugasans, not just the first
     if (status_filter === 'belum_ditugaskan') {
-      filteredData = filteredData.filter(d => d.penugasan_id === null);
+      filteredData = filteredData.filter(d => !d.penugasans || d.penugasans.length === 0);
     } else if (status_filter === 'sedang_dikerjakan') {
-      filteredData = filteredData.filter(d => d.status_tugas_id !== null && d.status_tugas_id !== 3 && d.status_tugas_id !== 4);
+      filteredData = filteredData.filter(d =>
+        d.penugasans && d.penugasans.some(p =>
+          p.status_tugas_id !== null && p.status_tugas_id !== 3 && p.status_tugas_id !== 4
+        )
+      );
     } else if (status_filter === 'selesai') {
-      filteredData = filteredData.filter(d => d.status_tugas_id === 3);
+      filteredData = filteredData.filter(d =>
+        d.penugasans && d.penugasans.some(p =>
+          p.status_tugas_id === 3 || p.status_tugas_id === 4
+        )
+      );
     }
 
     const totalCount = filteredData.length;
@@ -217,9 +242,19 @@ export async function getDaftarKompen(
 export async function verifyPenugasan(
   params: VerifyParams
 ): Promise<VerifyResult> {
-  const { penugasan_id, verifikasi_oleh_nip } = params;
+  const { penugasan_id } = params;
 
   try {
+    const { cookies } = await import('next/headers')
+    const cookieStore = await cookies()
+    const nipCookie = cookieStore.get('nip')?.value
+    let verifikasi_oleh_nip: string
+
+    if (nipCookie) {
+      verifikasi_oleh_nip = nipCookie
+    } else {
+      verifikasi_oleh_nip = await getStaffNip()
+    }
     const penugasan = await prisma.penugasan.findUnique({
       where: { id: penugasan_id },
       include: {

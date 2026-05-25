@@ -22,14 +22,14 @@ async function getActiveSemester() {
     where: { is_aktif: true },
     select: { id: true },
   });
-  
+
   if (semester) return semester.id;
-  
+
   const firstSemester = await prisma.semester.findFirst({
     select: { id: true },
     orderBy: { id: 'asc' },
   });
-  
+
   return firstSemester?.id || null;
 }
 
@@ -38,13 +38,13 @@ async function getStaffNip(): Promise<string> {
     where: { nip: STAFF_NIP_DEFAULT },
     select: { nip: true },
   });
-  
+
   if (staff) return staff.nip;
-  
+
   const firstStaff = await prisma.staf.findFirst({
     select: { nip: true },
   });
-  
+
   return firstStaff?.nip || STAFF_NIP_DEFAULT;
 }
 
@@ -68,7 +68,7 @@ export async function createPekerjaan(
     const tipeExists = await prisma.ref_tipe_pekerjaan.findUnique({
       where: { id: data.tipe_pekerjaan_id },
     });
-    
+
     if (!tipeExists) {
       return { success: false, error: 'Tipe pekerjaan tidak valid' };
     }
@@ -77,7 +77,7 @@ export async function createPekerjaan(
       const ruanganExists = await prisma.ruangan.findUnique({
         where: { id: data.ruangan_id },
       });
-      
+
       if (!ruanganExists) {
         return { success: false, error: 'Ruangan tidak valid' };
       }
@@ -90,11 +90,11 @@ export async function createPekerjaan(
         tipe_pekerjaan_id: data.tipe_pekerjaan_id,
         poin_jam: data.poin_jam,
         kuota: data.quota || 1,
-        tanggal_mulai: data.tanggal_mulai 
-          ? new Date(data.tanggal_mulai) 
+        tanggal_mulai: data.tanggal_mulai
+          ? new Date(data.tanggal_mulai)
           : null,
-        tanggal_selesai: data.tanggal_selesai 
-          ? new Date(data.tanggal_selesai) 
+        tanggal_selesai: data.tanggal_selesai
+          ? new Date(data.tanggal_selesai)
           : null,
         ruangan_id: data.ruangan_id || null,
         semester_id: data.semester_id || semesterId,
@@ -133,7 +133,7 @@ export async function getDaftarPekerjaan(
 
   try {
     let semesterId: number | undefined;
-    
+
     if (filters?.semester_id) {
       semesterId = filters.semester_id;
     } else {
@@ -145,11 +145,11 @@ export async function getDaftarPekerjaan(
     }
 
     const whereClause: any = {};
-    
+
     if (semesterId) {
       whereClause.semester_id = semesterId;
     }
-    
+
     if (filters?.is_aktif !== undefined) {
       whereClause.is_aktif = filters.is_aktif;
     }
@@ -195,11 +195,11 @@ export async function getDaftarPekerjaan(
       is_aktif: p.is_aktif || false,
       created_at: p.created_at?.toISOString() || new Date().toISOString(),
       staf: p.staf ? { nip: p.staf.nip, nama: p.staf.nama || '' } : undefined,
-      ruangan: p.ruangan 
-        ? { id: p.ruangan.id, nama_ruangan: p.ruangan.nama_ruangan || '' } 
+      ruangan: p.ruangan
+        ? { id: p.ruangan.id, nama_ruangan: p.ruangan.nama_ruangan || '' }
         : undefined,
-      tipe_pekerjaan: p.tipe_pekerjaan 
-        ? { id: p.tipe_pekerjaan.id, nama: p.tipe_pekerjaan.nama || '' } 
+      tipe_pekerjaan: p.tipe_pekerjaan
+        ? { id: p.tipe_pekerjaan.id, nama: p.tipe_pekerjaan.nama || '' }
         : undefined,
     }));
 
@@ -246,13 +246,13 @@ export async function updatePekerjaan(
     }
     if (data.poin_jam !== undefined) updateData.poin_jam = data.poin_jam;
     if (data.tanggal_mulai !== undefined) {
-      updateData.tanggal_mulai = data.tanggal_mulai 
-        ? new Date(data.tanggal_mulai) 
+      updateData.tanggal_mulai = data.tanggal_mulai
+        ? new Date(data.tanggal_mulai)
         : null;
     }
     if (data.tanggal_selesai !== undefined) {
-      updateData.tanggal_selesai = data.tanggal_selesai 
-        ? new Date(data.tanggal_selesai) 
+      updateData.tanggal_selesai = data.tanggal_selesai
+        ? new Date(data.tanggal_selesai)
         : null;
     }
     if (data.ruangan_id !== undefined) {
@@ -291,24 +291,38 @@ export async function deletePekerjaan(id: number): Promise<DeleteResult> {
       return { success: false, error: 'Pekerjaan tidak ditemukan' };
     }
 
-    const activeAssignments = await prisma.penugasan.count({
+    // 1. Cek apakah ada yang sudah SELESAI atau DIVERIFIKASI atau SEDANG DIKERJAKAN
+    // Jika sudah ada yang selesai/diverifikasi, HARUS dilarang hapus (integritas data)
+    const finalizedAssignments = await prisma.penugasan.count({
       where: {
         pekerjaan_id: id,
         status_tugas_id: {
-          notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
+          in: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI, STATUS_TUGAS.SEDANG_DIKERJAKAN],
         },
       },
     });
 
-    if (activeAssignments > 0) {
+    if (finalizedAssignments > 0) {
       return {
         success: false,
-        error: `Tidak dapat dihapus. Ada ${activeAssignments} mahasiswa yang sedang bekerja pada pekerjaan ini.`,
+        error: `Pekerjaan tidak bisa dihapus karena sudah ada ${finalizedAssignments} mahasiswa yang menyelesaikan tugas ini.`,
       };
     }
 
+    // 2. Jika ada yang masih MENUNGGU atau SEDANG_DIKERJAKAN, 
+    // hapus penugasan mereka terlebih dahulu (Auto-Cancel)
+    await prisma.penugasan.deleteMany({
+      where: {
+        pekerjaan_id: id,
+        status_tugas_id: {
+          in: [STATUS_TUGAS.MENUNGGU],
+        },
+      },
+    });
+
+    // 3. Soft delete pekerjaannya
     await prisma.daftar_pekerjaan.update({
-      where: { id },
+      where: { id: id },
       data: { is_aktif: false },
     });
 

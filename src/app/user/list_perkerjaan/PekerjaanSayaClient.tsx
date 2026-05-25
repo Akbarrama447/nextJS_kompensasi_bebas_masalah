@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import Webcam from 'react-webcam'
+import { 
+  Camera, MapPin, X, Scan, Banknote, FileText, Search, 
+  RefreshCcw, MapPinned, ListFilter, ChevronLeft, ChevronRight, 
+  ChevronDown, Filter 
+} from 'lucide-react'
 import { 
   Camera, MapPin, X, Scan, Banknote, FileText, Search, 
   RefreshCcw, MapPinned, ListFilter, ChevronLeft, ChevronRight, 
@@ -60,17 +66,24 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
           setLocation({ lat, lng })
           try {
             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
             const data = await response.json()
             const loc = data.address.village || data.address.suburb || data.address.city || "Lokasi Terdeteksi"
             setAddress(loc)
           } catch { setAddress("Koordinat Terkunci") }
+            const loc = data.address.village || data.address.suburb || data.address.city || "Lokasi Terdeteksi"
+            setAddress(loc)
+          } catch { setAddress("Koordinat Terkunci") }
         },
+        (err) => console.error(err)
         (err) => console.error(err)
       )
     }
   }
 
   const handleAction = (tugas: any) => {
+    setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); getLocation(); setIsModalOpen(true);
+    setNominal("");
     setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); getLocation(); setIsModalOpen(true);
     setNominal("");
   }
@@ -98,6 +111,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
 
     const result = await updateProgresTugas(formData)
     if (result.success) {
+      const updated = dataTugas.map((t: any) => t.id === id ? { ...t, status_tugas_id: result.nextStatus } : t)
       const updated = dataTugas.map((t: any) => t.id === id ? { ...t, status_tugas_id: result.nextStatus } : t)
       setDataTugas(updated)
       if (imgSrc?.preview) URL.revokeObjectURL(imgSrc.preview)
@@ -226,11 +240,79 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                 ))}
               </div>
               <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(p => p + 1)} className="p-2 bg-white border border-slate-200 rounded-xl disabled:opacity-30"><ChevronRight size={16} /></button>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
+                  <th className="px-4 py-5 text-center w-12">No</th>
+                  <th className="px-8 py-5">Pekerjaan</th>
+                  <th className="px-6 py-5 text-center hidden lg:table-cell">Tipe</th>
+                  <th className="px-6 py-5 text-center">Poin</th>
+                  <th className="px-6 py-5 text-center hidden md:table-cell">Semester</th>
+                  <th className="px-6 py-5 text-center hidden xl:table-cell">Status</th>
+                  <th className="px-8 py-5 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm font-medium text-slate-600">
+                {currentRows.map((t: any, index: number) => (
+                  <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
+                    <td className="px-4 py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
+                    <td className="px-8 py-6 text-left">
+                      <div className="font-bold text-slate-800 leading-tight text-base">{t.pekerjaan?.judul}</div>
+                      <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-1 lowercase font-medium">
+                        <MapPin size={12}/> {t.pekerjaan?.ruangan?.nama_ruangan || 'Polines'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-6 text-center hidden lg:table-cell">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-[9px] font-bold uppercase ${
+                        t.pekerjaan?.tipe_pekerjaan?.nama === 'Internal' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {t.pekerjaan?.tipe_pekerjaan?.nama || 'Eksternal'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-6 text-center text-slate-800 font-bold">{t.pekerjaan?.poin_jam} jam</td>
+                    <td className="px-6 py-6 text-center hidden md:table-cell text-slate-500 text-xs font-medium uppercase tracking-tighter">smt {t.pekerjaan?.semester?.nama || '-'}</td>
+                    <td className="px-6 py-6 text-center hidden xl:table-cell">
+                      <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${
+                        t.status_tugas_id === 2 ? 'bg-blue-50 text-[#2e5299]' :
+                        t.status_tugas_id === 3 ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-300'
+                      }`}>
+                        {t.status_tugas?.nama || 'Menunggu'}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      {t.status_tugas_id <= 2 && (
+                        <button onClick={() => handleAction(t)} className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 ${t.status_tugas_id === 1 ? 'bg-[#2e5299] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}>
+                          {t.status_tugas_id === 1 ? 'Mulai' : 'Akhiri'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* PAGINATION FOOTER */}
+          <div className="p-6 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              Total {filteredData.length} Pekerjaan
+            </p>
+            <div className="flex items-center gap-2">
+              <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="p-2 bg-white border border-slate-200 rounded-xl disabled:opacity-30"><ChevronLeft size={16} /></button>
+              <div className="flex gap-1">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button key={i} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg font-bold text-[10px] ${currentPage === i + 1 ? 'bg-[#2e5299] text-white' : 'bg-white border border-slate-200 text-slate-400'}`}> {i + 1} </button>
+                ))}
+              </div>
+              <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(p => p + 1)} className="p-2 bg-white border border-slate-200 rounded-xl disabled:opacity-30"><ChevronRight size={16} /></button>
             </div>
+          </div>
           </div>
         </div>
       </div>
 
+      {/* MODAL (Tetap Sesuai Layout Sebelumnya) */}
       {/* MODAL (Tetap Sesuai Layout Sebelumnya) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/20 backdrop-blur-sm p-0 md:p-4 text-left">
@@ -272,6 +354,8 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                    </p>
                  </div>
 
+                 <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc || (selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && !nominal)} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all">Kirim Laporan</button>
+             </div>
                  <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc || (selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && !nominal)} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all">Kirim Laporan</button>
              </div>
           </div>

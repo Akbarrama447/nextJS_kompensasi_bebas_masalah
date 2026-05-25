@@ -14,6 +14,7 @@ export default function TabPenugasan() {
     tipe_pekerjaan: [],
     ruangan: [],
     semester_aktif: null,
+    kelas: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +22,7 @@ export default function TabPenugasan() {
   const [modalState, setModalState] = useState<"closed" | "verifikasi" | "tolak">("closed");
   const [selectedData, setSelectedData] = useState<MahasiswaKompenRow | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("semua");
+  const [kelasFilter, setKelasFilter] = useState<number>(0);
   const [search, setSearch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -47,6 +49,7 @@ export default function TabPenugasan() {
           offset,
           status_filter: statusFilter,
           search: search,
+          kelas_id: kelasFilter || undefined,
         }),
         getOptions(),
       ]);
@@ -65,11 +68,11 @@ export default function TabPenugasan() {
 
   useEffect(() => {
     fetchData();
-  }, [page, limit, statusFilter, search]);
+  }, [page, limit, statusFilter, search, kelasFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, search]);
+  }, [statusFilter, search, kelasFilter]);
 
   const openVerifikasi = (data: MahasiswaKompenRow) => {
     setSelectedData(data);
@@ -97,11 +100,9 @@ export default function TabPenugasan() {
     setSuccessMsg("");
 
     try {
-      const staffNip = options.semester_aktif?.nama ? "196801011990031001" : "196801011990031001";
-
       const result = await verifyPenugasan({
         penugasan_id: selectedData.penugasan_id,
-        verifikasi_oleh_nip: staffNip,
+        verifikasi_oleh_nip: '',
       });
 
       if (result.success) {
@@ -205,6 +206,19 @@ export default function TabPenugasan() {
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400"
         />
+
+        <select
+          value={kelasFilter}
+          onChange={(e) => setKelasFilter(Number(e.target.value))}
+          className="px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
+        >
+          <option value={0}>Semua Kelas</option>
+          {options.kelas.map((k) => (
+            <option key={k.id} value={k.id}>
+              {k.nama_kelas}
+            </option>
+          ))}
+        </select>
 
         <div className="flex border border-gray-200 rounded-lg overflow-hidden divide-x divide-gray-200 shadow-sm">
           <button
@@ -448,34 +462,66 @@ export default function TabPenugasan() {
                 </div>
               </div>
 
-              {/* Photos Grid - Placeholder */}
-              <div className="grid grid-cols-2 gap-6 mb-2">
-                <div>
-                  <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Mulai</h4>
-                  <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Belum ada foto</span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
-                    <div className="flex items-center gap-2 text-gray-600 text-sm">
-                      <Clock className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span>{formatDate(selectedData.created_at || "")}</span>
+              {/* Photos Grid */}
+              {(() => {
+                const currentPenugasan = selectedData.penugasans?.find(p => p.id === selectedData.penugasan_id);
+                let fotoMulai: string | undefined;
+                let fotoSelesai: string | undefined;
+                try {
+                  const dp = currentPenugasan?.detail_pengerjaan;
+                  if (dp && typeof dp === 'object' && !Array.isArray(dp)) {
+                    const obj = dp as Record<string, unknown>;
+                    fotoMulai = obj.foto_mulai as string | undefined;
+                    fotoSelesai = obj.foto_selesai as string | undefined;
+                    // backward compat: data lama pake format { fileName }
+                    if (!fotoMulai && !fotoSelesai && obj.fileName) {
+                      const statusId = currentPenugasan?.status_tugas_id;
+                      if (statusId === 2) {
+                        fotoMulai = obj.fileName as string;
+                      } else {
+                        fotoSelesai = obj.fileName as string;
+                      }
+                    }
+                  }
+                } catch {}
+                return (
+                  <div className="grid grid-cols-2 gap-6 mb-2">
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Mulai</h4>
+                      <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
+                        {fotoMulai ? (
+                          <img src={`/uploads/${fotoMulai}`} alt="Foto Mulai" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-400 text-sm">Tidak tersedia</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <Clock className="w-4 h-4 shrink-0 text-gray-400" />
+                          <span>{formatDate(selectedData.created_at || "")}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                <div>
-                  <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Selesai</h4>
-                  <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Belum ada foto</span>
-                  </div>
-                  <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
-                    <div className="flex items-center gap-2 text-gray-600 text-sm">
-                      <Clock className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span>{formatDate(selectedData.created_at || "")}</span>
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Selesai</h4>
+                      <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
+                        {fotoSelesai ? (
+                          <img src={`/uploads/${fotoSelesai}`} alt="Foto Selesai" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-400 text-sm">Belum ada foto</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <Clock className="w-4 h-4 shrink-0 text-gray-400" />
+                          <span>{formatDate(selectedData.created_at || "")}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()}
             </div>
 
             {/* Footer / Actions */}
