@@ -69,6 +69,11 @@ export async function PATCH(req: NextRequest) {
     })
   } catch (error) {
     console.error('Update phone error:', error)
-    return NextResponse.json({ message: 'Gagal mengupdate nomor telepon' }, { status: 500 })
+    console.error('Error details:', JSON.stringify(error, null, 2))
+    if (error instanceof Error) {
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+    }
+    return NextResponse.json({ message: 'Gagal mengupdate nomor telepon', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 }
