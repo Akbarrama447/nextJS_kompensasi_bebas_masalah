@@ -29,7 +29,13 @@ export default function LoginPage() {
         return
       }
 
-      router.push(data.role === 'admin' ? '/admin/dashboard' : '/user/dashboard')
+      const target =
+        data.role === 'superadmin'
+          ? '/superadmin/dashboard'
+          : data.role === 'admin'
+            ? '/admin/dashboard'
+            : '/user/dashboard'
+      router.push(target)
     } catch {
       setError('Terjadi kesalahan')
     } finally {

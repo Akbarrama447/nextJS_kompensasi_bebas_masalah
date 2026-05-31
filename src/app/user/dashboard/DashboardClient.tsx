@@ -3,12 +3,22 @@
 import UserHeader from '@/components/UserHeader'
 import { AlertCircle, Calendar } from 'lucide-react'
 
+interface ActiveSemester {
+  id: number
+  nama: string
+  tahun: number | null
+  periode: string | null
+  mulai: string | null
+  selesai: string | null
+}
+
 interface DashboardClientProps {
   namaMahasiswa: string
   sisaJam: number
   totalJamSelesai: number
   totalJamWajib: number
   semesterLabel?: string
+  activeSemester: ActiveSemester | null
 }
 
 export default function DashboardClient({
@@ -77,14 +87,6 @@ export default function DashboardClient({
 
         <div className="grid grid-cols-3 gap-6 mb-8">
           
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <p className="text-[#2e5299] font-semibold text-xs mb-3">Sisa Jam Kompen</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-800">{sisaJam}</span>
-              <span className="text-sm font-medium text-slate-500">Jam</span>
-            </div>
-          </div>
-
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <p className="text-[#2e5299] font-semibold text-xs mb-3">Sisa Jam Kompen</p>
             <div className="flex items-baseline gap-1">

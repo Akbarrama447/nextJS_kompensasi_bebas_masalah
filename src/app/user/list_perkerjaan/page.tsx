@@ -6,11 +6,19 @@ import UserHeader from '@/components/UserHeader'
 
 export default async function PekerjaanSayaPage() {
   const cookieStore = await cookies()
-  const nim = cookieStore.get('nim')?.value || 
-              cookieStore.get('NIM')?.value || 
-              cookieStore.get('user_id')?.value || 
-              '33424202'; // Fallback ke NIM lo biar PASTI MUNCUL pas demo
+  const nim = cookieStore.get('nim')?.value || ''
 
+  // Tanpa sesi NIM yang valid, jangan tampilkan data siapa pun
+  if (!nim) {
+    return (
+      <Sidebar role="mahasiswa" activePath="/user/list_perkerjaan">
+        <UserHeader nama="Mahasiswa" role="mahasiswa" />
+        <div className="flex-1 flex items-center justify-center p-10">
+          <p className="text-sm text-slate-500">Sesi tidak ditemukan. Silakan login ulang.</p>
+        </div>
+      </Sidebar>
+    )
+  }
 
   const mhsAktif = await prisma.mahasiswa.findUnique({
     where: { nim },

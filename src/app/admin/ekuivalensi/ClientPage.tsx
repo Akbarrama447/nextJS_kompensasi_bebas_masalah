@@ -230,9 +230,11 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
 
               <div className="flex flex-col sm:block font-bold text-gray-900 sm:ml-6 text-right sm:text-left">
                 <div>{totalJam} JAM</div>
-                <div className="text-xs text-green-600 mt-1">
-                  Rp {((ekuivalensi?.nominal) || (totalJam * 2000)).toLocaleString("id-ID")}
-                </div>
+                {ekuivalensi?.nominal != null && (
+                  <div className="text-xs text-green-600 mt-1">
+                    Rp {Number(ekuivalensi.nominal).toLocaleString("id-ID")}
+                  </div>
+                )}
               </div>
             </div>
 

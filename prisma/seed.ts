@@ -354,12 +354,30 @@ async function seedRoleHasMenus() {
   }
 }
 
+async function seedPengaturanSistem() {
+  console.log('\n⚙️  Seeding pengaturan_sistem...')
+  const settings = [
+    { grup: 'kompen', key: 'jam_wajib_per_semester', value: '30', tipe_data: 'integer', keterangan: 'Jumlah jam wajib kompen per semester' },
+    { grup: 'kompen', key: 'maks_penugasan_per_mahasiswa', value: '5', tipe_data: 'integer', keterangan: 'Maksimal penugasan aktif per mahasiswa' },
+    { grup: 'ekuivalensi', key: 'tarif_ekuivalensi_per_jam', value: '2000', tipe_data: 'integer', keterangan: 'Tarif konversi 1 jam kompen ke rupiah' },
+  ]
+  for (const s of settings) {
+    await prisma.pengaturan_sistem.upsert({
+      where: { key: s.key },
+      update: { grup: s.grup, value: s.value, tipe_data: s.tipe_data, keterangan: s.keterangan },
+      create: s,
+    })
+    console.log(`  ✓ pengaturan_sistem: ${s.key} = ${s.value}`)
+  }
+}
+
 async function main() {
   console.log('🌱 Starting database seeding...')
   console.log('================================')
 
   await seedRefStatus()
   await seedSemester()
+  await seedPengaturanSistem()
   await seedStaff()
   await seedStudents()
   await seedMenus()

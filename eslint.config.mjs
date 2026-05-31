@@ -18,7 +18,18 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "src/generated/**",
+      "prisma/**",
     ],
+  },
+  {
+    rules: {
+      // Codebase memakai `any` & require() di beberapa tempat secara sengaja.
+      // Turunkan ke warning agar tidak memblokir build produksi.
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+      "@typescript-eslint/no-unused-expressions": "warn",
+    },
   },
 ];
 

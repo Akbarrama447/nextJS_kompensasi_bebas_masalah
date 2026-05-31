@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { getActiveSemesterId } from '@/lib/semester';
 import type { PlottingConfig, PlottingResult, PlottingPekerjaanResult, PlottingAssignment } from '../types';
 
 const STATUS_TUGAS = {
@@ -9,22 +10,6 @@ const STATUS_TUGAS = {
   SELESAI: 3,
   DIVERIFIKASI: 4,
 } as const;
-
-async function getActiveSemester() {
-  const semester = await prisma.semester.findFirst({
-    where: { is_aktif: true },
-    select: { id: true },
-  });
-  
-  if (semester) return semester.id;
-  
-  const firstSemester = await prisma.semester.findFirst({
-    select: { id: true },
-    orderBy: { id: 'asc' },
-  });
-  
-  return firstSemester?.id || null;
-}
 
 interface MhsWithJam {
   nim: string;
@@ -37,7 +22,7 @@ export async function generatePlotting(
   config?: PlottingConfig
 ): Promise<PlottingResult> {
   try {
-    const semesterId = config?.semester_id || await getActiveSemester();
+    const semesterId = config?.semester_id || await getActiveSemesterId();
     
     if (!semesterId) {
       return { success: false, error: 'Tidak ada semester aktif' };

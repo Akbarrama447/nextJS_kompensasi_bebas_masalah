@@ -20,18 +20,13 @@ export default async function DashboardMahasiswa() {
   const activeSemesterMapped = activeSemester ? {
     id: activeSemester.id,
     nama: activeSemester.nama || '',
-    tahun: activeSemester.tahun || undefined,
-    periode: activeSemester.periode || undefined,
-    mulai: activeSemester.mulai,
-    selesai: activeSemester.selesai
+    tahun: activeSemester.tahun ?? null,
+    periode: activeSemester.periode ?? null,
+    mulai: activeSemester.mulai ? activeSemester.mulai.toISOString() : null,
+    selesai: activeSemester.selesai ? activeSemester.selesai.toISOString() : null,
   } : null
 
   const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
-
-  const activeSemester = await prisma.semester.findFirst({
-    where: { is_aktif: true },
-    select: { id: true, nama: true, tahun: true },
-  })
 
   const kompenAwal = activeSemester
     ? await prisma.kompen_awal.findFirst({
@@ -68,6 +63,7 @@ export default async function DashboardMahasiswa() {
           totalJamSelesai={totalJamSelesai}
           totalJamWajib={totalJamWajib}
           semesterLabel={semesterLabel}
+          activeSemester={activeSemesterMapped}
         />
       </main>
     </Sidebar>

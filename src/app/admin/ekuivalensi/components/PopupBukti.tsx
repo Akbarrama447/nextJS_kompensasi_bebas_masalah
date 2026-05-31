@@ -1,6 +1,7 @@
 "use client";
 
 import { X, Clock, MapPin, CheckCircle, XCircle } from "lucide-react";
+import BlobImage from "@/components/BlobImage";
 
 interface Props {
   open: boolean;
@@ -66,23 +67,12 @@ export default function PopupBukti({
           </p>
 
           <div className="w-full h-36 sm:h-56 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
-
-            {data.fotoUrl ? (
-              <img
-                src={data.fotoUrl}
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center text-gray-400">
-                <span className="text-xs sm:text-sm font-medium">
-                  No Image
-                </span>
-                <span className="text-[10px] sm:text-xs text-gray-300">
-                  Belum ada bukti
-                </span>
-              </div>
-            )}
-
+            <BlobImage
+              src={data.fotoUrl}
+              alt="Foto Nota"
+              className="object-cover w-full h-full"
+              emptyText="Belum ada bukti"
+            />
           </div>
         </div>
 

@@ -28,6 +28,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
+  if (pathname.startsWith('/superadmin') && role !== 'superadmin') {
+    // Hanya superadmin yang boleh; selain itu arahkan ke dashboard sesuai peran
+    if (isAuthenticated) {
+      const target = nip ? '/admin/dashboard' : '/user/dashboard'
+      return NextResponse.redirect(new URL(target, req.url))
+    }
+    return NextResponse.redirect(new URL('/login', req.url))
+  }
+
   return NextResponse.next()
 }
 

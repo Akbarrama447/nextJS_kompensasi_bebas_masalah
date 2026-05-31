@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { compare } from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,6 +57,13 @@ export async function POST(req: NextRequest) {
 
     if (!user || !profile) {
       return NextResponse.json({ error: 'Akun tidak ditemukan' }, { status: 401 })
+    }
+
+    // Tentukan roleType final dari nama role di DB (tanpa hardcode).
+    // Staf bisa berperan sebagai 'admin' atau 'superadmin'.
+    const roleName = (user.role?.nama || '').toLowerCase()
+    if (roleType === 'admin' && roleName === 'superadmin') {
+      roleType = 'superadmin'
     }
 
     const isValidPassword = await compare(password, user.kata_sandi || '')

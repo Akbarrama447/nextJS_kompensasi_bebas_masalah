@@ -1,15 +1,12 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { getActiveSemesterId } from '@/lib/semester';
 import type { OptionsData } from '../types';
 
 export async function getOptions(): Promise<OptionsData> {
   try {
-    let [tipePekerjaan, ruangan, semesterAktif, kelas] = await Promise.all([
-      prisma.ref_tipe_pekerjaan.findMany({
-        select: { id: true, nama: true },
-        orderBy: { id: 'asc' },
-      }),
+    const [ruangan, semesterAktif, kelas, semesters] = await Promise.all([
       prisma.ruangan.findMany({
         include: {
           gedung: {
@@ -26,7 +23,16 @@ export async function getOptions(): Promise<OptionsData> {
         select: { id: true, nama_kelas: true },
         orderBy: { nama_kelas: 'asc' },
       }),
+      prisma.semester.findMany({
+        select: { id: true, nama: true, tahun: true, periode: true, is_aktif: true },
+        orderBy: [{ tahun: 'desc' }, { id: 'desc' }],
+      }),
     ]);
+
+    let tipePekerjaan = await prisma.ref_tipe_pekerjaan.findMany({
+      select: { id: true, nama: true },
+      orderBy: { id: 'asc' },
+    });
 
     // Jika tipe pekerjaan kosong, buat default dengan upsert
     if (tipePekerjaan.length === 0) {
@@ -34,7 +40,7 @@ export async function getOptions(): Promise<OptionsData> {
         { id: 1, nama: 'Internal' },
         { id: 2, nama: 'Eksternal' },
       ];
-      
+
       for (const type of defaultTypes) {
         try {
           await prisma.ref_tipe_pekerjaan.upsert({
@@ -42,11 +48,11 @@ export async function getOptions(): Promise<OptionsData> {
             update: {},
             create: type,
           });
-        } catch (e) {
+        } catch {
           // Ignore duplicate errors
         }
       }
-      
+
       tipePekerjaan = await prisma.ref_tipe_pekerjaan.findMany({
         select: { id: true, nama: true },
         orderBy: { id: 'asc' },
@@ -59,11 +65,25 @@ export async function getOptions(): Promise<OptionsData> {
       gedung: r.gedung?.nama_gedung || undefined,
     }));
 
+    const formattedSemesters = semesters.map((s) => ({
+      id: s.id,
+      nama: s.nama || '',
+      tahun: s.tahun ?? null,
+      periode: s.periode ?? null,
+      is_aktif: s.is_aktif ?? false,
+    }));
+
+    const tahunAkademik = Array.from(
+      new Set(semesters.map((s) => s.tahun).filter((t): t is number => t !== null))
+    ).sort((a, b) => b - a);
+
     return {
       tipe_pekerjaan: tipePekerjaan.map(t => ({ id: t.id, nama: t.nama || '' })),
       ruangan: formattedRuangan,
       semester_aktif: semesterAktif ? { id: semesterAktif.id, nama: semesterAktif.nama || '' } : null,
       kelas: kelas.map(k => ({ id: k.id, nama_kelas: k.nama_kelas || '' })),
+      semesters: formattedSemesters,
+      tahun_akademik: tahunAkademik,
     };
   } catch (error) {
     console.error('Error fetching options:', error);
@@ -72,25 +92,24 @@ export async function getOptions(): Promise<OptionsData> {
       ruangan: [],
       semester_aktif: null,
       kelas: [],
+      semesters: [],
+      tahun_akademik: [],
     };
   }
 }
 
-export async function getMahasiswaByKelas(kelasId: number) {
+export async function getMahasiswaByKelas(kelasId: number, semesterId?: number) {
   try {
-    const activeSemester = await prisma.semester.findFirst({
-      where: { is_aktif: true },
-      select: { id: true },
-    });
+    const targetSemesterId = semesterId ?? (await getActiveSemesterId());
 
-    if (!activeSemester) return [];
+    if (!targetSemesterId) return [];
 
     const mahasiswaList = await prisma.mahasiswa.findMany({
       where: {
         registrasi_mahasiswa: {
           some: {
             kelas_id: kelasId,
-            semester_id: activeSemester.id,
+            semester_id: targetSemesterId,
           },
         },
       },
@@ -98,12 +117,12 @@ export async function getMahasiswaByKelas(kelasId: number) {
         nim: true,
         nama: true,
         kompen_awal: {
-          where: { semester_id: activeSemester.id },
+          where: { semester_id: targetSemesterId },
           select: { total_jam_wajib: true }
         },
         penugasan: {
           where: {
-            pekerjaan: { semester_id: activeSemester.id },
+            pekerjaan: { semester_id: targetSemesterId },
             status_tugas_id: {
               notIn: [4] // 4 = DIVERIFIKASI
             }

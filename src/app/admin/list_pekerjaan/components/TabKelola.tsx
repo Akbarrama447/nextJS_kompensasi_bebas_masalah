@@ -34,6 +34,8 @@ export default function TabKelola() {
     ruangan: [],
     semester_aktif: null,
     kelas: [],
+    semesters: [],
+    tahun_akademik: [],
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,6 +67,11 @@ export default function TabKelola() {
   const [limit, setLimit] = useState(10);
   const [totalData, setTotalData] = useState(0);
 
+  // Filter Tahun Akademik + Semester + Search (dinamis dari DB)
+  const [tahunFilter, setTahunFilter] = useState<number | 0>(0);
+  const [semesterFilter, setSemesterFilter] = useState<number | 0>(0);
+  const [search, setSearch] = useState("");
+
   const totalPages = Math.ceil(totalData / limit);
   const startItem = totalData === 0 ? 0 : (page - 1) * limit + 1;
   const endItem = Math.min(page * limit, totalData);
@@ -74,7 +81,12 @@ export default function TabKelola() {
     try {
       const offset = (page - 1) * limit;
       const [pekerjaanData, optionsData] = await Promise.all([
-        getDaftarPekerjaan({ limit, offset }),
+        getDaftarPekerjaan({
+          limit,
+          offset,
+          search: search || undefined,
+          semester_id: semesterFilter || undefined,
+        }),
         getOptions(),
       ]);
 
@@ -91,11 +103,35 @@ export default function TabKelola() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit]);
+  }, [page, limit, search, semesterFilter]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Inisialisasi filter default ke semester aktif
+  useEffect(() => {
+    let cancelled = false;
+    getOptions().then((opts) => {
+      if (cancelled) return;
+      const aktif = opts.semesters.find((s) => s.is_aktif) || opts.semesters[0];
+      if (aktif) {
+        setSemesterFilter(aktif.id);
+        if (aktif.tahun) setTahunFilter(aktif.tahun);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, semesterFilter]);
+
+  const semestersForTahun = tahunFilter
+    ? options.semesters.filter((s) => s.tahun === tahunFilter)
+    : options.semesters;
 
   // Handle click outside to close dropdowns
   useEffect(() => {
@@ -315,7 +351,56 @@ export default function TabKelola() {
       )}
 
       {/* Action Bar */}
-      <div className="flex justify-end items-center mb-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              placeholder="Cari pekerjaan / ruangan..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400"
+            />
+          </div>
+
+          {/* Filter Tahun Akademik — dinamis dari DB */}
+          <select
+            value={tahunFilter}
+            onChange={(e) => {
+              const th = Number(e.target.value);
+              setTahunFilter(th);
+              if (th) {
+                const match = options.semesters.find((s) => s.tahun === th);
+                setSemesterFilter(match ? match.id : 0);
+              }
+            }}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
+            title="Filter Tahun Akademik"
+          >
+            <option value={0}>Semua Tahun</option>
+            {options.tahun_akademik.map((th) => (
+              <option key={th} value={th}>
+                {th}/{th + 1}
+              </option>
+            ))}
+          </select>
+
+          {/* Filter Semester — dinamis dari DB */}
+          <select
+            value={semesterFilter}
+            onChange={(e) => setSemesterFilter(Number(e.target.value))}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
+            title="Filter Semester"
+          >
+            <option value={0}>Semua Semester</option>
+            {semestersForTahun.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nama}{s.is_aktif ? " (Aktif)" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex gap-3">
           <button
             onClick={handleGeneratePlotting}
@@ -354,6 +439,7 @@ export default function TabKelola() {
               <th className="px-4 py-3 text-center">Tipe</th>
               <th className="px-4 py-3 text-center">Poin</th>
               <th className="px-4 py-3 text-center">Kuota Sisa</th>
+              <th className="px-4 py-3 text-center">Semester</th>
               <th className="px-4 py-3 text-center">Tanggal Selesai</th>
               <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3 text-center">Aksi</th>
@@ -362,15 +448,17 @@ export default function TabKelola() {
           <tbody className="divide-y divide-gray-100">
             {isLoading ? (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
                   <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
                   Memuat data...
                 </td>
               </tr>
             ) : dataPekerjaan.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                  Belum ada data pekerjaan.
+                <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+                  {search || semesterFilter || tahunFilter
+                    ? "Tidak ada data untuk periode ini."
+                    : "Belum ada data pekerjaan."}
                 </td>
               </tr>
             ) : (
@@ -399,6 +487,11 @@ export default function TabKelola() {
                   </td>
                   <td className="px-4 py-3 text-gray-600 text-center">
                     {item.kuotatersisa}/{item.kuotatotal}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 text-center">
+                    <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
+                      {item.semester?.nama || "-"}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-gray-600 text-center">
                     {formatDate(item.tanggal_selesai)}

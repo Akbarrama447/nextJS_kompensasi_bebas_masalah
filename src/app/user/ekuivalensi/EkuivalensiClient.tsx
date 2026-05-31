@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import UserHeader from '@/components/UserHeader'
+import BlobImage from '@/components/BlobImage'
 
 interface StudentData {
   nama: string
@@ -459,15 +460,11 @@ export default function EkuivalensiClient({
                   )
                 }
                 return (
-                  <img
+                  <BlobImage
                     src={previewFile}
                     alt="Preview Bukti"
                     className="max-w-full max-h-[70vh] object-contain rounded shadow-sm"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.onerror = null
-                      target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150' viewBox='0 0 300 150'%3E%3Crect width='300' height='150' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%2394a3b8'%3EFile Tidak Ditemukan%3C/text%3E%3C/svg%3E"
-                      }}
+                    errorText="File Tidak Ditemukan"
                   />
                 )
               })()}

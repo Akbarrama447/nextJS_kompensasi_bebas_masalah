@@ -125,12 +125,11 @@ export default async function EkuivalensiPage() {
       <main className="flex-1 flex flex-col">
         <EkuivalensiClient
           namaMahasiswa={namaMahasiswa}
-          ekuivalensi={ekuivalensi.map((item) => ({
-            id: item.id,
-            penanggung_jawab_nim: item.penanggung_jawab_nim || '',
-            mahasiswa: item.mahasiswa ? { nama: item.mahasiswa.nama || '' } : undefined,
-            jam_diakui: item.jam_diakui || 0,
-          }))}
+          nim={nim || ''}
+          namaKelas={namaKelas}
+          students={students}
+          ekuivalensi={ekuivalensi}
+          semesterLabel={semesterLabel}
         />
       </main>
     </Sidebar>

@@ -34,6 +34,11 @@ export interface PekerjaanRow {
     id: number;
     nama: string;
   };
+  semester?: {
+    id: number;
+    nama: string;
+    tahun: number | null;
+  };
 }
 
 export interface OptionsData {
@@ -41,6 +46,8 @@ export interface OptionsData {
   ruangan: { id: number; nama_ruangan: string; gedung?: string }[];
   semester_aktif: { id: number; nama: string } | null;
   kelas: { id: number; nama_kelas: string }[];
+  semesters: { id: number; nama: string; tahun: number | null; periode: string | null; is_aktif: boolean }[];
+  tahun_akademik: number[];
 }
 
 export interface PlottingConfig {
@@ -141,6 +148,8 @@ export interface MahasiswaKompenRow {
     pekerjaan_id: number | null;
     pekerjaan_judul: string | null;
     poin_jam: number | null;
+    tipe_pekerjaan_id: number | null;
+    tipe_pekerjaan_nama: string | null;
     status_tugas_id: number | null;
     status_nama: string | null;
     created_at: string | null;

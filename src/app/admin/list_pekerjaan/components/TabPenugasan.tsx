@@ -5,6 +5,7 @@ import { Info, Clock, X, CheckCircle, XCircle, Loader2, AlertCircle, ChevronLeft
 import { getDaftarKompen, verifyPenugasan, rejectPenugasan } from "../actions/penugasan";
 import { getOptions } from "../actions/options";
 import type { MahasiswaKompenRow, OptionsData } from "../types";
+import BlobImage from "@/components/BlobImage";
 
 type StatusFilter = "belum_ditugaskan" | "sedang_dikerjakan" | "selesai" | "semua";
 
@@ -15,6 +16,8 @@ export default function TabPenugasan() {
     ruangan: [],
     semester_aktif: null,
     kelas: [],
+    semesters: [],
+    tahun_akademik: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +26,8 @@ export default function TabPenugasan() {
   const [selectedData, setSelectedData] = useState<MahasiswaKompenRow | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("semua");
   const [kelasFilter, setKelasFilter] = useState<number>(0);
+  const [tahunFilter, setTahunFilter] = useState<number | 0>(0);
+  const [semesterFilter, setSemesterFilter] = useState<number | 0>(0);
   const [search, setSearch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -42,7 +47,6 @@ export default function TabPenugasan() {
     setErrorMessage("");
     try {
       const offset = (page - 1) * limit;
-      console.log('Fetching with:', { page, limit, offset, statusFilter, search });
       const [kompenData, optionsData] = await Promise.all([
         getDaftarKompen({
           limit,
@@ -50,11 +54,11 @@ export default function TabPenugasan() {
           status_filter: statusFilter,
           search: search,
           kelas_id: kelasFilter || undefined,
+          semester_id: semesterFilter || undefined,
         }),
         getOptions(),
       ]);
 
-      console.log('Result:', kompenData);
       setDataMahasiswa(kompenData.data);
       setTotalData(kompenData.total);
       setOptions(optionsData);
@@ -64,15 +68,37 @@ export default function TabPenugasan() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, statusFilter, search]);
+  }, [page, limit, statusFilter, search, kelasFilter, semesterFilter]);
+
+  // Inisialisasi filter default ke semester aktif (dinamis dari DB)
+  useEffect(() => {
+    let cancelled = false;
+    getOptions().then((opts) => {
+      if (cancelled) return;
+      setOptions(opts);
+      const aktif = opts.semesters.find((s) => s.is_aktif) || opts.semesters[0];
+      if (aktif) {
+        setSemesterFilter(aktif.id);
+        if (aktif.tahun) setTahunFilter(aktif.tahun);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [page, limit, statusFilter, search, kelasFilter]);
+  }, [page, limit, statusFilter, search, kelasFilter, semesterFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, search, kelasFilter]);
+  }, [statusFilter, search, kelasFilter, semesterFilter]);
+
+  // Semester yang ditampilkan di dropdown, difilter oleh tahun akademik terpilih
+  const semestersForTahun = tahunFilter
+    ? options.semesters.filter((s) => s.tahun === tahunFilter)
+    : options.semesters;
 
   const openVerifikasi = (data: MahasiswaKompenRow) => {
     setSelectedData(data);
@@ -207,6 +233,44 @@ export default function TabPenugasan() {
           className="flex-1 px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-gray-400"
         />
 
+        {/* Filter Tahun Akademik — dinamis dari DB */}
+        <select
+          value={tahunFilter}
+          onChange={(e) => {
+            const th = Number(e.target.value);
+            setTahunFilter(th);
+            // Pindahkan semester ke salah satu semester pada tahun tsb
+            if (th) {
+              const match = options.semesters.find((s) => s.tahun === th);
+              setSemesterFilter(match ? match.id : 0);
+            }
+          }}
+          className="px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
+          title="Filter Tahun Akademik"
+        >
+          <option value={0}>Semua Tahun</option>
+          {options.tahun_akademik.map((th) => (
+            <option key={th} value={th}>
+              {th}/{th + 1}
+            </option>
+          ))}
+        </select>
+
+        {/* Filter Semester — dinamis dari DB */}
+        <select
+          value={semesterFilter}
+          onChange={(e) => setSemesterFilter(Number(e.target.value))}
+          className="px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
+          title="Filter Semester"
+        >
+          <option value={0}>Semua Semester</option>
+          {semestersForTahun.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.nama}{s.is_aktif ? " (Aktif)" : ""}
+            </option>
+          ))}
+        </select>
+
         <select
           value={kelasFilter}
           onChange={(e) => setKelasFilter(Number(e.target.value))}
@@ -286,11 +350,13 @@ export default function TabPenugasan() {
             ) : dataMahasiswa.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                  {statusFilter === "belum_ditugaskan"
-                    ? "Tidak ada mahasiswa yang belum dapat pekerjaan."
-                    : statusFilter === "selesai"
-                      ? "Tidak ada yang menyelesaikan pekerjaan."
-                      : "Tidak ada data."}
+                  {semesterFilter || tahunFilter
+                    ? "Tidak ada data untuk periode ini."
+                    : statusFilter === "belum_ditugaskan"
+                      ? "Tidak ada mahasiswa yang belum dapat pekerjaan."
+                      : statusFilter === "selesai"
+                        ? "Tidak ada yang menyelesaikan pekerjaan."
+                        : "Tidak ada data."}
                 </td>
               </tr>
             ) : (
@@ -307,8 +373,18 @@ export default function TabPenugasan() {
                     <div className="flex flex-col gap-2">
                       {item.penugasans && item.penugasans.length > 0 ? (
                         item.penugasans.map((p, i) => (
-                          <div key={p.id} className={i > 0 ? "pt-2 border-t border-gray-100" : ""}>
-                            {p.pekerjaan_judul || "-"}
+                          <div key={p.id} className={`flex items-center gap-2 ${i > 0 ? "pt-2 border-t border-gray-100" : ""}`}>
+                            {p.tipe_pekerjaan_nama && (
+                              <span
+                                className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase text-white shrink-0 ${
+                                  p.tipe_pekerjaan_nama === "Internal" ? "bg-[var(--color-primary)]" : "bg-orange-500"
+                                }`}
+                                title={p.tipe_pekerjaan_nama}
+                              >
+                                {p.tipe_pekerjaan_nama}
+                              </span>
+                            )}
+                            <span>{p.pekerjaan_judul || "-"}</span>
                           </div>
                         ))
                       ) : (
@@ -489,11 +565,12 @@ export default function TabPenugasan() {
                     <div>
                       <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Mulai</h4>
                       <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
-                        {fotoMulai ? (
-                          <img src={`/uploads/${fotoMulai}`} alt="Foto Mulai" className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-gray-400 text-sm">Tidak tersedia</span>
-                        )}
+                        <BlobImage
+                          src={fotoMulai ? `/uploads/${fotoMulai}` : null}
+                          alt="Foto Mulai"
+                          className="w-full h-full object-cover"
+                          emptyText="Tidak tersedia"
+                        />
                       </div>
                       <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
                         <div className="flex items-center gap-2 text-gray-600 text-sm">
@@ -506,11 +583,12 @@ export default function TabPenugasan() {
                     <div>
                       <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Foto Selesai</h4>
                       <div className="aspect-video bg-gray-100 rounded-xl border border-gray-200 overflow-hidden mb-3 flex items-center justify-center">
-                        {fotoSelesai ? (
-                          <img src={`/uploads/${fotoSelesai}`} alt="Foto Selesai" className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-gray-400 text-sm">Belum ada foto</span>
-                        )}
+                        <BlobImage
+                          src={fotoSelesai ? `/uploads/${fotoSelesai}` : null}
+                          alt="Foto Selesai"
+                          className="w-full h-full object-cover"
+                          emptyText="Belum ada foto"
+                        />
                       </div>
                       <div className="flex flex-col gap-1.5 p-3 border border-gray-200 rounded-xl">
                         <div className="flex items-center gap-2 text-gray-600 text-sm">

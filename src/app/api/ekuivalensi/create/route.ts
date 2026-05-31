@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getTarifPerJam } from '@/lib/settings'
 
 export async function POST(req: NextRequest) {
   try {
@@ -89,7 +90,8 @@ export async function POST(req: NextRequest) {
       return acc + Math.max(0, totalJam - jamSelesai)
     }, 0)
 
-    const nominalTotal = totalSisaJam * 2000
+    const tarifPerJam = await getTarifPerJam()
+    const nominalTotal = totalSisaJam * tarifPerJam
 
     const ekuivalensi = await prisma.ekuivalensi_kelas.create({
       data: {
