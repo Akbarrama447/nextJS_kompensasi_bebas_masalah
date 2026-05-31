@@ -221,13 +221,19 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
           {/* BOTTOM SECTION */}
           <div className="flex flex-col sm:grid sm:grid-cols-6 gap-3 sm:gap-2 items-start sm:items-center text-sm">
 
-            {/* TOTAL */}
-            <div className="flex justify-between sm:block font-semibold text-gray-700 sm:ml-10">
-              TOTAL
-            </div>
+            {/* TOTAL & NOMINAL */}
+            <div className="w-full flex justify-between sm:contents">
+              <div className="flex flex-col sm:block font-semibold text-gray-700 sm:ml-10">
+                <div>TOTAL</div>
 
-            <div className="flex justify-between sm:block font-bold text-gray-900 sm:ml-6">
-              {totalJam} JAM
+              </div>
+
+              <div className="flex flex-col sm:block font-bold text-gray-900 sm:ml-6 text-right sm:text-left">
+                <div>{totalJam} JAM</div>
+                <div className="text-xs text-green-600 mt-1">
+                  Rp {((ekuivalensi?.nominal) || (totalJam * 2000)).toLocaleString("id-ID")}
+                </div>
+              </div>
             </div>
 
             {/* PEKERJAAN */}
