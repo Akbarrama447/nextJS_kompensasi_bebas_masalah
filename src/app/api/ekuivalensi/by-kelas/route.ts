@@ -41,8 +41,9 @@ export async function GET(req: Request) {
         // Ada Penanggung Jawab (dari pengajuan user)
         studentList = [{
           nama: ekuivalensi.mahasiswa.nama,
+          nama: ekuivalensi.mahasiswa.nama,
           nim: ekuivalensi.mahasiswa.nim,
-          jam: ekuivalensi.jam_diakui || 0,
+          jam: Math.floor(ekuivalensi.jam_diakui || 0),
         }];
       } else if (ekuivalensi.kelas_id) {
         // Auto-assign: tidak ada penanggung jawab, ambil semua mahasiswa di kelas ini
@@ -84,7 +85,7 @@ export async function GET(req: Request) {
           .map((r) => {
             const totalJam = r.mahasiswa?.kompen_awal?.[0]?.total_jam_wajib || 0;
             const jamSelesai = jamSelesaiMap.get(r.nim!) || 0;
-            const sisaJam = Math.max(0, totalJam - jamSelesai);
+            const sisaJam = Math.floor(Math.max(0, totalJam - jamSelesai));
             return {
               nama: r.mahasiswa!.nama,
               nim: r.nim,
@@ -104,7 +105,7 @@ export async function GET(req: Request) {
         notaUrl: ekuivalensi.nota_url,
         // Nominal dihitung otomatis dari jam_diakui * 2000 sesuai instruksi
         nominal: (ekuivalensi.jam_diakui || 0) * 2000,
-        jam: ekuivalensi.jam_diakui || 0,
+        jam: Math.floor(ekuivalensi.jam_diakui || 0),
         catatan: ekuivalensi.catatan || '',
         keterangan_pekerjaan: ekuivalensi.keterangan_pekerjaan || '',
         noTelepon: ekuivalensi.no_telepon || '',

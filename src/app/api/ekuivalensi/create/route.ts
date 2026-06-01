@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const totalSisaJam = allRegs.reduce((acc, r) => {
       const totalJam = r.mahasiswa?.kompen_awal[0]?.total_jam_wajib || 0
       const jamSelesai = jamSelesaiMap.get(r.nim || '') || 0
-      return acc + Math.max(0, totalJam - jamSelesai)
+      return acc + Math.floor(Math.max(0, totalJam - jamSelesai))
     }, 0)
 
     const nominalTotal = totalSisaJam * 2000
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       success: true,
       ekuivalensi: {
         id: ekuivalensi.id,
-        jam: ekuivalensi.jam_diakui,
+        jam: Math.floor(Number(ekuivalensi.jam_diakui || 0)),
         nominal: Number(ekuivalensi.nominal_total),
         noTelepon: ekuivalensi.no_telepon,
         noTeleponChangeCount: ekuivalensi.no_telepon_change_count,
