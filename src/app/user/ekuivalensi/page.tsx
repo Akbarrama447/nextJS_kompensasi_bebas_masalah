@@ -108,6 +108,7 @@ export default async function EkuivalensiPage() {
           notaUrl: ekuivalensiData.nota_url || '',
           catatan: ekuivalensiData.catatan || '',
           keterangan_pekerjaan: ekuivalensiData.keterangan_pekerjaan || '',
+          linkBarang: ekuivalensiData.link_barang || '',
           penanggung_jawab_nim: ekuivalensiData.penanggung_jawab_nim || '',
           noTelepon: ekuivalensiData.no_telepon || '',
           noTeleponChangeCount: ekuivalensiData.no_telepon_change_count ?? 0,

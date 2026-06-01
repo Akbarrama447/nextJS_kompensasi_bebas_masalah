@@ -17,6 +17,7 @@ interface EkuivalensiData {
   notaUrl: string
   catatan: string
   keterangan_pekerjaan: string
+  linkBarang: string
   penanggung_jawab_nim: string
   noTelepon?: string
   noTeleponChangeCount?: number
@@ -94,6 +95,7 @@ export default function EkuivalensiClient({
         notaUrl: '',
         catatan: '',
         keterangan_pekerjaan: '',
+        linkBarang: '',
         penanggung_jawab_nim: nim,
         noTelepon: noTelepon.trim(),
         noTeleponChangeCount: 0,
@@ -271,6 +273,31 @@ export default function EkuivalensiClient({
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-0.5">Pekerjaan</p>
                 <p className="text-sm font-semibold text-slate-800">{localEkuivalensi.keterangan_pekerjaan}</p>
+              </div>
+            </div>
+          )}
+
+          {/* LINK BARANG */}
+          {localEkuivalensi?.linkBarang && (
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50/50 border border-purple-200 rounded-xl">
+              <div className="mt-0.5 text-purple-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-purple-600 uppercase tracking-wider mb-0.5">Link Barang</p>
+                <a
+                  href={localEkuivalensi.linkBarang}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-purple-700 hover:text-purple-900 hover:underline break-all inline-flex items-center gap-1"
+                >
+                  {localEkuivalensi.linkBarang}
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
               </div>
             </div>
           )}
