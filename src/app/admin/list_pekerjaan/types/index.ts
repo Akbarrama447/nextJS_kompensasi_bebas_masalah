@@ -144,6 +144,7 @@ export interface MahasiswaKompenRow {
     status_tugas_id: number | null;
     status_nama: string | null;
     created_at: string | null;
+    detail_pengerjaan: Record<string, unknown> | null;
   }[];
 }
 

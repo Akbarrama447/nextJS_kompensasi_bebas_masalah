@@ -24,6 +24,8 @@ model roles {
   key_condition Json?
   users         Users[]
   role_has_menus role_has_menus[]
+
+  @@map("roles")
 }
 
 model Users {
@@ -69,6 +71,17 @@ model ref_tipe_pekerjaan {
   daftar_pekerjaan Daftar_pekerjaan[]
 
   @@map("ref_tipe_pekerjaan")
+}
+
+model role_has_menus {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  role_id    Int?
+  menus_id   Int?
+  roles      roles?   @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menus      menus?   @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("role_has_menus")
 }
 
 model Semester {
@@ -200,6 +213,7 @@ model Import_log {
   staf_nip         String?            @db.VarChar
   semester_id      Int?
   nama_file        String?            @db.VarChar
+  file_hash        String?            @db.VarChar
   total_baris      Int?
   sukses_baris     Int?
   error_details    Json?
@@ -225,6 +239,10 @@ model Ekuivalensi_kelas {
   verified_by_nip       String?                 @map("verified_by_nip") @db.VarChar
   catatan               String?
   created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
+  no_telepon            String?                 @map("no_telepon") @db.VarChar
+  no_telepon_change_count Int?                  @default(0) @map("no_telepon_change_count")
+  keterangan_pekerjaan  String?
+  link_barang           String?
   kelas                 Kelas?                  @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa             Mahasiswa?              @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   semester              Semester?               @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -301,26 +319,15 @@ model registrasi_mahasiswa {
 }
 
 model menus {
-  id            Int              @id @default(autoincrement())
-  key           String           @unique @db.VarChar
-  label         String           @db.VarChar
-  icon          String?          @db.VarChar
-  path          String           @db.VarChar
-  urutan        Int?             @default(0)
-  parent_id     Int?
-  created_at    DateTime?        @default(now()) @db.Timestamp(6)
-  menus         menus?           @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_menus   menus[]          @relation("menusTomenus")
-  role_has_menus role_has_menus[]
-}
-
-model role_has_menus {
-  id        Int                @id @default(autoincrement())
-  created_at DateTime?          @default(now()) @db.Timestamptz(6)
-  role_id   Int?
-  menus_id  Int?
-  role      roles?             @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  menu      menus?             @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@map("role_has_menus")
+  id              Int               @id @default(autoincrement())
+  key             String            @unique @db.VarChar
+  label           String            @db.VarChar
+  icon            String?           @db.VarChar
+  path            String            @db.VarChar
+  urutan          Int?              @default(0)
+  parent_id       Int?
+  created_at      DateTime?         @default(now()) @db.Timestamp(6)
+  menus           menus?            @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus     menus[]           @relation("menusTomenus")
+  role_has_menus  role_has_menus[]
 }

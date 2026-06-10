@@ -41,7 +41,7 @@ export default async function DashboardMahasiswa() {
 
   const totalJamWajib = kompenAwal?.total_jam_wajib ?? 0
   const totalJamSelesai = logPotongJam?._sum.jam_dikurangi ?? 0
-  const sisaJam = totalJamWajib - totalJamSelesai
+  const sisaJam = Math.floor(Math.max(0, totalJamWajib - totalJamSelesai))
 
   const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 

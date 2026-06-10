@@ -48,7 +48,7 @@ export default function DashboardClient({
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <p className="text-[#2e5299] font-semibold text-xs mb-3">Total Jam Selesai</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-800">{totalJamSelesai}</span>
+              <span className="text-3xl font-bold text-slate-800">{Math.floor(totalJamSelesai)}</span>
               <span className="text-sm font-medium text-slate-500">Jam</span>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function DashboardClient({
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <p className="text-[#2e5299] font-semibold text-xs mb-3">Total Jam Wajib</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-800">{totalJamWajib}</span>
+              <span className="text-3xl font-bold text-slate-800">{Math.floor(totalJamWajib)}</span>
               <span className="text-sm font-medium text-slate-500">Jam</span>
             </div>
           </div>
