@@ -78,7 +78,7 @@ export default async function EkuivalensiPage() {
           const studentNim = r.nim || ''
           const totalJam = r.mahasiswa?.kompen_awal[0]?.total_jam_wajib || 0
           const jamSelesai = jamSelesaiMap.get(studentNim) || 0
-          const sisaJam = Math.max(0, totalJam - jamSelesai)
+          const sisaJam = Math.floor(Math.max(0, totalJam - jamSelesai))
           return {
             nama: r.mahasiswa?.nama || '',
             nim: studentNim,
@@ -103,10 +103,12 @@ export default async function EkuivalensiPage() {
         ekuivalensi = {
           id: ekuivalensiData.id,
           status: ekuivalensiData.status_ekuivalensi?.nama || 'Menunggu',
-          jam: ekuivalensiData.jam_diakui || 0,
+          jam: Math.floor(ekuivalensiData.jam_diakui || 0),
           nominal: Number(ekuivalensiData.nominal_total || 0),
           notaUrl: ekuivalensiData.nota_url || '',
           catatan: ekuivalensiData.catatan || '',
+          keterangan_pekerjaan: ekuivalensiData.keterangan_pekerjaan || '',
+          linkBarang: ekuivalensiData.link_barang || '',
           penanggung_jawab_nim: ekuivalensiData.penanggung_jawab_nim || '',
           noTelepon: ekuivalensiData.no_telepon || '',
           noTeleponChangeCount: ekuivalensiData.no_telepon_change_count ?? 0,

@@ -1,109 +1,123 @@
-import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const kelas = searchParams.get("kelas");
+
+  if (!kelas) {
+    return NextResponse.json({ message: "kelas wajib" }, { status: 400 });
+  }
+
   try {
-    const { searchParams } = new URL(req.url)
-    const namaKelas = searchParams.get('kelas')
+    // 0. Cari semester aktif
+    const activeSemester = await prisma.semester.findFirst({
+      where: { is_aktif: true }
+    });
 
-    if (!namaKelas) {
-      return NextResponse.json({ error: 'Parameter kelas diperlukan' }, { status: 400 })
+    if (!activeSemester) {
+      return NextResponse.json({ message: "Tidak ada semester aktif" }, { status: 404 });
     }
 
-    const kelas = await prisma.kelas.findFirst({
-      where: { nama_kelas: namaKelas },
-    })
-
-    if (!kelas) {
-      return NextResponse.json({ mahasiswa: [], ekuivalensi: null })
-    }
-
-    const semesterAktif = await prisma.semester.findFirst({
-      where: { is_aktif: true },
-    })
-
-    if (!semesterAktif) {
-      return NextResponse.json({ mahasiswa: [], ekuivalensi: null })
-    }
-
-    const registrations = await prisma.registrasi_mahasiswa.findMany({
-      where: {
-        kelas_id: kelas.id,
-        semester_id: semesterAktif.id,
-        status: 'Aktif',
-      },
-      include: {
-        mahasiswa: {
-          include: {
-            kompen_awal: {
-              where: { semester_id: semesterAktif.id },
-              take: 1,
-            },
-          },
-        },
-      },
-    })
-
-    const nims = registrations.map((r) => r.nim).filter(Boolean) as string[]
-
-    const logSum = await prisma.log_potong_jam.groupBy({
-      by: ['nim'],
-      where: {
-        nim: { in: nims },
-        semester_id: semesterAktif.id,
-      },
-      _sum: { jam_dikurangi: true },
-    })
-
-    const jamSelesaiMap = new Map<string, number>()
-    for (const log of logSum) {
-      if (log.nim) jamSelesaiMap.set(log.nim, log._sum.jam_dikurangi || 0)
-    }
-
+    // 1. Ambil data UTAMA dari tabel ekuivalensi_kelas, lalu dihubungkan (join) ke tabel lain
     const ekuivalensi = await prisma.ekuivalensi_kelas.findFirst({
       where: {
-        kelas_id: kelas.id,
-        semester_id: semesterAktif.id,
+        kelas: {
+            nama_kelas: kelas
+        },
+        semester_id: activeSemester.id
       },
-      orderBy: { created_at: 'desc' },
-    })
+      include: {
+        status_ekuivalensi: true,
+        mahasiswa: true, // Penanggung Jawab
+        kelas: true      // Data Kelas
+      }
+    });
 
-    if (!ekuivalensi) {
-      return NextResponse.json({ mahasiswa: [], ekuivalensi: null })
+    // 2. Mapping ke UI
+    let studentList: any[] = [];
+    if (ekuivalensi) {
+      if (ekuivalensi.mahasiswa) {
+        // Ada Penanggung Jawab (dari pengajuan user)
+        studentList = [{
+          nama: ekuivalensi.mahasiswa.nama,
+          nim: ekuivalensi.mahasiswa.nim,
+          jam: Math.floor(ekuivalensi.jam_diakui || 0),
+        }];
+      } else if (ekuivalensi.kelas_id) {
+        // Auto-assign: tidak ada penanggung jawab, ambil semua mahasiswa di kelas ini
+        const regs = await prisma.registrasi_mahasiswa.findMany({
+          where: {
+            kelas_id: ekuivalensi.kelas_id,
+            semester_id: activeSemester.id,
+            status: 'Aktif',
+          },
+          include: {
+            mahasiswa: {
+              include: {
+                kompen_awal: {
+                  where: { semester_id: activeSemester.id },
+                  take: 1,
+                },
+              },
+            },
+          },
+        });
+
+        // Hitung sisa jam per mahasiswa
+        const nims = regs.map((r) => r.nim).filter(Boolean) as string[];
+        const logSum = await prisma.log_potong_jam.groupBy({
+          by: ['nim'],
+          where: {
+            nim: { in: nims },
+            semester_id: activeSemester.id,
+          },
+          _sum: { jam_dikurangi: true },
+        });
+        const jamSelesaiMap = new Map<string, number>();
+        for (const log of logSum) {
+          if (log.nim) jamSelesaiMap.set(log.nim, log._sum.jam_dikurangi || 0);
+        }
+
+        studentList = regs
+          .filter((r) => r.mahasiswa)
+          .map((r) => {
+            const totalJam = r.mahasiswa?.kompen_awal?.[0]?.total_jam_wajib || 0;
+            const jamSelesai = jamSelesaiMap.get(r.nim!) || 0;
+            const sisaJam = Math.floor(Math.max(0, totalJam - jamSelesai));
+            return {
+              nama: r.mahasiswa!.nama,
+              nim: r.nim,
+              jam: sisaJam,
+            };
+          })
+          .filter((s) => s.jam > 0);
+      }
     }
 
-    const mahasiswa = registrations
-      .map((r) => {
-        const studentNim = r.nim || ''
-        const totalJam = r.mahasiswa?.kompen_awal[0]?.total_jam_wajib || 0
-        const jamSelesai = jamSelesaiMap.get(studentNim) || 0
-        const sisaJam = Math.max(0, totalJam - jamSelesai)
-        return {
-          nama: r.mahasiswa?.nama || '',
-          nim: studentNim,
-          jam: sisaJam,
-        }
-      })
-      .filter((m) => m.jam > 0)
-
     return NextResponse.json({
-      mahasiswa,
-      ekuivalensi: ekuivalensi
-        ? {
-            id: ekuivalensi.id,
-            statusId: ekuivalensi.status_ekuivalensi_id,
-            jam: ekuivalensi.jam_diakui || 0,
-            nominal: Number(ekuivalensi.nominal_total || 0),
-            tanggal: ekuivalensi.created_at,
-            notaUrl: ekuivalensi.nota_url || '',
-            catatan: ekuivalensi.catatan || '',
-            noTelepon: ekuivalensi.no_telepon || '',
-            noTeleponChangeCount: ekuivalensi.no_telepon_change_count ?? 0,
-          }
-        : null,
-    })
-  } catch (error) {
-    console.error('Fetch by-kelas error:', error)
-    return NextResponse.json({ error: 'Gagal mengambil data ekuivalensi' }, { status: 500 })
+      mahasiswa: studentList, // Penanggung jawab (1 data) atau semua mahasiswa kelas (auto-assign)
+      ekuivalensi: ekuivalensi ? {
+        id: ekuivalensi.id,
+        status: ekuivalensi.status_ekuivalensi?.nama?.toLowerCase() || 'pending',
+        statusId: ekuivalensi.status_ekuivalensi_id,
+        notaUrl: ekuivalensi.nota_url,
+        // Nominal dihitung otomatis dari jam_diakui * 2000 sesuai instruksi
+        nominal: (ekuivalensi.jam_diakui || 0) * 2000,
+        jam: Math.floor(ekuivalensi.jam_diakui || 0),
+        catatan: ekuivalensi.catatan || '',
+        keterangan_pekerjaan: ekuivalensi.keterangan_pekerjaan || '',
+        link_barang: ekuivalensi.link_barang || '',
+        noTelepon: ekuivalensi.no_telepon || '',
+        noTeleponChangeCount: ekuivalensi.no_telepon_change_count ?? 0,
+        tanggal: ekuivalensi.created_at
+      } : null
+    });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { message: "error ambil data" },
+      { status: 500 }
+    );
   }
 }

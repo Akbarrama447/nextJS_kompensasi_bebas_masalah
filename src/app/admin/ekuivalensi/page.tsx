@@ -10,7 +10,7 @@ export default async function Page() {
   const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 
   return (
-    <Sidebar role="admin" activePath="/ekuivalensi">
+    <Sidebar role="admin" activePath="/admin/ekuivalensi">
       <ClientPage semesterLabel={semesterLabel} />
     </Sidebar>
   );

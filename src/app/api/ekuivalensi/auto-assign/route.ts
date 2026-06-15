@@ -64,7 +64,7 @@ async function autoAssign() {
 
     const totalJam = r.mahasiswa?.kompen_awal[0]?.total_jam_wajib || 0
     const jamSelesai = jamSelesaiMap.get(r.nim) || 0
-    const sisaJam = Math.max(0, totalJam - jamSelesai)
+    const sisaJam = Math.floor(Math.max(0, totalJam - jamSelesai))
 
     if (sisaJam <= 0) continue
 

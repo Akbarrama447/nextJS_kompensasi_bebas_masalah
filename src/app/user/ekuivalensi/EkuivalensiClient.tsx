@@ -17,6 +17,8 @@ interface EkuivalensiData {
   nominal: number
   notaUrl: string
   catatan: string
+  keterangan_pekerjaan: string
+  linkBarang: string
   penanggung_jawab_nim: string
   noTelepon?: string
   noTeleponChangeCount?: number
@@ -93,10 +95,13 @@ export default function EkuivalensiClient({
         nominal: data.ekuivalensi.nominal,
         notaUrl: '',
         catatan: '',
+        keterangan_pekerjaan: '',
+        linkBarang: '',
         penanggung_jawab_nim: nim,
         noTelepon: noTelepon.trim(),
         noTeleponChangeCount: 0,
       })
+      setNoTelepon(noTelepon.trim())
 
       setUploadMessage({ type: 'success', text: 'Pengajuan berhasil! Upload bukti sekarang.' })
       setTimeout(() => setUploadMessage(null), 3000)
@@ -236,7 +241,7 @@ export default function EkuivalensiClient({
     <>
       <UserHeader nama={namaMahasiswa} role="mahasiswa" semesterLabel={semesterLabel} />
 
-      <div className="p-10 max-w-6xl mx-auto">
+      <div className="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-800 mb-0.5">Ekuivalensi</h2>
           <p className="text-sm text-[#2e5299] font-medium opacity-80">
@@ -255,6 +260,46 @@ export default function EkuivalensiClient({
                   Penanggung Jawab
                 </span>
               )}
+            </div>
+          )}
+
+          {/* PEKERJAAN */}
+          {localEkuivalensi?.keterangan_pekerjaan && (
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50/50 border border-blue-200 rounded-xl">
+              <div className="mt-0.5 text-blue-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-0.5">Pekerjaan</p>
+                <p className="text-sm font-semibold text-slate-800">{localEkuivalensi.keterangan_pekerjaan}</p>
+              </div>
+            </div>
+          )}
+
+          {/* LINK BARANG */}
+          {localEkuivalensi?.linkBarang && (
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50/50 border border-purple-200 rounded-xl">
+              <div className="mt-0.5 text-purple-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-purple-600 uppercase tracking-wider mb-0.5">Link Barang</p>
+                <a
+                  href={localEkuivalensi.linkBarang}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-purple-700 hover:text-purple-900 hover:underline break-all inline-flex items-center gap-1"
+                >
+                  {localEkuivalensi.linkBarang}
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
             </div>
           )}
 
