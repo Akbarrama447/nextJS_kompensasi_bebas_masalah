@@ -1,5 +1,7 @@
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 import prisma from '@/lib/prisma'
+import { verifySession } from '@/lib/session'
 import SidebarClient from './SidebarClient'
 
 interface SidebarProps {
@@ -8,57 +10,11 @@ interface SidebarProps {
   children: React.ReactNode
 }
 
-export default async function Sidebar({ role, activePath = '', children }: SidebarProps) {
-  const cookieStore = await cookies()
-
-  let nama = 'User'
-  let roleId: number | null = null
-  let id = '-'
-
-  if (role === 'superadmin') {
-    nama = 'Super Admin'
-    id = cookieStore.get('superadmin')?.value || '-'
-    const superRole = await prisma.roles.findFirst({
-      where: { nama: { equals: 'superadmin', mode: 'insensitive' } },
-      select: { id: true },
-    })
-    roleId = superRole?.id ?? null
-  } else if (role === 'mahasiswa') {
-    const nim = cookieStore.get('nim')?.value
-    id = nim || '-'
-    if (nim) {
-      const mahasiswa = await prisma.mahasiswa.findUnique({
-        where: { nim },
-        select: { nama: true, user: { select: { role_id: true } } },
-      })
-      if (mahasiswa) {
-        nama = mahasiswa.nama || 'User'
-        roleId = mahasiswa.user?.role_id ?? null
-      }
-    }
-  } else {
-    const nip = cookieStore.get('nip')?.value
-    id = nip || '-'
-    if (nip) {
-      const staf = await prisma.staf.findUnique({
-        where: { nip },
-        select: { nama: true, user: { select: { role_id: true } } },
-      })
-      if (staf) {
-        nama = staf.nama || 'Admin'
-        roleId = staf.user?.role_id ?? null
-      }
-    }
-  }
-
-  // Menu yang boleh diakses role ini — sepenuhnya dari DB (role_has_menus)
-  const allowedMenuIds =
-    roleId !== null
-      ? await prisma.role_has_menus.findMany({
-          where: { role_id: roleId },
-          select: { menus_id: true },
-        })
-      : []
+const getMenusForRole = cache(async (roleId: number) => {
+  const allowedMenuIds = await prisma.role_has_menus.findMany({
+    where: { role_id: roleId },
+    select: { menus_id: true },
+  })
 
   const allowedIds = allowedMenuIds
     .map((r) => r.menus_id)
@@ -72,7 +28,7 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
     orderBy: { urutan: 'asc' },
   })
 
-  const serializedMenus = menus.map((m) => ({
+  return menus.map((m) => ({
     id: m.id,
     key: m.key,
     label: m.label,
@@ -80,6 +36,56 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
     path: m.path,
     urutan: m.urutan,
   }))
+})
+
+const getRoleIdByName = cache(async (name: string) => {
+  const role = await prisma.roles.findFirst({
+    where: { nama: { equals: name, mode: 'insensitive' } },
+    select: { id: true },
+  })
+  return role?.id ?? null
+})
+
+export default async function Sidebar({ role, activePath = '', children }: SidebarProps) {
+  const cookieStore = await cookies()
+  const sessionToken = cookieStore.get('session')?.value
+  const session = sessionToken ? await verifySession(sessionToken) : null
+
+  let nama = 'User'
+  let roleId: number | null = null
+  let id = '-'
+
+  if (role === 'superadmin') {
+    nama = session?.nama || 'Super Admin'
+    id = session?.identifier || '-'
+    roleId = await getRoleIdByName('superadmin')
+  } else if (role === 'mahasiswa') {
+    id = session?.identifier || '-'
+    if (session?.identifier) {
+      const mahasiswa = await prisma.mahasiswa.findUnique({
+        where: { nim: session.identifier },
+        select: { nama: true, user: { select: { role_id: true } } },
+      })
+      if (mahasiswa) {
+        nama = mahasiswa.nama || 'User'
+        roleId = mahasiswa.user?.role_id ?? null
+      }
+    }
+  } else {
+    id = session?.identifier || '-'
+    if (session?.identifier) {
+      const staf = await prisma.staf.findUnique({
+        where: { nip: session.identifier },
+        select: { nama: true, user: { select: { role_id: true } } },
+      })
+      if (staf) {
+        nama = staf.nama || 'Admin'
+        roleId = staf.user?.role_id ?? null
+      }
+    }
+  }
+
+  const serializedMenus = roleId !== null ? await getMenusForRole(roleId) : []
 
   return (
     <SidebarClient

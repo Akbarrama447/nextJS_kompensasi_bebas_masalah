@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { compare } from 'bcryptjs'
+import { createSession, sessionCookieOptions, SESSION_COOKIE } from '@/lib/session'
 
 export async function POST(req: NextRequest) {
   try {
@@ -59,8 +60,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Akun tidak ditemukan' }, { status: 401 })
     }
 
-    // Tentukan roleType final dari nama role di DB (tanpa hardcode).
-    // Staf bisa berperan sebagai 'admin' atau 'superadmin'.
     const roleName = (user.role?.nama || '').toLowerCase()
     if (roleType === 'admin' && roleName === 'superadmin') {
       roleType = 'superadmin'
@@ -78,20 +77,23 @@ export async function POST(req: NextRequest) {
       role: roleType,
     })
 
-    const cookieOptions = {
-      httpOnly: true,
-      path: '/',
-      maxAge: 60 * 60 * 24,
-    }
+    const sessionToken = await createSession({
+      userId: user.user_id,
+      role: roleType,
+      identifier: nim || nip || '',
+      nama: profile.nama || '',
+    })
+
+    response.cookies.set(SESSION_COOKIE, sessionToken, sessionCookieOptions())
 
     if (nim) {
-      response.cookies.set('nim', nim, cookieOptions)
+      response.cookies.set('nim', nim, { ...sessionCookieOptions(), httpOnly: true })
     }
     if (nip) {
-      response.cookies.set('nip', nip, cookieOptions)
+      response.cookies.set('nip', nip, { ...sessionCookieOptions(), httpOnly: true })
     }
-    response.cookies.set('role', roleType, cookieOptions)
-    response.cookies.set('nama', profile.nama || '', { ...cookieOptions, httpOnly: false })
+    response.cookies.set('role', roleType, { ...sessionCookieOptions(), httpOnly: true })
+    response.cookies.set('nama', profile.nama || '', { ...sessionCookieOptions(), httpOnly: true })
 
     return response
 

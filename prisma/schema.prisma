@@ -349,3 +349,15 @@ model menus {
   other_menus     menus[]           @relation("menusTomenus")
   role_has_menus  role_has_menus[]
 }
+
+model audit_log {
+  id          Int      @id @default(autoincrement())
+  actor_nip   String?  @db.VarChar
+  actor_nama  String?  @db.VarChar
+  aksi        String?  @db.VarChar
+  target      String?  @db.VarChar
+  detail      Json?
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+
+  @@map("audit_log")
+}
