@@ -14,6 +14,13 @@ export async function updateProgresTugas(formData: FormData) {
   const nextStatus = statusSekarang === 1 ? 2 : 3
 
   try {
+    // Fetch detail_pengerjaan yang sudah ada (jangan overwrite)
+    const existing = await prisma.penugasan.findUnique({
+      where: { id: penugasanId },
+      select: { detail_pengerjaan: true }
+    })
+    const existingData = (existing?.detail_pengerjaan as Record<string, unknown>) || {}
+
     let fileName = null
 
     // 2. Handle Upload Gambar jika ada
@@ -30,7 +37,11 @@ export async function updateProgresTugas(formData: FormData) {
       await writeFile(path, buffer)
     }
 
-    // 3. Update Database via Prisma
+    // 3. Tentukan key foto berdasarkan transisi status
+    // Status 1->2 (Mulai) => foto_mulai, Status 2->3 (Selesai) => foto_selesai
+    const fotoKey = statusSekarang === 1 ? 'foto_mulai' : 'foto_selesai'
+
+    // 4. Update Database via Prisma (merge, jangan overwrite)
     const nominalRaw = formData.get('nominal')
     const nominal = nominalRaw ? Number(nominalRaw) : null
 
@@ -38,10 +49,9 @@ export async function updateProgresTugas(formData: FormData) {
       where: { id: penugasanId },
       data: {
         status_tugas_id: nextStatus,
-        // Asumsi kolom di DB lo namanya 'detail_pengerjaan' untuk nyimpen nama file
-        // Atau sesuaikan dengan kolom foto yang ada di schema lo
         detail_pengerjaan: {
-          ...(fileName ? { fileName } : {}),
+          ...existingData,
+          ...(fileName ? { [fotoKey]: fileName } : {}),
           ...(nominal !== null ? { nominal } : {})
         }, 
         updated_at: new Date()
