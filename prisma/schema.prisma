@@ -1,11 +1,17 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
   provider = "postgresql"
 }
+
+
+// =====================================================
+// LEVEL 1: Independent Tables
+// =====================================================
 
 model Jurusan {
   id           Int      @id @default(autoincrement())
@@ -24,6 +30,8 @@ model roles {
   key_condition Json?
   users         Users[]
   role_has_menus role_has_menus[]
+
+  @@map("roles")
 }
 
 model Users {
@@ -71,6 +79,17 @@ model ref_tipe_pekerjaan {
   @@map("ref_tipe_pekerjaan")
 }
 
+model role_has_menus {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  role_id    Int?
+  menus_id   Int?
+  roles      roles?   @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menus      menus?   @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("role_has_menus")
+}
+
 model Semester {
   id                   Int                    @id @default(autoincrement())
   nama                 String?                @db.VarChar
@@ -99,6 +118,11 @@ model Pengaturan_sistem {
 
   @@map("pengaturan_sistem")
 }
+
+// =====================================================
+// LEVEL 2: Dependent on Level 1
+// =====================================================
+
 
 model Prodi {
   id              Int      @id @default(autoincrement())
@@ -142,6 +166,7 @@ model Kelas {
   @@map("kelas")
 }
 
+
 model Mahasiswa {
   nim                         String                 @id @db.VarChar
   user_id                     Int?                   @unique
@@ -172,6 +197,10 @@ model Staf {
   @@map("staf")
 }
 
+// =====================================================
+// LEVEL 4: Dependent on Level 3
+// =====================================================
+
 model Daftar_pekerjaan {
   id                Int                 @id @default(autoincrement())
   staf_nip          String?             @db.VarChar
@@ -200,6 +229,7 @@ model Import_log {
   staf_nip         String?            @db.VarChar
   semester_id      Int?
   nama_file        String?            @db.VarChar
+  file_hash        String?            @db.VarChar
   total_baris      Int?
   sukses_baris     Int?
   error_details    Json?
@@ -225,6 +255,10 @@ model Ekuivalensi_kelas {
   verified_by_nip       String?                 @map("verified_by_nip") @db.VarChar
   catatan               String?
   created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
+  no_telepon            String?                 @map("no_telepon") @db.VarChar
+  no_telepon_change_count Int?                  @default(0) @map("no_telepon_change_count")
+  keterangan_pekerjaan  String?
+  link_barang           String?
   kelas                 Kelas?                  @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa             Mahasiswa?              @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   semester              Semester?               @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -234,6 +268,10 @@ model Ekuivalensi_kelas {
 
   @@map("ekuivalensi_kelas")
 }
+
+// =====================================================
+// LEVEL 5: Final Level (Log & Operations)
+// =====================================================
 
 model Penugasan {
   id                    Int               @id @default(autoincrement())
@@ -301,26 +339,27 @@ model registrasi_mahasiswa {
 }
 
 model menus {
-  id            Int              @id @default(autoincrement())
-  key           String           @unique @db.VarChar
-  label         String           @db.VarChar
-  icon          String?          @db.VarChar
-  path          String           @db.VarChar
-  urutan        Int?             @default(0)
-  parent_id     Int?
-  created_at    DateTime?        @default(now()) @db.Timestamp(6)
-  menus         menus?           @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_menus   menus[]          @relation("menusTomenus")
-  role_has_menus role_has_menus[]
+  id              Int               @id @default(autoincrement())
+  key             String            @unique @db.VarChar
+  label           String            @db.VarChar
+  icon            String?           @db.VarChar
+  path            String            @db.VarChar
+  urutan          Int?              @default(0)
+  parent_id       Int?
+  created_at      DateTime?         @default(now()) @db.Timestamp(6)
+  menus           menus?            @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus     menus[]           @relation("menusTomenus")
+  role_has_menus  role_has_menus[]
 }
 
-model role_has_menus {
-  id        Int                @id @default(autoincrement())
-  created_at DateTime?          @default(now()) @db.Timestamptz(6)
-  role_id   Int?
-  menus_id  Int?
-  role      roles?             @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  menu      menus?             @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model audit_log {
+  id          Int      @id @default(autoincrement())
+  actor_nip   String?  @db.VarChar
+  actor_nama  String?  @db.VarChar
+  aksi        String?  @db.VarChar
+  target      String?  @db.VarChar
+  detail      Json?
+  created_at  DateTime @default(now()) @db.Timestamp(6)
 
-  @@map("role_has_menus")
+  @@map("audit_log")
 }

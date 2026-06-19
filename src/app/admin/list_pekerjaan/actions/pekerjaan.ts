@@ -1,14 +1,14 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { getActiveSemesterId } from '@/lib/semester';
+import { getCurrentStaffNip } from '@/lib/staff';
 import type {
   PekerjaanForm,
   PekerjaanRow,
   CreateResult,
   DeleteResult,
 } from '../types';
-
-const STAFF_NIP_DEFAULT = '196801011990031001';
 
 const STATUS_TUGAS = {
   MENUNGGU: 1,
@@ -17,48 +17,21 @@ const STATUS_TUGAS = {
   DIVERIFIKASI: 4,
 } as const;
 
-async function getActiveSemester() {
-  const semester = await prisma.semester.findFirst({
-    where: { is_aktif: true },
-    select: { id: true },
-  });
-
-  if (semester) return semester.id;
-
-  const firstSemester = await prisma.semester.findFirst({
-    select: { id: true },
-    orderBy: { id: 'asc' },
-  });
-
-  return firstSemester?.id || null;
-}
-
-async function getStaffNip(): Promise<string> {
-  const staff = await prisma.staf.findUnique({
-    where: { nip: STAFF_NIP_DEFAULT },
-    select: { nip: true },
-  });
-
-  if (staff) return staff.nip;
-
-  const firstStaff = await prisma.staf.findFirst({
-    select: { nip: true },
-  });
-
-  return firstStaff?.nip || STAFF_NIP_DEFAULT;
-}
-
 export async function createPekerjaan(
   data: PekerjaanForm
 ): Promise<CreateResult> {
   try {
     const [semesterId, staffNip] = await Promise.all([
-      getActiveSemester(),
-      getStaffNip(),
+      getActiveSemesterId(),
+      getCurrentStaffNip(),
     ]);
 
     if (!semesterId) {
       return { success: false, error: 'Tidak ada semester aktif' };
+    }
+
+    if (!staffNip) {
+      return { success: false, error: 'Sesi staf tidak valid. Silakan login ulang.' };
     }
 
     if (!data.tipe_pekerjaan_id) {
@@ -126,23 +99,14 @@ export async function getDaftarPekerjaan(
   filters?: {
     semester_id?: number;
     is_aktif?: boolean;
+    search?: string;
   } & PaginationParams
 ): Promise<GetDaftarPekerjaanResult | PekerjaanRow[]> {
   const returnAll = filters === undefined;
-  const { limit = 10, offset = 0, ...filterRest } = filters || {};
+  const { limit = 10, offset = 0 } = filters || {};
 
   try {
-    let semesterId: number | undefined;
-
-    if (filters?.semester_id) {
-      semesterId = filters.semester_id;
-    } else {
-      const activeSemester = await prisma.semester.findFirst({
-        where: { is_aktif: true },
-        select: { id: true },
-      });
-      semesterId = activeSemester?.id;
-    }
+    const semesterId = filters?.semester_id ?? (await getActiveSemesterId()) ?? undefined;
 
     const whereClause: any = {};
 
@@ -152,6 +116,15 @@ export async function getDaftarPekerjaan(
 
     if (filters?.is_aktif !== undefined) {
       whereClause.is_aktif = filters.is_aktif;
+    }
+
+    const search = filters?.search?.trim();
+    if (search) {
+      whereClause.OR = [
+        { judul: { contains: search, mode: 'insensitive' } },
+        { deskripsi: { contains: search, mode: 'insensitive' } },
+        { ruangan: { is: { nama_ruangan: { contains: search, mode: 'insensitive' } } } },
+      ];
     }
 
     const [pekerjaan, totalCount] = await Promise.all([
@@ -166,6 +139,9 @@ export async function getDaftarPekerjaan(
           },
           ruangan: {
             select: { id: true, nama_ruangan: true },
+          },
+          semester: {
+            select: { id: true, nama: true, tahun: true },
           },
           penugasan: {
             where: {
@@ -200,6 +176,9 @@ export async function getDaftarPekerjaan(
         : undefined,
       tipe_pekerjaan: p.tipe_pekerjaan
         ? { id: p.tipe_pekerjaan.id, nama: p.tipe_pekerjaan.nama || '' }
+        : undefined,
+      semester: p.semester
+        ? { id: p.semester.id, nama: p.semester.nama || '', tahun: p.semester.tahun ?? null }
         : undefined,
     }));
 

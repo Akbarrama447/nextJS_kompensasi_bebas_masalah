@@ -12,12 +12,21 @@ export default async function DashboardMahasiswa() {
     include: { user: true }
   })
 
-  const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
-
   const activeSemester = await prisma.semester.findFirst({
     where: { is_aktif: true },
-    select: { id: true, nama: true, tahun: true },
+    select: { id: true, nama: true, tahun: true, periode: true, mulai: true, selesai: true }
   })
+
+  const activeSemesterMapped = activeSemester ? {
+    id: activeSemester.id,
+    nama: activeSemester.nama || '',
+    tahun: activeSemester.tahun ?? null,
+    periode: activeSemester.periode ?? null,
+    mulai: activeSemester.mulai ? activeSemester.mulai.toISOString() : null,
+    selesai: activeSemester.selesai ? activeSemester.selesai.toISOString() : null,
+  } : null
+
+  const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
 
   const kompenAwal = activeSemester
     ? await prisma.kompen_awal.findFirst({
@@ -41,7 +50,7 @@ export default async function DashboardMahasiswa() {
 
   const totalJamWajib = kompenAwal?.total_jam_wajib ?? 0
   const totalJamSelesai = logPotongJam?._sum.jam_dikurangi ?? 0
-  const sisaJam = totalJamWajib - totalJamSelesai
+  const sisaJam = Math.floor(Math.max(0, totalJamWajib - totalJamSelesai))
 
   const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 
@@ -54,6 +63,7 @@ export default async function DashboardMahasiswa() {
           totalJamSelesai={totalJamSelesai}
           totalJamWajib={totalJamWajib}
           semesterLabel={semesterLabel}
+          activeSemester={activeSemesterMapped}
         />
       </main>
     </Sidebar>

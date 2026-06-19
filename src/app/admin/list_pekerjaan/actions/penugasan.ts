@@ -1,6 +1,8 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { resolveSemesterId } from '@/lib/semester';
+import { getCurrentStaffNip } from '@/lib/staff';
 import type {
   PenugasanRow,
   VerifyParams,
@@ -13,45 +15,12 @@ import type {
   GetDaftarKompenResult,
 } from '../types';
 
-const STAFF_NIP_DEFAULT = '196801011990031001';
-
 const STATUS_TUGAS = {
   MENUNGGU: 1,
   SEDANG_DIKERJAKAN: 2,
   SELESAI: 3,
   DIVERIFIKASI: 4,
 } as const;
-
-async function getActiveSemester() {
-  const semester = await prisma.semester.findFirst({
-    where: { is_aktif: true },
-    select: { id: true },
-  });
-  
-  if (semester) return semester.id;
-  
-  const firstSemester = await prisma.semester.findFirst({
-    select: { id: true },
-    orderBy: { id: 'asc' },
-  });
-  
-  return firstSemester?.id || null;
-}
-
-async function getStaffNip(): Promise<string> {
-  const staff = await prisma.staf.findUnique({
-    where: { nip: STAFF_NIP_DEFAULT },
-    select: { nip: true },
-  });
-  
-  if (staff) return staff.nip;
-  
-  const firstStaff = await prisma.staf.findFirst({
-    select: { nip: true },
-  });
-  
-  return firstStaff?.nip || STAFF_NIP_DEFAULT;
-}
 
 export async function getDaftarKompen(
   params?: GetDaftarKompenParams
@@ -65,25 +34,7 @@ export async function getDaftarKompen(
   } = params || {};
 
   try {
-    let semesterId: number | undefined;
-    
-    if (params?.semester_id) {
-      semesterId = params.semester_id;
-    } else {
-      const activeSemester = await prisma.semester.findFirst({
-        where: { is_aktif: true },
-        select: { id: true },
-      });
-      semesterId = activeSemester?.id;
-      
-      if (!semesterId) {
-        const firstSemester = await prisma.semester.findFirst({
-          orderBy: { id: 'asc' },
-          select: { id: true },
-        });
-        semesterId = firstSemester?.id;
-      }
-    }
+    const semesterId = await resolveSemesterId(params?.semester_id);
 
     if (!semesterId) {
       return { data: [], total: 0 };
@@ -126,7 +77,12 @@ export async function getDaftarKompen(
       },
       include: {
         pekerjaan: {
-          select: { id: true, judul: true, poin_jam: true },
+          select: {
+            id: true,
+            judul: true,
+            poin_jam: true,
+            tipe_pekerjaan: { select: { id: true, nama: true } },
+          },
         },
         status_tugas: {
           select: { id: true, nama: true },
@@ -147,9 +103,12 @@ export async function getDaftarKompen(
           pekerjaan_id: p.pekerjaan?.id || null,
           pekerjaan_judul: p.pekerjaan?.judul || null,
           poin_jam: p.pekerjaan?.poin_jam || null,
+          tipe_pekerjaan_id: p.pekerjaan?.tipe_pekerjaan?.id || null,
+          tipe_pekerjaan_nama: p.pekerjaan?.tipe_pekerjaan?.nama || null,
           status_tugas_id: p.status_tugas?.id || null,
           status_nama: p.status_tugas?.nama || null,
           created_at: p.created_at?.toISOString() || null,
+          detail_pengerjaan: p.detail_pengerjaan as Record<string, unknown> | null,
         });
       }
     }
@@ -208,13 +167,21 @@ export async function getDaftarKompen(
       );
     }
 
-    // Apply status filter
+    // Apply status filter — check across ALL penugasans, not just the first
     if (status_filter === 'belum_ditugaskan') {
-      filteredData = filteredData.filter(d => d.penugasan_id === null);
+      filteredData = filteredData.filter(d => !d.penugasans || d.penugasans.length === 0);
     } else if (status_filter === 'sedang_dikerjakan') {
-      filteredData = filteredData.filter(d => d.status_tugas_id !== null && d.status_tugas_id !== 3 && d.status_tugas_id !== 4);
+      filteredData = filteredData.filter(d =>
+        d.penugasans && d.penugasans.some(p =>
+          p.status_tugas_id !== null && p.status_tugas_id !== 3 && p.status_tugas_id !== 4
+        )
+      );
     } else if (status_filter === 'selesai') {
-      filteredData = filteredData.filter(d => d.status_tugas_id === 3);
+      filteredData = filteredData.filter(d =>
+        d.penugasans && d.penugasans.some(p =>
+          p.status_tugas_id === 3 || p.status_tugas_id === 4
+        )
+      );
     }
 
     const totalCount = filteredData.length;
@@ -236,16 +203,12 @@ export async function verifyPenugasan(
   const { penugasan_id } = params;
 
   try {
-    const { cookies } = await import('next/headers')
-    const cookieStore = await cookies()
-    const nipCookie = cookieStore.get('nip')?.value
-    let verifikasi_oleh_nip: string
+    const verifikasi_oleh_nip = await getCurrentStaffNip()
 
-    if (nipCookie) {
-      verifikasi_oleh_nip = nipCookie
-    } else {
-      verifikasi_oleh_nip = await getStaffNip()
+    if (!verifikasi_oleh_nip) {
+      return { success: false, error: 'Sesi staf tidak valid. Silakan login ulang.' }
     }
+
     const penugasan = await prisma.penugasan.findUnique({
       where: { id: penugasan_id },
       include: {

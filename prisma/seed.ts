@@ -18,9 +18,44 @@ const studentAccounts = [
   { nim: '3372003', nama: 'Citra Dewi', password: 'password123' },
 ]
 
-// Test accounts - admin
-const adminAccounts = [
-  { nip: '196801011990031001', nama: 'Dr. Admin', password: 'admin123' },
+// Test accounts - admin & staff
+const staffAccounts = [
+  {
+    nip: 'admin',
+    nama: 'Super Admin',
+    email: 'admin@admin.com',
+    password: 'admin123',
+    tipe_staf: 'admin',
+    jurusan_id: 1,
+    role_id: 3 // admin
+  },
+  {
+    nip: '196801011990031001',
+    nama: 'Dr. Ahmad Fauzi, M.T.',
+    email: 'ahmad.fauzi@polines.ac.id',
+    password: 'admin123',
+    tipe_staf: 'admin',
+    jurusan_id: 1,
+    role_id: 3 // admin
+  },
+  {
+    nip: '197505122002121002',
+    nama: 'Ir. Siti Aminah, M.Kom.',
+    email: 'siti.aminah@polines.ac.id',
+    password: 'password123',
+    tipe_staf: 'staf',
+    jurusan_id: 1,
+    role_id: 2 // staf
+  },
+  {
+    nip: '198203042010012001',
+    nama: 'Budi Raharjo, S.T.',
+    email: 'budi.raharjo@polines.ac.id',
+    password: 'password123',
+    tipe_staf: 'teknisi',
+    jurusan_id: 2,
+    role_id: 2 // staf
+  }
 ]
 
 // Reference data
@@ -37,10 +72,8 @@ const refTipePekerjaan = [
 ]
 
 const refStatusImport = [
-  { id: 1, nama: 'MENUNGGU' },
-  { id: 2, nama: 'SEDANG_DIPROSES' },
-  { id: 3, nama: 'SELESAI' },
-  { id: 4, nama: 'GAGAL' },
+  { id: 1, nama: 'SELESAI' },
+  { id: 2, nama: 'GAGAL' },
 ]
 
 const refStatusEkuivalensi = [
@@ -50,12 +83,12 @@ const refStatusEkuivalensi = [
   { id: 4, nama: 'DITOLAK' },
 ]
 
-// Menus for admin
+// Menus for admin (key berbeda dari mahasiswa agar unique)
 const adminMenus = [
-  { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
-  { key: 'pekerjaan', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/pekerjaan', urutan: 2, parent_id: null },
-  { key: 'laporan', label: 'Laporan', icon: 'FileText', path: '/admin/laporan', urutan: 3, parent_id: null },
-  { key: 'pengaturan', label: 'Pengaturan', icon: 'Settings', path: '/admin/pengaturan', urutan: 4, parent_id: null },
+  { key: 'dashboard_admin', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
+  { key: 'pekerjaan_admin', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/list_pekerjaan', urutan: 2, parent_id: null },
+  // { key: 'laporan', label: 'Laporan', icon: 'FileText', path: '/admin/laporan', urutan: 3, parent_id: null },
+  // { key: 'pengaturan', label: 'Pengaturan', icon: 'Settings', path: '/admin/pengaturan', urutan: 4, parent_id: null },
 ]
 
 // Menus for mahasiswa
@@ -70,7 +103,7 @@ const semesterData = { id: 1, nama: '2025/2026 Ganjil', tahun: 2025, periode: 'G
 
 async function seedRefStatus() {
   console.log('\n📋 Seeding reference data...')
-  
+
   // Status Tugas
   for (const status of refStatusTugas) {
     await prisma.ref_status_tugas.upsert({
@@ -110,6 +143,38 @@ async function seedRefStatus() {
     })
     console.log(`  ✓ ref_status_ekuivalensi: ${status.nama}`)
   }
+
+  // Roles
+  const roles = [
+    { id: 1, nama: 'mahasiswa' },
+    { id: 2, nama: 'staf' },
+    { id: 3, nama: 'admin' },
+  ];
+  for (const role of roles) {
+    await prisma.roles.upsert({
+      where: { id: role.id },
+      update: { nama: role.nama },
+      create: role,
+    });
+    console.log(`  ✓ roles: ${role.nama}`)
+  }
+
+  // Jurusan
+  const jurusans = [
+    { id: 1, nama_jurusan: 'Teknik Elektro' },
+    { id: 2, nama_jurusan: 'Teknik Mesin' },
+    { id: 3, nama_jurusan: 'Teknik Sipil' },
+    { id: 4, nama_jurusan: 'Akuntansi' },
+    { id: 5, nama_jurusan: 'Administrasi Bisnis' },
+  ];
+  for (const j of jurusans) {
+    await prisma.jurusan.upsert({
+      where: { id: j.id },
+      update: { nama_jurusan: j.nama_jurusan },
+      create: j,
+    });
+    console.log(`  ✓ jurusan: ${j.nama_jurusan}`)
+  }
 }
 
 async function seedSemester() {
@@ -117,11 +182,11 @@ async function seedSemester() {
   try {
     await prisma.semester.upsert({
       where: { id: semesterData.id },
-      update: { 
-        nama: semesterData.nama, 
-        tahun: semesterData.tahun, 
-        periode: semesterData.periode, 
-        is_aktif: semesterData.is_aktif 
+      update: {
+        nama: semesterData.nama,
+        tahun: semesterData.tahun,
+        periode: semesterData.periode,
+        is_aktif: semesterData.is_aktif
       },
       create: semesterData,
     })
@@ -131,44 +196,53 @@ async function seedSemester() {
   }
 }
 
-async function seedAdmin() {
-  console.log('\n👨‍💼 Seeding admin accounts...')
-  for (const account of adminAccounts) {
+async function seedStaff() {
+  console.log('\n👨‍💼 Seeding staff accounts...')
+  for (const account of staffAccounts) {
     try {
       const hashedPassword = await hash(account.password, 10)
-      
-      const user = await prisma.users.create({
-        data: {
-          email: `${account.nip}@polnes.ac.id`,
+
+      const user = await prisma.users.upsert({
+        where: { email: account.email },
+        update: { role_id: account.role_id },
+        create: {
+          email: account.email,
           kata_sandi: hashedPassword,
+          role_id: account.role_id,
         },
       })
 
       await prisma.staf.upsert({
         where: { nip: account.nip },
-        update: { user_id: user.user_id, nama: account.nama, tipe_staf: 'admin' },
+        update: {
+          user_id: user.user_id,
+          nama: account.nama,
+          tipe_staf: account.tipe_staf,
+          jurisdiction_id: account.jurusan_id
+        },
         create: {
           nip: account.nip,
           user_id: user.user_id,
           nama: account.nama,
-          tipe_staf: 'admin',
+          tipe_staf: account.tipe_staf,
+          jurisdiction_id: account.jurusan_id
         },
       })
 
-      console.log(`  ✓ Admin: ${account.nip} (${account.nama}) | Password: ${account.password}`)
+      console.log(`  ✓ Staff: ${account.nip} (${account.nama}) | Role ID: ${account.role_id}`)
     } catch (e) {
-      console.error(`  ✗ Error creating admin ${account.nip}:`, e)
+      console.error(`  ✗ Error creating staff ${account.nip}:`, e)
     }
   }
 }
 
 async function seedStudents() {
   console.log('\n👨‍🎓 Seeding student accounts...')
-  
+
   // Get or create default kelas
   const prodi = await prisma.prodi.findFirst()
   let kelasId = null
-  
+
   if (prodi) {
     const kelas = await prisma.kelas.upsert({
       where: { id: 1 },
@@ -182,13 +256,22 @@ async function seedStudents() {
   for (const account of studentAccounts) {
     try {
       const hashedPassword = await hash(account.password, 10)
-      
-      const user = await prisma.users.create({
-        data: {
-          email: `${account.nim}@student.polnes.ac.id`,
-          kata_sandi: hashedPassword,
-        },
+      const email = `${account.nim}@student.polnes.ac.id`
+
+      // Cari atau buat User agar aman dari duplikasi email
+      let user = await prisma.users.findUnique({
+        where: { email }
       })
+
+      if (!user) {
+        user = await prisma.users.create({
+          data: {
+            email,
+            kata_sandi: hashedPassword,
+            role_id: 1 // mahasiswa
+          }
+        })
+      }
 
       await prisma.mahasiswa.upsert({
         where: { nim: account.nim },
@@ -205,10 +288,10 @@ async function seedStudents() {
       const existingKompen = await prisma.kompen_awal.findFirst({
         where: { nim: account.nim },
       })
-      
+
       // Create kompen_awal for student
       const jamKompen = Math.floor(Math.random() * 16) + 8 // 8-24 jam random
-      
+
       if (!existingKompen) {
         await prisma.kompen_awal.create({
           data: {
@@ -228,13 +311,13 @@ async function seedStudents() {
 
 async function seedMenus() {
   console.log('\n📱 Seeding menus...')
-  
-  // Clear existing menus and insert new ones
+
+  // Clear existing menus and insert new ones (both admin + mahasiswa)
   await prisma.menus.deleteMany({ where: { parent_id: null } })
-  
-  const menusToSeed = studentAccounts.length === 0 ? adminMenus : mahasiswaMenus
-  
-  for (const menu of menusToSeed) {
+
+  const allMenus = [...adminMenus, ...mahasiswaMenus]
+
+  for (const menu of allMenus) {
     await prisma.menus.create({
       data: menu,
     })
@@ -242,16 +325,66 @@ async function seedMenus() {
   }
 }
 
+async function seedRoleHasMenus() {
+  console.log('\n🔗 Seeding role_has_menus...')
+
+  // Hapus semua data lama
+  await prisma.role_has_menus.deleteMany()
+
+  // Mapping role → key menu
+  const roleMenuMap: { role_id: number; keys: string[] }[] = [
+    { role_id: 1, keys: ['dashboard', 'pekerjaan', 'ekuivalensi'] },
+    { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin'] },
+    { role_id: 3, keys: ['dashboard_admin', 'pekerjaan_admin', 'laporan', 'pengaturan'] },
+  ]
+
+  for (const entry of roleMenuMap) {
+    const menusData = await prisma.menus.findMany({
+      where: { key: { in: entry.keys } },
+      select: { id: true, key: true },
+    })
+
+    for (const menu of menusData) {
+      await prisma.role_has_menus.create({
+        data: {
+          role_id: entry.role_id,
+          menus_id: menu.id,
+        },
+      })
+      console.log(`  ✓ role_has_menus: role_id=${entry.role_id} → menu_key=${menu.key}`)
+    }
+  }
+}
+
+async function seedPengaturanSistem() {
+  console.log('\n⚙️  Seeding pengaturan_sistem...')
+  const settings = [
+    { grup: 'kompen', key: 'jam_wajib_per_semester', value: '30', tipe_data: 'integer', keterangan: 'Jumlah jam wajib kompen per semester' },
+    { grup: 'kompen', key: 'maks_penugasan_per_mahasiswa', value: '5', tipe_data: 'integer', keterangan: 'Maksimal penugasan aktif per mahasiswa' },
+    { grup: 'ekuivalensi', key: 'tarif_ekuivalensi_per_jam', value: '2000', tipe_data: 'integer', keterangan: 'Tarif konversi 1 jam kompen ke rupiah' },
+  ]
+  for (const s of settings) {
+    await prisma.pengaturan_sistem.upsert({
+      where: { key: s.key },
+      update: { grup: s.grup, value: s.value, tipe_data: s.tipe_data, keterangan: s.keterangan },
+      create: s,
+    })
+    console.log(`  ✓ pengaturan_sistem: ${s.key} = ${s.value}`)
+  }
+}
+
 async function main() {
   console.log('🌱 Starting database seeding...')
   console.log('================================')
-  
+
   await seedRefStatus()
   await seedSemester()
-  await seedAdmin()
+  await seedPengaturanSistem()
+  await seedStaff()
   await seedStudents()
   await seedMenus()
-  
+  await seedRoleHasMenus()
+
   console.log('\n================================')
   console.log('✅ Seeding completed successfully!\n')
 }

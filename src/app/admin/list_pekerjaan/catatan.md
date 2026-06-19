@@ -12,6 +12,7 @@ Fitur Import Data Kompensasi via Excel telah dirombak dan dinyatakan **100% Sele
 
 ### Tambahan untuk Tab Import
 1. **Fitur Pagination Preview**: Menambahkan pagination pada tabel preview data Excel sebelum di-import. Opsi tampilkan 10/25/50 data per halaman dengan navigasi prev/next. Sangat penting karena Import file Excel bisa berisi 250+ mahasiswa sekaligus.
+2. **Validasi File Hash (Anti-Duplikasi)**: Mengimplementasikan sistem validasi SHA-256 pada konten data Excel untuk mendeteksi dan mencegah unggahan file ganda (idempotency safety). Ini menjaga kebersihan tabel `import_log` dan mencegah query redundan ke database. (Menambahkan kolom `file_hash` di `schema.prisma`).
 2.
 3.
 4.

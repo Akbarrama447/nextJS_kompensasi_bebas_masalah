@@ -11,10 +11,13 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
   const [mahasiswa, setMahasiswa] = useState<any[]>([]);
   const [ekuivalensi, setEkuivalensi] = useState<any>(null);
   const [pekerjaan, setPekerjaan] = useState("");
+  const [linkBarang, setLinkBarang] = useState("");
 
   const [openPopup, setOpenPopup] = useState(false);
   const [openTolak, setOpenTolak] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [autoLoading, setAutoLoading] = useState(false);
+  const [autoMsg, setAutoMsg] = useState("");
 
   // Fetch Class List
   useEffect(() => {
@@ -45,6 +48,8 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
           setMahasiswa([]);
         }
         setEkuivalensi(data.ekuivalensi);
+        setPekerjaan(data.ekuivalensi?.keterangan_pekerjaan || "");
+        setLinkBarang(data.ekuivalensi?.link_barang || "");
       })
       .catch((err) => {
         console.error("Fetch error:", err);
@@ -56,6 +61,31 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
   const totalJam = Array.isArray(mahasiswa)
     ? mahasiswa.reduce((acc, m) => acc + (m.jam || 0), 0)
     : 0;
+
+  const handleAutoAssign = async () => {
+    setAutoLoading(true);
+    setAutoMsg("");
+    try {
+      const res = await fetch("/api/ekuivalensi/auto-assign", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        setAutoMsg(`✅ ${data.created} class ter-create, ${data.skipped} class di-skip`);
+      } else {
+        setAutoMsg("❌ " + (data.message || "Gagal"));
+      }
+    } catch {
+      setAutoMsg("❌ Gagal connect");
+    } finally {
+      setAutoLoading(false);
+      // Refresh current class
+      if (kelas) {
+        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const refreshData = await refreshRes.json();
+        setMahasiswa(refreshData.mahasiswa || []);
+        setEkuivalensi(refreshData.ekuivalensi);
+      }
+    }
+  };
 
   const handleVerify = async (statusId: number, catatan?: string) => {
     if (!ekuivalensi?.id) {
@@ -95,6 +125,81 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
     }
   };
 
+  const handleSavePekerjaan = async () => {
+    if (!pekerjaan.trim()) {
+      alert("Pekerjaan tidak boleh kosong");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ekuivalensi/pekerjaan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ekuivalensiId: ekuivalensi?.id,
+          keterangan_pekerjaan: pekerjaan,
+          kelas: kelas,
+        }),
+      });
+
+      if (res.ok) {
+        alert("Pekerjaan berhasil disimpan");
+        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const refreshData = await refreshRes.json();
+        setEkuivalensi(refreshData.ekuivalensi);
+        setPekerjaan(refreshData.ekuivalensi?.keterangan_pekerjaan || "");
+      } else {
+        const error = await res.json();
+        alert(error.message || "Gagal menyimpan pekerjaan");
+      }
+    } catch (err) {
+      console.error("Save pekerjaan error:", err);
+      alert("Terjadi kesalahan koneksi");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveLinkBarang = async () => {
+    if (!ekuivalensi?.id) {
+      alert("Data ekuivalensi tidak ditemukan");
+      return;
+    }
+    if (!linkBarang.trim()) {
+      alert("Link barang tidak boleh kosong");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ekuivalensi/link-barang", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ekuivalensiId: ekuivalensi.id,
+          link_barang: linkBarang,
+        }),
+      });
+
+      if (res.ok) {
+        alert("Link barang berhasil disimpan");
+        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const refreshData = await refreshRes.json();
+        setEkuivalensi(refreshData.ekuivalensi);
+        setLinkBarang(refreshData.ekuivalensi?.link_barang || "");
+      } else {
+        const error = await res.json();
+        alert(error.message || "Gagal menyimpan link barang");
+      }
+    } catch (err) {
+      console.error("Save link barang error:", err);
+      alert("Terjadi kesalahan koneksi");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen flex flex-col bg-gray-100">
       <UserHeader nama="Admin" role="admin" semesterLabel={semesterLabel} />
@@ -114,7 +219,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
         {/* CARD */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
 
-          {/* PILIH KELAS */}
+          {/* PILIH KELAS + AUTO ASSIGN */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
             <label className="text-sm font-medium text-gray-700">
               Pilih Kelas
@@ -132,6 +237,18 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                 </option>
               ))}
             </select>
+
+            <button
+              onClick={handleAutoAssign}
+              disabled={autoLoading}
+              className="ml-auto px-4 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white text-xs font-bold rounded-lg transition"
+            >
+              {autoLoading ? "Proses..." : "Auto Assign Ekuivalensi"}
+            </button>
+
+            {autoMsg && (
+              <span className="text-xs font-medium text-gray-600">{autoMsg}</span>
+            )}
           </div>
 
           {/* TABLE */}
@@ -139,6 +256,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
             <table className="min-w-[500px] w-full text-sm text-left">
               <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
                 <tr>
+                  <th className="px-4 py-3 text-center w-12">No</th>
                   <th className="px-4 py-3">Nama</th>
                   <th className="px-4 py-3 text-center">NIM</th>
                   <th className="px-4 py-3 text-center">Jam</th>
@@ -152,6 +270,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                       key={i}
                       className="border-b border-gray-200 last:border-none text-center"
                     >
+                      <td className="px-4 py-3 text-gray-400">{i + 1}</td>
                       <td className="px-4 py-3 text-left">{m.nama}</td>
                       <td>{m.nim}</td>
                       <td>{m.jam}</td>
@@ -159,7 +278,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="px-4 py-10 text-center text-gray-400">
+                    <td colSpan={4} className="px-4 py-10 text-center text-gray-400">
                       Tidak ada data mahasiswa di kelas ini.
                     </td>
                   </tr>
@@ -180,25 +299,40 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
           {/* BOTTOM SECTION */}
           <div className="flex flex-col sm:grid sm:grid-cols-6 gap-3 sm:gap-2 items-start sm:items-center text-sm">
 
-            {/* TOTAL */}
-            <div className="flex justify-between sm:block font-semibold text-gray-700 sm:ml-10">
-              TOTAL
-            </div>
+            {/* TOTAL & NOMINAL */}
+            <div className="w-full flex justify-between sm:contents">
+              <div className="flex flex-col sm:block font-semibold text-gray-700 sm:ml-10">
+                <div>TOTAL</div>
 
-            <div className="flex justify-between sm:block font-bold text-gray-900 sm:ml-6">
-              {totalJam} JAM
+              </div>
+
+              <div className="flex flex-col sm:block font-bold text-gray-900 sm:ml-6 text-right sm:text-left">
+                <div>{totalJam} JAM</div>
+                {ekuivalensi?.nominal != null && (
+                  <div className="text-xs text-green-600 mt-1">
+                    Rp {Number(ekuivalensi.nominal).toLocaleString("id-ID")}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* PEKERJAAN */}
-            <div className="sm:col-span-2 w-full">
+            <div className="sm:col-span-2 w-full relative">
               <input
                 type="text"
                 value={pekerjaan}
                 onChange={(e) => setPekerjaan(e.target.value)}
                 placeholder="Input pekerjaan..."
                 suppressHydrationWarning
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full pl-3 pr-20 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
+              <button
+                onClick={handleSavePekerjaan}
+                disabled={loading}
+                className="absolute right-1 top-1 bottom-1 bg-blue-600 text-white px-3 text-xs font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Simpan
+              </button>
             </div>
 
             {/* BUKTI */}
@@ -244,6 +378,52 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
             </div>
           </div>
 
+          {/* NOMOR TELEPON PERWAKILAN */}
+          {ekuivalensi?.noTelepon && (
+            <div className="mt-4 p-3 border border-blue-200 bg-blue-50 rounded-lg flex items-center justify-between">
+              <div>
+                <p className="text-xs text-blue-500 font-medium">Nomor Telepon Perwakilan</p>
+                <p className="text-sm font-bold text-blue-700">{ekuivalensi.noTelepon}</p>
+              </div>
+              <a
+                href={`https://wa.me/${ekuivalensi.noTelepon.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 text-xs font-bold text-white bg-green-500 hover:bg-green-600 transition rounded-lg flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                WhatsApp
+              </a>
+            </div>
+          )}
+
+          {/* LINK BARANG */}
+          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <div className="w-full sm:w-1/4">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                Link Barang
+              </label>
+            </div>
+            <div className="w-full sm:w-3/4 relative">
+              <input
+                type="text"
+                value={linkBarang}
+                onChange={(e) => setLinkBarang(e.target.value)}
+                placeholder="Input link barang (misal link e-commerce)..."
+                className="w-full pl-3 pr-20 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+              />
+              <button
+                onClick={handleSaveLinkBarang}
+                disabled={loading || !ekuivalensi}
+                className="absolute right-1 top-1 bottom-1 bg-blue-600 text-white px-3 text-xs font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+
           {/* ALASAN TOLAK */}
           {ekuivalensi?.catatan && (
             <div className="mt-4 p-3 border border-red-200 bg-red-50 rounded-lg">
@@ -266,19 +446,20 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
             setOpenPopup(false);
             setOpenTolak(true);
           }}
-          data={{
-            kelas,
-            jam: ekuivalensi.jam,
-            nominal: ekuivalensi.nominal,
-            tanggal: new Date(ekuivalensi.tanggal).toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            fotoUrl: ekuivalensi.notaUrl || "",
-          }}
+            data={{
+              kelas,
+              jam: ekuivalensi.jam,
+              nominal: ekuivalensi.nominal,
+              tanggal: new Date(ekuivalensi.tanggal).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              fotoUrl: ekuivalensi.notaUrl || "",
+              noTelepon: ekuivalensi.noTelepon || "",
+            }}
         />
       )}
 

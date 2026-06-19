@@ -18,6 +18,7 @@
 
 import prisma, { Prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import type { ParsedStudent } from '@/lib/excel-parser';
 
 // ─────────────────────────────────────────
@@ -26,10 +27,8 @@ import type { ParsedStudent } from '@/lib/excel-parser';
 
 /** ID status pada tabel ref_status_import */
 const IMPORT_STATUS = {
-  PROSES: 1,
-  SELESAI: 2,
-  GAGAL: 3,
-  PARTIAL: 4,
+  SELESAI: 1,
+  GAGAL: 2,
 } as const;
 
 // ─────────────────────────────────────────
@@ -96,6 +95,36 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
     }
   }
 
+  // ── 0.2 Validasi Hash File (Mencegah Duplikasi Upload) ──────────────
+  const dataString = JSON.stringify(students);
+  const fileHash = crypto.createHash('sha256').update(dataString).digest('hex');
+
+  const existingImport = await prisma.import_log.findFirst({
+    where: {
+      file_hash: fileHash,
+      status_import_id: IMPORT_STATUS.SELESAI
+    },
+    include: {
+      staf: { select: { nama: true } }
+    }
+  });
+
+  if (existingImport) {
+    const tanggalImport = existingImport.created_at 
+      ? new Date(existingImport.created_at).toLocaleString('id-ID')
+      : 'waktu tidak diketahui';
+      
+    return {
+      successCount: 0,
+      errors: [{
+        nim: '-',
+        nama: '-',
+        error: `File ini sudah pernah di-import sukses oleh ${existingImport.staf?.nama || 'Staf'} pada ${tanggalImport}.`
+      }],
+      importLogId: null
+    };
+  }
+
   // ── 1. Buat record import_log (status: proses) ──────────────────────────
   let importLog: { id: number };
   try {
@@ -104,9 +133,9 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
         staf_nip: finalStaffNip,
         semester_id: finalSemesterId,
         nama_file: namaFile,
+        file_hash: fileHash,
         total_baris: students.length,
         sukses_baris: 0,
-        status_import_id: IMPORT_STATUS.PROSES,
       },
       select: { id: true },
     });
@@ -295,13 +324,11 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
     } catch (err) {}
   }
 
-  // Status: GAGAL jika 0 sukses, PARTIAL jika ada error + ada sukses, SELESAI jika tanpa error
+  // Status: GAGAL jika 0 sukses, SELESAI jika ada baris yang berhasil masuk (sebagian/seluruhnya)
   const finalStatus =
     successCount === 0
       ? IMPORT_STATUS.GAGAL
-      : errors.length > 0
-        ? IMPORT_STATUS.PARTIAL
-        : IMPORT_STATUS.SELESAI;
+      : IMPORT_STATUS.SELESAI;
 
   // Untuk field Json? nullable, Prisma butuh Prisma.JsonNull (bukan JS null)
   await prisma.import_log.update({
@@ -314,4 +341,46 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
   });
 
   return { successCount, errors, importLogId: importLog.id };
+}
+
+// ─────────────────────────────────────────
+// Fetch Riwayat Import (Pagination)
+// ─────────────────────────────────────────
+
+export async function getImportHistory(page: number = 1, limit: number = 10) {
+  try {
+    const skip = (page - 1) * limit;
+    
+    const [data, total] = await Promise.all([
+      prisma.import_log.findMany({
+        skip,
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        include: {
+          semester: { select: { nama: true } },
+          staf: { select: { nama: true, nip: true } },
+          status_import: { select: { nama: true } },
+        },
+      }),
+      prisma.import_log.count(),
+    ]);
+
+    return {
+      success: true,
+      data,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
+  } catch (error) {
+    console.error("Gagal mengambil riwayat import:", error);
+    return {
+      success: false,
+      data: [],
+      total: 0,
+      totalPages: 0,
+      currentPage: page,
+      error: error instanceof Error ? error.message : "Terjadi kesalahan",
+    };
+  }
 }
