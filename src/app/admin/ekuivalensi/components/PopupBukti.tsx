@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Clock, MapPin, CheckCircle, XCircle } from "lucide-react";
+import { X, Clock, CheckCircle, XCircle } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -138,18 +138,10 @@ export default function PopupBukti({
               <div className="flex flex-col items-center gap-1 sm:gap-2 text-[10px] sm:text-sm text-gray-700">
 
                 {/* WAKTU */}
-                <div className="flex items-start sm:items-center gap-1 sm:gap-2 text-center sm:text-left leading-tight">
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 mt-[2px] sm:mt-0" />
-                    <span className="break-words text-center">
+                <div className="flex items-center gap-1 sm:gap-2">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-center">
                     {data.tanggal}
-                    </span>
-                </div>
-
-                {/* LOKASI */}
-                <div className="flex items-center gap-1 sm:gap-2 text-blue-600 cursor-pointer hover:underline">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="whitespace-nowrap">
-                    Lihat Lokasi
                     </span>
                 </div>
 

@@ -27,16 +27,18 @@ const staffAccounts = [
     password: 'admin123',
     tipe_staf: 'admin',
     jurusan_id: 1,
-    role_id: 3 // admin
+    tipe_staf: 'superadmin',
+    jurusan_id: 1,
+    role_id: 1 // Super Admin
   },
   {
     nip: '196801011990031001',
     nama: 'Dr. Ahmad Fauzi, M.T.',
     email: 'ahmad.fauzi@polines.ac.id',
     password: 'admin123',
-    tipe_staf: 'admin',
+    tipe_staf: 'dosen',
     jurusan_id: 1,
-    role_id: 3 // admin
+    role_id: 4 // Dosen
   },
   {
     nip: '197505122002121002',
@@ -45,7 +47,7 @@ const staffAccounts = [
     password: 'password123',
     tipe_staf: 'staf',
     jurusan_id: 1,
-    role_id: 2 // staf
+    role_id: 2 // Staf Jurusan
   },
   {
     nip: '198203042010012001',
@@ -54,7 +56,7 @@ const staffAccounts = [
     password: 'password123',
     tipe_staf: 'teknisi',
     jurusan_id: 2,
-    role_id: 2 // staf
+    role_id: 2 // Staf Jurusan
   }
 ]
 
@@ -83,12 +85,17 @@ const refStatusEkuivalensi = [
   { id: 4, nama: 'DITOLAK' },
 ]
 
+// Menus for superadmin
+const superadminMenus = [
+  { key: 'dashboard_superadmin', label: 'Dashboard', icon: 'LayoutDashboard', path: '/superadmin/dashboard', urutan: 1, parent_id: null },
+  { key: 'manajemen_menu', label: 'Manajemen Menu', icon: 'Menu', path: '/superadmin/manajemen-menu', urutan: 2, parent_id: null },
+  { key: 'manajemen_user', label: 'User', icon: 'Users', path: '/superadmin/users', urutan: 3, parent_id: null },
+]
+
 // Menus for admin
 const adminMenus = [
   { key: 'dashboard_admin', label: 'Dashboard', icon: 'LayoutDashboard', path: '/admin/dashboard', urutan: 1, parent_id: null },
   { key: 'pekerjaan_admin', label: 'Pekerjaan', icon: 'Briefcase', path: '/admin/list_pekerjaan', urutan: 2, parent_id: null },
-  // { key: 'laporan', label: 'Laporan', icon: 'FileText', path: '/admin/laporan', urutan: 3, parent_id: null },
-  // { key: 'pengaturan', label: 'Pengaturan', icon: 'Settings', path: '/admin/pengaturan', urutan: 4, parent_id: null },
 ]
 
 // Menus for mahasiswa
@@ -144,16 +151,17 @@ async function seedRefStatus() {
     console.log(`  ✓ ref_status_ekuivalensi: ${status.nama}`)
   }
 
-  // Roles
+  // Roles — sync dengan data di database
   const roles = [
-    { id: 1, nama: 'mahasiswa' },
-    { id: 2, nama: 'staf' },
-    { id: 3, nama: 'admin' },
+    { id: 1, nama: 'Super Admin', key_menu: ['all'], key_condition: { all: true } },
+    { id: 2, nama: 'Staf Jurusan', key_menu: ['daftar_pekerjaan', 'penugasan', 'verifikasi'], key_condition: { jurusan_only: true } },
+    { id: 3, nama: 'Mahasiswa', key_menu: ['pekerjaan', 'riwayat', 'profil'], key_condition: { self_only: true } },
+    { id: 4, nama: 'Dosen', key_menu: ['verifikasi', 'laporan'], key_condition: { jurusan_only: true } },
   ];
   for (const role of roles) {
     await prisma.roles.upsert({
       where: { id: role.id },
-      update: { nama: role.nama },
+      update: { nama: role.nama, key_menu: role.key_menu, key_condition: role.key_condition },
       create: role,
     });
     console.log(`  ✓ roles: ${role.nama}`)
@@ -268,7 +276,7 @@ async function seedStudents() {
           data: {
             email,
             kata_sandi: hashedPassword,
-            role_id: 1 // mahasiswa
+            role_id: 3 // Mahasiswa (role_id di DB)
           }
         })
       }
@@ -315,9 +323,10 @@ async function seedMenus() {
   // Clear existing menus and insert new ones
   await prisma.menus.deleteMany({ where: { parent_id: null } })
 
-  const menusToSeed = studentAccounts.length === 0 ? adminMenus : mahasiswaMenus
+  // Seed ALL menus — superadmin, admin, and mahasiswa
+  const allMenus = [...superadminMenus, ...adminMenus, ...mahasiswaMenus]
 
-  for (const menu of menusToSeed) {
+  for (const menu of allMenus) {
     await prisma.menus.create({
       data: menu,
     })
@@ -331,9 +340,10 @@ async function seedRoleHasMenus() {
   await prisma.role_has_menus.deleteMany()
 
   const roleMenuMap: { role_id: number; keys: string[] }[] = [
-    { role_id: 1, keys: ['dashboard', 'pekerjaan', 'ekuivalensi'] },
-    { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin'] },
-    { role_id: 3, keys: ['dashboard_admin', 'pekerjaan_admin', 'laporan', 'pengaturan'] },
+    { role_id: 1, keys: ['dashboard_superadmin', 'manajemen_menu', 'manajemen_user'] }, // Super Admin — superadmin access
+    { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin'] }, // Staf Jurusan
+    { role_id: 3, keys: ['dashboard', 'pekerjaan', 'ekuivalensi'] }, // Mahasiswa
+    { role_id: 4, keys: ['dashboard_admin', 'pekerjaan_admin'] }, // Dosen
   ]
 
   for (const entry of roleMenuMap) {

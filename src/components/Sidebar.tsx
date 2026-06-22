@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { LogOut, LucideIcon } from 'lucide-react'
 
 interface SidebarProps {
-  role: 'mahasiswa' | 'admin'
+  role: 'mahasiswa' | 'admin' | 'superadmin'
   activePath?: string
   children: React.ReactNode
 }
@@ -118,7 +118,11 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-white">{nama}</span>
-              <span className="text-[11px] text-white/60">{role === 'mahasiswa' ? 'Mahasiswa' : 'Admin'}</span>
+              <span className="text-[11px] text-white/60">{
+                role === 'mahasiswa' ? 'Mahasiswa' :
+                role === 'superadmin' ? 'Superadmin' :
+                'Admin'
+              }</span>
             </div>
           </div>
           <Link href="/logout" className="flex items-center gap-2 text-white/60 hover:text-white text-xs font-medium transition-colors">

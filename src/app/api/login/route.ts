@@ -28,7 +28,11 @@ export async function POST(req: NextRequest) {
         nim = profile.nim
       } else if (user?.staf) {
         profile = user.staf
-        roleType = 'admin'
+        // Cek apakah staf adalah superadmin berdasarkan role di database atau tipe_staf
+        const isSuperadmin =
+          user.staf.tipe_staf === 'superadmin' ||
+          user.role?.nama?.toLowerCase() === 'super admin'
+        roleType = isSuperadmin ? 'superadmin' : 'admin'
         nip = profile.nip
       }
     } else {
@@ -49,7 +53,10 @@ export async function POST(req: NextRequest) {
         if (staf?.user) {
           user = staf.user
           profile = staf
-          roleType = 'admin'
+          const isSuperadmin =
+            staf.tipe_staf === 'superadmin' ||
+            staf.user?.role?.nama?.toLowerCase() === 'super admin'
+          roleType = isSuperadmin ? 'superadmin' : 'admin'
           nip = profile.nip
         }
       }

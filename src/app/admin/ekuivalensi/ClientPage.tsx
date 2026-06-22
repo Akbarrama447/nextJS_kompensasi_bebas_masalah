@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import UserHeader from "@/components/UserHeader";
@@ -69,7 +69,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
       const res = await fetch("/api/ekuivalensi/auto-assign", { method: "POST" });
       const data = await res.json();
       if (data.success) {
-        setAutoMsg(`✅ ${data.created} class ter-create, ${data.skipped} class di-skip`);
+        setAutoMsg(`✔️ ${data.created} class ter-create, ${data.skipped} class di-skip`);
       } else {
         setAutoMsg("❌ " + (data.message || "Gagal"));
       }
@@ -125,7 +125,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
     }
   };
 
-  const handleSavePekerjaan = async () => {
+  const handleSaveDetails = async () => {
     if (!pekerjaan.trim()) {
       alert("Pekerjaan tidak boleh kosong");
       return;
@@ -133,68 +133,195 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
 
     setLoading(true);
     try {
-      const res = await fetch("/api/ekuivalensi/pekerjaan", {
+      let currentId = ekuivalensi?.id;
+
+      // 1. Simpan Pekerjaan (ini juga bisa men-generate ekuivalensi baru di database jika belum ada)
+      const resPekerjaan = await fetch("/api/ekuivalensi/pekerjaan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ekuivalensiId: ekuivalensi?.id,
+          ekuivalensiId: currentId,
           keterangan_pekerjaan: pekerjaan,
           kelas: kelas,
         }),
       });
 
-      if (res.ok) {
-        alert("Pekerjaan berhasil disimpan");
-        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
-        const refreshData = await refreshRes.json();
-        setEkuivalensi(refreshData.ekuivalensi);
-        setPekerjaan(refreshData.ekuivalensi?.keterangan_pekerjaan || "");
-      } else {
-        const error = await res.json();
-        alert(error.message || "Gagal menyimpan pekerjaan");
+      if (!resPekerjaan.ok) {
+        const error = await resPekerjaan.json();
+        throw new Error(error.message || "Gagal menyimpan pekerjaan");
       }
-    } catch (err) {
-      console.error("Save pekerjaan error:", err);
-      alert("Terjadi kesalahan koneksi");
+
+      // 2. Jika tadinya belum ada ID, ambil ID yang baru terbuat
+      if (!currentId) {
+        const fetchNewId = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+        const dataNewId = await fetchNewId.json();
+        currentId = dataNewId.ekuivalensi?.id;
+      }
+
+      // 3. Simpan Link Barang jika ID sudah tersedia
+      if (currentId) {
+        const resLink = await fetch("/api/ekuivalensi/link-barang", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ekuivalensiId: currentId,
+            link_barang: linkBarang,
+          }),
+        });
+
+        if (!resLink.ok) {
+          const error = await resLink.json();
+          throw new Error(error.message || "Gagal menyimpan link barang");
+        }
+      }
+
+      alert("Detail Pekerjaan dan Referensi berhasil disimpan!");
+
+      // Refresh Data
+      const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
+      const refreshData = await refreshRes.json();
+      setEkuivalensi(refreshData.ekuivalensi);
+      setPekerjaan(refreshData.ekuivalensi?.keterangan_pekerjaan || "");
+      setLinkBarang(refreshData.ekuivalensi?.link_barang || "");
+
+    } catch (err: any) {
+      console.error("Save details error:", err);
+      alert(err.message || "Terjadi kesalahan koneksi saat menyimpan detail");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSaveLinkBarang = async () => {
-    if (!ekuivalensi?.id) {
-      alert("Data ekuivalensi tidak ditemukan");
-      return;
-    }
-    if (!linkBarang.trim()) {
-      alert("Link barang tidak boleh kosong");
+  const handleExport = async () => {
+    if (!kelas) {
+      alert("Pilih kelas terlebih dahulu untuk menentukan prodi.");
       return;
     }
 
-    setLoading(true);
     try {
-      const res = await fetch("/api/ekuivalensi/link-barang", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ekuivalensiId: ekuivalensi.id,
-          link_barang: linkBarang,
-        }),
+      setLoading(true);
+      const res = await fetch(`/api/ekuivalensi/export?kelas=${encodeURIComponent(kelas)}`);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errData.message || `Gagal mengambil data laporan (${res.status})`);
+      }
+
+      const resData = await res.json();
+      const { prodiName, semesterName, data } = resData;
+
+      if (!data || data.length === 0) {
+        alert("Tidak ada data untuk diekspor");
+        return;
+      }
+
+      const jsPDF = (await import("jspdf")).default;
+      const autoTable = (await import("jspdf-autotable")).default;
+
+      const doc = new jsPDF("p", "pt", "a4");
+
+      // Header
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("LAPORAN EKUIVALENSI KOMPENSASI BEBAS MASALAH", doc.internal.pageSize.getWidth() / 2, 40, { align: "center" });
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text("Sistem Informasi Bebas Masalah", doc.internal.pageSize.getWidth() / 2, 55, { align: "center" });
+
+      doc.setLineWidth(1);
+      doc.line(40, 65, doc.internal.pageSize.getWidth() - 40, 65);
+
+      // Info
+      doc.setFontSize(10);
+      doc.text(`Program Studi`, 40, 85);
+      doc.text(`: ${prodiName}`, 120, 85);
+      doc.text(`Tahun Ajaran`, 40, 100);
+      doc.text(`: ${semesterName}`, 120, 100);
+      doc.text(`Tanggal Cetak`, 40, 115);
+      const printDate = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+      doc.text(`: ${printDate}`, 120, 115);
+
+      // Group Data by Kelas
+      const groupedData: Record<string, any[]> = {};
+      data.forEach((row: any) => {
+        const className = row.Kelas || "Tanpa Kelas";
+        if (!groupedData[className]) {
+          groupedData[className] = [];
+        }
+        groupedData[className].push(row);
       });
 
-      if (res.ok) {
-        alert("Link barang berhasil disimpan");
-        const refreshRes = await fetch(`/api/ekuivalensi/by-kelas?kelas=${kelas}`);
-        const refreshData = await refreshRes.json();
-        setEkuivalensi(refreshData.ekuivalensi);
-        setLinkBarang(refreshData.ekuivalensi?.link_barang || "");
-      } else {
-        const error = await res.json();
-        alert(error.message || "Gagal menyimpan link barang");
+      let currentY = 135;
+      let totalJamAll = 0;
+      let totalNominalAll = 0;
+
+      // Generate Tables
+      const classKeys = Object.keys(groupedData).sort();
+      classKeys.forEach((className) => {
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Kelas: ${className}`, 40, currentY);
+        currentY += 10;
+
+        const tableBody = groupedData[className].map((row, index) => {
+          totalJamAll += row['Jam Diakui'] || 0;
+          totalNominalAll += row['Total Nominal (Rp)'] || 0;
+          return [
+            index + 1,
+            row.NIM,
+            row.Nama,
+            row.Pekerjaan || "-",
+            row['Jam Diakui'] || 0,
+            row.Status || "-"
+          ];
+        });
+
+        autoTable(doc, {
+          startY: currentY,
+          head: [['No', 'NIM', 'Nama Mahasiswa', 'Pekerjaan', 'Jam', 'Status']],
+          body: tableBody,
+          theme: 'grid',
+          headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+          styles: { fontSize: 9, cellPadding: 4 },
+          columnStyles: {
+            0: { halign: 'center', cellWidth: 30 },
+            1: { cellWidth: 60 },
+            2: { cellWidth: 120 },
+            4: { halign: 'center', cellWidth: 30 },
+            5: { halign: 'center', cellWidth: 60 }
+          },
+          margin: { left: 40, right: 40 },
+        });
+
+        currentY = (doc as any).lastAutoTable.finalY + 20;
+      });
+
+      if (currentY > doc.internal.pageSize.getHeight() - 150) {
+        doc.addPage();
+        currentY = 40;
       }
-    } catch (err) {
-      console.error("Save link barang error:", err);
-      alert("Terjadi kesalahan koneksi");
+
+      // Summary
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text("Ringkasan Total:", 40, currentY);
+      doc.setFont("helvetica", "normal");
+      doc.text(`- Total Jam Kompensasi Keseluruhan  : ${totalJamAll} Jam`, 40, currentY + 15);
+      doc.text(`- Total Nominal Ekuivalensi Keseluruhan : Rp ${totalNominalAll.toLocaleString('id-ID')}`, 40, currentY + 30);
+
+      // Signatures
+      currentY += 70;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.text("Batam, ........................................", pageWidth - 200, currentY);
+      doc.text("Mengetahui,", pageWidth - 200, currentY + 15);
+      doc.text("Penanggung Jawab / Admin,", pageWidth - 200, currentY + 30);
+      doc.text("( ...................................................... )", pageWidth - 200, currentY + 90);
+
+      doc.save(`Laporan_Ekuivalensi_${prodiName.replace(/\s+/g, '_')}_${semesterName.replace(/\s+/g, '_')}.pdf`);
+
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Terjadi kesalahan saat membuat PDF.");
     } finally {
       setLoading(false);
     }
@@ -288,22 +415,19 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
           </div>
 
           {/* HEADER */}
-          <div className="hidden sm:grid grid-cols-6 text-xs text-gray-500 font-medium mb-2 border-t-2 border-gray-300 pt-2">
-            <div></div>
-            <div></div>
-            <div className="col-span-2 text-center">PEKERJAAN</div>
-            <div className="text-center">BUKTI</div>
-            <div className="text-center">STATUS</div>
+          <div className="hidden sm:grid grid-cols-12 text-xs text-gray-500 font-medium mb-2 border-t-2 border-gray-300 pt-2">
+            <div className="col-span-6 sm:ml-10">RINGKASAN TOTAL</div>
+            <div className="col-span-3 text-center">BUKTI</div>
+            <div className="col-span-3 text-center">STATUS</div>
           </div>
 
           {/* BOTTOM SECTION */}
-          <div className="flex flex-col sm:grid sm:grid-cols-6 gap-3 sm:gap-2 items-start sm:items-center text-sm">
+          <div className="flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-2 items-start sm:items-center text-sm">
 
             {/* TOTAL & NOMINAL */}
-            <div className="w-full flex justify-between sm:contents">
+            <div className="sm:col-span-6 w-full flex justify-between sm:justify-start">
               <div className="flex flex-col sm:block font-semibold text-gray-700 sm:ml-10">
                 <div>TOTAL</div>
-
               </div>
 
               <div className="flex flex-col sm:block font-bold text-gray-900 sm:ml-6 text-right sm:text-left">
@@ -314,60 +438,64 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
               </div>
             </div>
 
-            {/* PEKERJAAN */}
-            <div className="sm:col-span-2 w-full relative">
-              <input
-                type="text"
-                value={pekerjaan}
-                onChange={(e) => setPekerjaan(e.target.value)}
-                placeholder="Input pekerjaan..."
-                suppressHydrationWarning
-                className="w-full pl-3 pr-20 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <button
-                onClick={handleSavePekerjaan}
-                disabled={loading}
-                className="absolute right-1 top-1 bottom-1 bg-blue-600 text-white px-3 text-xs font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Simpan
-              </button>
+            {/* BUKTI */}
+            <div className="sm:col-span-3 w-full flex justify-center">
+              {(() => {
+                // Logika warna tombol bukti
+                const hasFoto = !!ekuivalensi?.notaUrl;
+                const isVerified = ekuivalensi?.statusId === 2;
+
+                let btnClass = "w-full sm:w-auto px-4 py-2 rounded-lg transition text-center font-medium ";
+
+                if (!ekuivalensi || !hasFoto) {
+                  // Belum ada bukti → abu-abu
+                  btnClass += "bg-gray-200 text-gray-700 hover:bg-gray-300";
+                } else if (isVerified) {
+                  // Udah diverifikasi → ijo
+                  btnClass += "bg-green-500 text-white hover:bg-green-600";
+                } else {
+                  // Udah ada bukti tapi belum diverifikasi → kuning
+                  btnClass += "bg-amber-400 text-white hover:bg-amber-500";
+                }
+
+                return (
+                  <button
+                    onClick={() => {
+                      if (!ekuivalensi) {
+                        alert("Tidak ada pengajuan ekuivalensi untuk kelas ini.");
+                        return;
+                      }
+                      setOpenPopup(true);
+                    }}
+                    suppressHydrationWarning
+                    className={btnClass}
+                  >
+                    LIHAT
+                  </button>
+                );
+              })()}
             </div>
 
-            {/* BUKTI */}
-            <button
-              onClick={() => {
-                if (!ekuivalensi) {
-                  alert("Tidak ada pengajuan ekuivalensi untuk kelas ini.");
-                  return;
-                }
-                setOpenPopup(true);
-              }}
-              suppressHydrationWarning
-              className="w-full sm:w-auto bg-gray-200 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-300 transition"
-            >
-              LIHAT
-            </button>
-
             {/* STATUS */}
-            <div className="w-full sm:text-center">
+            <div className="sm:col-span-3 w-full flex justify-center">
               {!ekuivalensi ? (
                 <span className="text-xs text-gray-400">N/A</span>
               ) : (
                 <>
                   {(!ekuivalensi.statusId || ekuivalensi.statusId === 1) && (
-                    <span className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm">
+                    <span className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium">
                       Pending
                     </span>
                   )}
 
                   {ekuivalensi.statusId === 3 && (
-                    <span className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm">
+                    <span className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium">
                       DITOLAK
                     </span>
                   )}
 
                   {ekuivalensi.statusId === 2 && (
-                    <span className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm">
+                    <span className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm font-medium">
                       DISETUJUI
                     </span>
                   )}
@@ -390,35 +518,50 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                 className="px-3 py-1.5 text-xs font-bold text-white bg-green-500 hover:bg-green-600 transition rounded-lg flex items-center gap-1"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
                 WhatsApp
               </a>
             </div>
           )}
 
-          {/* LINK BARANG */}
-          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <div className="w-full sm:w-1/4">
-              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                Link Barang
-              </label>
-            </div>
-            <div className="w-full sm:w-3/4 relative">
-              <input
-                type="text"
-                value={linkBarang}
-                onChange={(e) => setLinkBarang(e.target.value)}
-                placeholder="Input link barang (misal link e-commerce)..."
-                className="w-full pl-3 pr-20 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-              />
-              <button
-                onClick={handleSaveLinkBarang}
-                disabled={loading || !ekuivalensi}
-                className="absolute right-1 top-1 bottom-1 bg-blue-600 text-white px-3 text-xs font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Simpan
-              </button>
+          {/* DETAIL PEKERJAAN & LINK BARANG */}
+          <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">Detail Pekerjaan & Referensi</h3>
+
+            <div className="flex flex-col sm:flex-row gap-4 items-end">
+              <div className="w-full sm:flex-1">
+                <label className="text-xs font-semibold text-gray-700 block mb-1">Pekerjaan</label>
+                <input
+                  type="text"
+                  value={pekerjaan}
+                  onChange={(e) => setPekerjaan(e.target.value)}
+                  placeholder="Input pekerjaan..."
+                  suppressHydrationWarning
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                />
+              </div>
+              <div className="w-full sm:flex-1">
+                <label className="text-xs font-semibold text-gray-700 block mb-1">Link Barang</label>
+                <input
+                  type="text"
+                  value={linkBarang}
+                  onChange={(e) => setLinkBarang(e.target.value)}
+                  placeholder="Input link barang..."
+                  suppressHydrationWarning
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                />
+              </div>
+              <div className="w-full sm:w-auto">
+                <button
+                  onClick={handleSaveDetails}
+                  disabled={loading}
+                  suppressHydrationWarning
+                  className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 text-sm font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Simpan
+                </button>
+              </div>
             </div>
           </div>
 
@@ -431,6 +574,19 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
               <p className="text-sm text-red-700">{ekuivalensi.catatan}</p>
             </div>
           )}
+
+          {/* EXPORT BUTTON */}
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Unduh Laporan (PDF)
+            </button>
+          </div>
         </div>
       </div>
 
@@ -444,20 +600,20 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
             setOpenPopup(false);
             setOpenTolak(true);
           }}
-            data={{
-              kelas,
-              jam: ekuivalensi.jam,
-              nominal: ekuivalensi.nominal,
-              tanggal: new Date(ekuivalensi.tanggal).toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              fotoUrl: ekuivalensi.notaUrl || "",
-              noTelepon: ekuivalensi.noTelepon || "",
-            }}
+          data={{
+            kelas,
+            jam: ekuivalensi.jam,
+            nominal: ekuivalensi.nominal,
+            tanggal: new Date(ekuivalensi.tanggal).toLocaleString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            fotoUrl: ekuivalensi.notaUrl || "",
+            noTelepon: ekuivalensi.noTelepon || "",
+          }}
         />
       )}
 

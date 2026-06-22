@@ -12,9 +12,14 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  if (pathname === '/' || pathname === '/user' || pathname === '/admin') {
+  if (pathname === '/' || pathname === '/user' || pathname === '/admin' || pathname === '/superadmin') {
     if (isAuthenticated) {
-      const target = role === 'admin' ? '/admin/dashboard' : '/user/dashboard'
+      let target = '/user/dashboard'
+      if (role === 'superadmin') {
+        target = '/superadmin/dashboard'
+      } else if (role === 'admin') {
+        target = '/admin/dashboard'
+      }
       return NextResponse.redirect(new URL(target, req.url))
     }
     return NextResponse.redirect(new URL('/login', req.url))
@@ -28,9 +33,16 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
+  // Superadmin routes — requires nip AND role='superadmin'
+  if (pathname.startsWith('/superadmin')) {
+    if (!nip || role !== 'superadmin') {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
+  }
+
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/', '/user', '/user/:path*', '/admin', '/admin/:path*', '/login', '/api/:path*'],
+  matcher: ['/', '/user', '/user/:path*', '/admin', '/admin/:path*', '/superadmin', '/superadmin/:path*', '/login', '/api/:path*'],
 }

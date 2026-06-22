@@ -1,0 +1,48 @@
+@startuml
+' Setting tampilan agar persis seperti gambar referensi (Classic UML)
+skinparam componentStyle classic
+skinparam shadowing true
+skinparam node {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam component {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================================================
+' NODES & COMPONENTS
+' ============================================================
+
+node "User Device (Laptop/Mobile)" as ClientNode {
+    component "Web Browser" as Browser
+}
+
+node "Application Server" as AppServer {
+    component "Nginx Reverse Proxy" as Proxy
+    component "Next.js 15 App" as NextApp
+    component "Local File System\n(/uploads & /nota)" as Storage
+}
+
+node "Database Server" as DBServer {
+    component "PostgreSQL 18" as Postgres
+    component "kompensasi_db\n(Tables & Views)" as Database
+}
+
+' ============================================================
+' COMMUNICATION & RELATIONSHIPS
+' ============================================================
+
+' Alur di dalam Application Server
+Proxy ..> NextApp : HTTP (3000)
+NextApp ..> Storage : Read/Write
+
+' Alur di dalam Database Server
+Postgres ..> Database : Manage
+
+' Koneksi antar Node Hardware (Garis tegas sesuai gambar referensi)
+ClientNode -- AppServer : HTTPS (443)
+AppServer -- DBServer : TCP (5432)
+
+@enduml

@@ -392,7 +392,7 @@ export default function TabKelola() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-600 text-center">
-                    {item.poin} jam
+                    {Math.floor(item.poin || 0)} jam
                   </td>
                   <td className="px-4 py-3 text-gray-600 text-center">
                     {item.kuotatersisa}/{item.kuotatotal}
@@ -746,7 +746,7 @@ export default function TabKelola() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Poin Jam</p>
-                  <p className="text-lg font-bold text-[var(--color-primary)]">{selectedJob.poin} Jam</p>
+                  <p className="text-lg font-bold text-[var(--color-primary)]">{Math.floor(selectedJob.poin || 0)} Jam</p>
                 </div>
               </div>
 

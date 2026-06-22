@@ -317,14 +317,14 @@ export default function TabPenugasan() {
                     </div>
                   </td>
                   <td className="px-2 md:px-4 py-2 md:py-3 text-center text-gray-600 hidden lg:table-cell text-xs">
-                    {item.jam_sisa}/{item.total_jam_wajib}
+                    {Math.floor(item.jam_sisa)}/{Math.floor(item.total_jam_wajib)}
                   </td>
                   <td className="px-2 md:px-4 py-2 md:py-3 text-center text-gray-600 hidden xl:table-cell text-xs">
                     <div className="flex flex-col gap-2">
                       {item.penugasans && item.penugasans.length > 0 ? (
                         item.penugasans.map((p, i) => (
                           <div key={p.id} className={i > 0 ? "pt-2 border-t border-gray-100" : ""}>
-                            {p.poin_jam ? `${p.poin_jam} jam` : "-"}
+                            {p.poin_jam ? `${Math.floor(p.poin_jam)} jam` : "-"}
                           </div>
                         ))
                       ) : (
@@ -457,8 +457,8 @@ export default function TabPenugasan() {
                 <Info className="w-6 h-6 text-[var(--color-primary)] shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-gray-900 text-base">{selectedData.pekerjaan_judul || 'Belum ada pekerjaan'}</h3>
-                  <p className="text-gray-500 mt-0.5">Poin jam yang akan dikurangi: <span className="text-[var(--color-primary)] font-semibold">{selectedData.poin_jam || 0} jam</span></p>
-                  <p className="text-gray-500 mt-1">Jam kompen tersisa: <span className="text-[var(--color-primary)] font-semibold">{selectedData.jam_sisa}/{selectedData.total_jam_wajib}</span></p>
+                  <p className="text-gray-500 mt-0.5">Poin jam yang akan dikurangi: <span className="text-[var(--color-primary)] font-semibold">{Math.floor(selectedData.poin_jam || 0)} jam</span></p>
+                  <p className="text-gray-500 mt-1">Jam kompen tersisa: <span className="text-[var(--color-primary)] font-semibold">{Math.floor(selectedData.jam_sisa)}/{Math.floor(selectedData.total_jam_wajib)}</span></p>
                 </div>
               </div>
 

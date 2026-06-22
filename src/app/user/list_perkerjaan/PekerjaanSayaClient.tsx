@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { updateProgresTugas } from './action'
 
-export default function PekerjaanSayaClient({ initialData, user }: any) {
+export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaan }: any) {
   const webcamRef = useRef<Webcam>(null)
   
   const [dataTugas, setDataTugas] = useState(initialData || [])
@@ -26,11 +26,11 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
-  // 1. Ambil List Tipe Pekerjaan secara Dinamis
+  // 1. Ambil List Tipe Pekerjaan — dari semua tipe yang ada di DB (bukan cuma dari data user)
   const listTipe = useMemo(() => {
-    const types = dataTugas.map((t: any) => t.pekerjaan?.tipe_pekerjaan?.nama).filter(Boolean)
-    return ["Semua", ...Array.from(new Set(types))]
-  }, [dataTugas])
+    const types = (allTipePekerjaan || []).map((t: any) => t.nama).filter(Boolean)
+    return ["Semua", ...types]
+  }, [allTipePekerjaan])
 
   // 2. Logic Filtering
   const filteredData = useMemo(() => {
@@ -180,7 +180,7 @@ export default function PekerjaanSayaClient({ initialData, user }: any) {
                         {t.pekerjaan?.tipe_pekerjaan?.nama || 'Eksternal'}
                       </span>
                     </td>
-                    <td className="px-6 py-6 text-center text-slate-800 font-bold">{t.pekerjaan?.poin_jam} jam</td>
+                    <td className="px-6 py-6 text-center text-slate-800 font-bold">{Math.floor(t.pekerjaan?.poin_jam || 0)} jam</td>
                     <td className="px-6 py-6 text-center hidden md:table-cell text-slate-500 text-xs font-medium uppercase tracking-tighter">smt {t.pekerjaan?.semester?.nama || '-'}</td>
                     <td className="px-6 py-6 text-center hidden xl:table-cell">
                       <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${
