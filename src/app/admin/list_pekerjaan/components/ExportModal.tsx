@@ -150,7 +150,7 @@ export default function ExportModal({ isOpen, onClose, semesterId }: ExportModal
       doc.setFontSize(12);
       doc.text(`PROGRAM STUDI ${previewData.metadata.prodi_nama.toUpperCase()}`, pageWidth / 2, currentY, { align: "center" });
       currentY += 6;
-      doc.text("POLITEKNIK NEGERI MALANG", pageWidth / 2, currentY, { align: "center" });
+      doc.text("POLITEKNIK NEGERI SEMARANG", pageWidth / 2, currentY, { align: "center" });
       currentY += 10;
 
       doc.setLineWidth(0.5);
@@ -284,7 +284,7 @@ export default function ExportModal({ isOpen, onClose, semesterId }: ExportModal
 
         sheet.mergeCells("A3:I3");
         const institutionCell = sheet.getCell("A3");
-        institutionCell.value = "POLITEKNIK NEGERI MALANG";
+        institutionCell.value = "POLITEKNIK NEGERI SEMARANG";
         institutionCell.font = { size: 11, bold: true };
         institutionCell.alignment = { horizontal: "center" };
         sheet.getRow(3).height = 18;
