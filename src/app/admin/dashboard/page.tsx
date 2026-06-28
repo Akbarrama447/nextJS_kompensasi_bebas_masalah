@@ -43,10 +43,10 @@ export default async function DashboardAdmin() {
               status_tugas_id: status.id,
             },
           })
-          return { id: status.id, nama: status.nama, count }
+          return { id: status.id, nama: status.nama || '', count }
         })
       )
-    : refStatusTugas.map(status => ({ id: status.id, nama: status.nama, count: 0 }))
+    : refStatusTugas.map(status => ({ id: status.id, nama: status.nama || '', count: 0 }))
 
   const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 

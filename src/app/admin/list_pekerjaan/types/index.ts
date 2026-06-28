@@ -41,6 +41,8 @@ export interface OptionsData {
   ruangan: { id: number; nama_ruangan: string; gedung?: string }[];
   semester_aktif: { id: number; nama: string } | null;
   kelas: { id: number; nama_kelas: string }[];
+  jurusan: { id: number; nama_jurusan: string }[];
+  prodi: { id: number; nama_prodi: string; jurusan_id: number }[];
 }
 
 export interface PlottingConfig {
@@ -160,4 +162,55 @@ export interface GetDaftarKompenParams {
 export interface GetDaftarKompenResult {
   data: MahasiswaKompenRow[];
   total: number;
+}
+
+// Export Laporan Types
+export interface LaporanMahasiswaData {
+  nim: string;
+  nama: string;
+  kelas: string;
+  total_jam_wajib: number;
+  jam_sudah_dikurangi: number;
+  jam_sisa: number;
+  status_lunas: boolean;
+  pekerjaan_list: string[];
+}
+
+export interface LaporanAngkatan {
+  angkatan: number;
+  mahasiswa: LaporanMahasiswaData[];
+  summary: {
+    total_mahasiswa: number;
+    total_lunas: number;
+    total_belum_lunas: number;
+  };
+}
+
+export interface LaporanKompensasiMetadata {
+  semester_nama: string;
+  semester_tahun: number;
+  prodi_nama: string;
+  tanggal_generate: string;
+  angkatan_filter: 1 | 2 | 3 | null;
+  prodi_filter: number | null;
+  kelas_filter: number | null;
+}
+
+export interface ExportFilterItem {
+  id: number;
+  nama: string;
+}
+
+export interface ExportFiltersResult {
+  prodi: ExportFilterItem[];
+  kelas: { id: number; nama: string; prodi_id: number }[];
+}
+
+export interface LaporanKompensasiResult {
+  success: boolean;
+  data?: {
+    metadata: LaporanKompensasiMetadata;
+    mahasiswa_by_angkatan: LaporanAngkatan[];
+  };
+  error?: string;
 }

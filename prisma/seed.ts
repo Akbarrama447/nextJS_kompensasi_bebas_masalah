@@ -25,8 +25,6 @@ const staffAccounts = [
     nama: 'Super Admin',
     email: 'admin@admin.com',
     password: 'admin123',
-    tipe_staf: 'admin',
-    jurusan_id: 1,
     tipe_staf: 'superadmin',
     jurusan_id: 1,
     role_id: 1 // Super Admin
@@ -182,6 +180,21 @@ async function seedRefStatus() {
       create: j,
     });
     console.log(`  ✓ jurusan: ${j.nama_jurusan}`)
+  }
+
+  // Prodi
+  const prodiList = [
+    { id: 1, nama_prodi: 'D4 Teknik Informatika', jurisdiction_id: 1 },
+    { id: 2, nama_prodi: 'D4 Teknologi Rekayasa Komputer', jurisdiction_id: 1 },
+    { id: 3, nama_prodi: 'D3 Telekomunikasi', jurisdiction_id: 1 },
+  ];
+  for (const p of prodiList) {
+    await prisma.prodi.upsert({
+      where: { id: p.id },
+      update: { nama_prodi: p.nama_prodi, jurisdiction_id: p.jurisdiction_id },
+      create: p,
+    });
+    console.log(`  ✓ prodi: ${p.nama_prodi}`)
   }
 }
 

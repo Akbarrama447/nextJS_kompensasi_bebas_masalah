@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Info, Clock, X, CheckCircle, XCircle, Loader2, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Info, Clock, X, CheckCircle, XCircle, Loader2, AlertCircle, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { getDaftarKompen, verifyPenugasan, rejectPenugasan } from "../actions/penugasan";
 import { getOptions } from "../actions/options";
 import type { MahasiswaKompenRow, OptionsData } from "../types";
+import ExportModal from "./ExportModal";
 
 type StatusFilter = "belum_ditugaskan" | "sedang_dikerjakan" | "selesai" | "semua";
 
@@ -15,6 +16,8 @@ export default function TabPenugasan() {
     ruangan: [],
     semester_aktif: null,
     kelas: [],
+    jurusan: [],
+    prodi: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +29,7 @@ export default function TabPenugasan() {
   const [search, setSearch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const [formAlasan, setFormAlasan] = useState({ penugasan_id: 0, catatan: "" });
 
@@ -258,6 +262,14 @@ export default function TabPenugasan() {
             Semua
           </button>
         </div>
+
+        <button
+          onClick={() => setShowExportModal(true)}
+          className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs md:text-sm font-medium whitespace-nowrap shadow-sm"
+        >
+          <FileDown className="w-4 h-4" />
+          Export Laporan
+        </button>
       </div>
 
       {/* Table */}
@@ -634,6 +646,13 @@ export default function TabPenugasan() {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      <ExportModal 
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        semesterId={options.semester_aktif?.id || 0}
+      />
     </div>
   );
 }

@@ -34,6 +34,8 @@ export default function TabKelola() {
     ruangan: [],
     semester_aktif: null,
     kelas: [],
+    jurusan: [],
+    prodi: [],
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);

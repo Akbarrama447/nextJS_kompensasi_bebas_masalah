@@ -4,7 +4,9 @@ import pg from 'pg'
 
 const { Pool } = pg
 
-const connectionString = process.env.DATABASE_URL
+// Use DIRECT_URL first (bypasses pgBouncer in Supabase dev environment)
+// Falls back to DATABASE_URL (for VPS production with direct PostgreSQL)
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL
 
 function createPrismaClient() {
   const pool = new Pool({ connectionString })

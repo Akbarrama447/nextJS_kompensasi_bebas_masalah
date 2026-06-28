@@ -4,7 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Jurusan {
@@ -18,12 +20,12 @@ model Jurusan {
 }
 
 model roles {
-  id            Int              @id
-  nama          String?          @db.VarChar
-  key_menu      Json?
-  key_condition Json?
-  users         Users[]
+  id             Int              @id
+  nama           String?          @db.VarChar
+  key_menu       Json?
+  key_condition  Json?
   role_has_menus role_has_menus[]
+  users          Users[]
 
   @@map("roles")
 }
@@ -74,12 +76,12 @@ model ref_tipe_pekerjaan {
 }
 
 model role_has_menus {
-  id         Int      @id @default(autoincrement())
-  created_at DateTime @default(now()) @db.Timestamp(6)
+  id         Int       @id @default(autoincrement())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
   role_id    Int?
   menus_id   Int?
-  roles      roles?   @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  menus      menus?   @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menus      menus?    @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  roles      roles?    @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("role_has_menus")
 }
@@ -238,11 +240,10 @@ model Ekuivalensi_kelas {
   status_ekuivalensi_id Int?                    @map("status_ekuivalensi_id")
   verified_by_nip       String?                 @map("verified_by_nip") @db.VarChar
   catatan               String?
-  created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
   no_telepon            String?                 @map("no_telepon") @db.VarChar
   no_telepon_change_count Int?                  @default(0) @map("no_telepon_change_count")
   keterangan_pekerjaan  String?
-  link_barang           String?
+  created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
   kelas                 Kelas?                  @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa             Mahasiswa?              @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)
   semester              Semester?               @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -319,15 +320,15 @@ model registrasi_mahasiswa {
 }
 
 model menus {
-  id              Int               @id @default(autoincrement())
-  key             String            @unique @db.VarChar
-  label           String            @db.VarChar
-  icon            String?           @db.VarChar
-  path            String            @db.VarChar
-  urutan          Int?              @default(0)
-  parent_id       Int?
-  created_at      DateTime?         @default(now()) @db.Timestamp(6)
-  menus           menus?            @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_menus     menus[]           @relation("menusTomenus")
-  role_has_menus  role_has_menus[]
+  id             Int              @id @default(autoincrement())
+  key            String           @unique @db.VarChar
+  label          String           @db.VarChar
+  icon           String?          @db.VarChar
+  path           String           @db.VarChar
+  urutan         Int?             @default(0)
+  parent_id      Int?
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  menus          menus?           @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_menus    menus[]          @relation("menusTomenus")
+  role_has_menus role_has_menus[]
 }
