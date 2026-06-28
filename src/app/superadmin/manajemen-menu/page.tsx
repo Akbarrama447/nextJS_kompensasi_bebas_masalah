@@ -1,3 +1,4 @@
+import Sidebar from '@/components/Sidebar'
 import prisma from '@/lib/prisma'
 import MenuManagementClient from './MenuManagementClient'
 
@@ -25,33 +26,35 @@ export default async function ManajemenMenuPage() {
   })
 
   return (
-    <MenuManagementClient
-      initialMenus={menus.map(m => ({
-        id: m.id,
-        key: m.key,
-        label: m.label,
-        icon: m.icon,
-        path: m.path,
-        urutan: m.urutan,
-        parent_id: m.parent_id,
-        children: m.other_menus.map(c => ({
-          id: c.id,
-          key: c.key,
-          label: c.label,
-          icon: c.icon,
-          path: c.path,
-          urutan: c.urutan,
-          parent_id: c.parent_id,
-        })),
-      }))}
-      roles={roles.map(r => ({
-        id: r.id,
-        nama: r.nama,
-      }))}
-      roleMenus={roleMenus.map(rm => ({
-        roleId: rm.role_id,
-        menuId: rm.menus_id,
-      }))}
-    />
+    <Sidebar role="superadmin" activePath="/superadmin/manajemen-menu">
+      <MenuManagementClient
+        initialMenus={menus.map(m => ({
+          id: m.id,
+          key: m.key,
+          label: m.label,
+          icon: m.icon,
+          path: m.path,
+          urutan: m.urutan,
+          parent_id: m.parent_id,
+          children: m.other_menus.map(c => ({
+            id: c.id,
+            key: c.key,
+            label: c.label,
+            icon: c.icon,
+            path: c.path,
+            urutan: c.urutan,
+            parent_id: c.parent_id,
+          })),
+        }))}
+        roles={roles.map(r => ({
+          id: r.id,
+          nama: r.nama,
+        }))}
+        roleMenus={roleMenus.map(rm => ({
+          roleId: rm.role_id,
+          menuId: rm.menus_id,
+        }))}
+      />
+    </Sidebar>
   )
 }

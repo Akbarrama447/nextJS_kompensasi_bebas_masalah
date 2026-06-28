@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Info, Clock, X, CheckCircle, XCircle, Loader2, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Info, Clock, X, CheckCircle, XCircle, Loader2, AlertCircle, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { getDaftarKompen, verifyPenugasan, rejectPenugasan } from "../actions/penugasan";
 import { getOptions } from "../actions/options";
 import type { MahasiswaKompenRow, OptionsData } from "../types";
+import ExportModal from "./ExportModal";
 
 type StatusFilter = "belum_ditugaskan" | "sedang_dikerjakan" | "selesai" | "semua";
 
@@ -15,6 +16,8 @@ export default function TabPenugasan() {
     ruangan: [],
     semester_aktif: null,
     kelas: [],
+    jurusan: [],
+    prodi: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +29,7 @@ export default function TabPenugasan() {
   const [search, setSearch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const [formAlasan, setFormAlasan] = useState({ penugasan_id: 0, catatan: "" });
 
@@ -42,7 +46,6 @@ export default function TabPenugasan() {
     setErrorMessage("");
     try {
       const offset = (page - 1) * limit;
-      console.log('Fetching with:', { page, limit, offset, statusFilter, search });
       const [kompenData, optionsData] = await Promise.all([
         getDaftarKompen({
           limit,
@@ -54,7 +57,6 @@ export default function TabPenugasan() {
         getOptions(),
       ]);
 
-      console.log('Result:', kompenData);
       setDataMahasiswa(kompenData.data);
       setTotalData(kompenData.total);
       setOptions(optionsData);
@@ -64,11 +66,11 @@ export default function TabPenugasan() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, statusFilter, search]);
+  }, [page, limit, statusFilter, search, kelasFilter]);
 
   useEffect(() => {
     fetchData();
-  }, [page, limit, statusFilter, search, kelasFilter]);
+  }, [fetchData]);
 
   useEffect(() => {
     setPage(1);
@@ -187,7 +189,7 @@ export default function TabPenugasan() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4" suppressHydrationWarning>
+    <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4">
       {(errorMessage || successMsg) && (
         <div className={`mb-4 flex items-center gap-2 p-3 text-sm ${errorMessage
             ? "bg-red-50 border border-red-200 rounded-lg text-red-700"
@@ -199,8 +201,9 @@ export default function TabPenugasan() {
       )}
 
       {/* Filter Tabs */}
-      <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4" suppressHydrationWarning>
+      <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4">
         <input
+          suppressHydrationWarning
           placeholder="Cari NIM, Nama..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -208,6 +211,7 @@ export default function TabPenugasan() {
         />
 
         <select
+          suppressHydrationWarning
           value={kelasFilter}
           onChange={(e) => setKelasFilter(Number(e.target.value))}
           className="px-3 md:px-4 py-1.5 md:py-2 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white text-gray-700 font-medium"
@@ -222,6 +226,7 @@ export default function TabPenugasan() {
 
         <div className="flex border border-gray-200 rounded-lg overflow-hidden divide-x divide-gray-200 shadow-sm">
           <button
+            suppressHydrationWarning
             onClick={() => setStatusFilter("belum_ditugaskan")}
             className={`px-2 md:px-4 py-1.5 md:py-2 font-medium text-xs md:text-sm transition-colors focus:outline-none whitespace-nowrap ${statusFilter === "belum_ditugaskan"
                 ? "bg-blue-50 text-blue-600"
@@ -231,6 +236,7 @@ export default function TabPenugasan() {
             Belum Ditugaskan
           </button>
           <button
+            suppressHydrationWarning
             onClick={() => setStatusFilter("sedang_dikerjakan")}
             className={`px-2 md:px-4 py-1.5 md:py-2 font-medium text-xs md:text-sm transition-colors focus:outline-none whitespace-nowrap ${statusFilter === "sedang_dikerjakan"
                 ? "bg-blue-50 text-blue-600"
@@ -240,6 +246,7 @@ export default function TabPenugasan() {
             Sedang Dikerjakan
           </button>
           <button
+            suppressHydrationWarning
             onClick={() => setStatusFilter("selesai")}
             className={`px-2 md:px-4 py-1.5 md:py-2 font-medium text-xs md:text-sm transition-colors focus:outline-none whitespace-nowrap ${statusFilter === "selesai"
                 ? "bg-blue-50 text-blue-600"
@@ -249,6 +256,7 @@ export default function TabPenugasan() {
             Selesai
           </button>
           <button
+            suppressHydrationWarning
             onClick={() => setStatusFilter("semua")}
             className={`px-2 md:px-4 py-1.5 md:py-2 font-medium text-xs md:text-sm transition-colors focus:outline-none whitespace-nowrap ${statusFilter === "semua"
                 ? "bg-blue-50 text-blue-600"
@@ -258,6 +266,15 @@ export default function TabPenugasan() {
             Semua
           </button>
         </div>
+
+        <button
+          suppressHydrationWarning
+          onClick={() => setShowExportModal(true)}
+          className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs md:text-sm font-medium whitespace-nowrap shadow-sm"
+        >
+          <FileDown className="w-4 h-4" />
+          Export Laporan
+        </button>
       </div>
 
       {/* Table */}
@@ -634,6 +651,13 @@ export default function TabPenugasan() {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      <ExportModal 
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        semesterId={options.semester_aktif?.id || 0}
+      />
     </div>
   );
 }

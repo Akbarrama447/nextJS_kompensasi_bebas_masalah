@@ -5,7 +5,7 @@ import type { OptionsData } from '../types';
 
 export async function getOptions(): Promise<OptionsData> {
   try {
-    let [tipePekerjaan, ruangan, semesterAktif, kelas] = await Promise.all([
+    let [tipePekerjaan, ruangan, semesterAktif, kelas, jurusan, prodi] = await Promise.all([
       prisma.ref_tipe_pekerjaan.findMany({
         select: { id: true, nama: true },
         orderBy: { id: 'asc' },
@@ -19,12 +19,20 @@ export async function getOptions(): Promise<OptionsData> {
         orderBy: { nama_ruangan: 'asc' },
       }),
       prisma.semester.findFirst({
-        where: { is_aktif: true },
+        orderBy: [{ is_aktif: 'desc' }, { id: 'desc' }],
         select: { id: true, nama: true },
       }),
       prisma.kelas.findMany({
         select: { id: true, nama_kelas: true },
         orderBy: { nama_kelas: 'asc' },
+      }),
+      prisma.jurusan.findMany({
+        select: { id: true, nama_jurusan: true },
+        orderBy: { id: 'asc' },
+      }),
+      prisma.prodi.findMany({
+        select: { id: true, nama_prodi: true, jurisdiction_id: true },
+        orderBy: { nama_prodi: 'asc' },
       }),
     ]);
 
@@ -64,6 +72,8 @@ export async function getOptions(): Promise<OptionsData> {
       ruangan: formattedRuangan,
       semester_aktif: semesterAktif ? { id: semesterAktif.id, nama: semesterAktif.nama || '' } : null,
       kelas: kelas.map(k => ({ id: k.id, nama_kelas: k.nama_kelas || '' })),
+      jurusan: jurusan.map(j => ({ id: j.id, nama_jurusan: j.nama_jurusan || '' })),
+      prodi: prodi.map(p => ({ id: p.id, nama_prodi: p.nama_prodi || '', jurusan_id: p.jurisdiction_id || 0 })),
     };
   } catch (error) {
     console.error('Error fetching options:', error);
@@ -72,6 +82,8 @@ export async function getOptions(): Promise<OptionsData> {
       ruangan: [],
       semester_aktif: null,
       kelas: [],
+      jurusan: [],
+      prodi: [],
     };
   }
 }
@@ -79,7 +91,7 @@ export async function getOptions(): Promise<OptionsData> {
 export async function getMahasiswaByKelas(kelasId: number) {
   try {
     const activeSemester = await prisma.semester.findFirst({
-      where: { is_aktif: true },
+      orderBy: [{ is_aktif: 'desc' }, { id: 'desc' }],
       select: { id: true },
     });
 

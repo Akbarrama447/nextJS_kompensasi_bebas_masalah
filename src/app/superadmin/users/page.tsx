@@ -1,3 +1,4 @@
+import Sidebar from '@/components/Sidebar'
 import prisma from '@/lib/prisma'
 import UsersManagementClient from './UsersManagementClient'
 
@@ -73,12 +74,14 @@ export default async function SuperadminUsersPage() {
   })
 
   return (
-    <UsersManagementClient
-      initialUsers={users}
-      roles={roles}
-      jurusans={jurusans}
-      prodis={prodis}
-      kelases={kelases}
-    />
+    <Sidebar role="superadmin" activePath="/superadmin/users">
+      <UsersManagementClient
+        initialUsers={users}
+        roles={roles}
+        jurusans={jurusans}
+        prodis={prodis}
+        kelases={kelases}
+      />
+    </Sidebar>
   )
 }

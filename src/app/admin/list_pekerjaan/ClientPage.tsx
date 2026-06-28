@@ -44,10 +44,10 @@ export default function ClientPage({ semesterLabel, staffNip, semesterId }: Clie
     };
 
     return (
-        <main className="flex-1 flex flex-col" suppressHydrationWarning>
+        <main className="flex-1 flex flex-col">
             <UserHeader nama="Admin" role="admin" semesterLabel={semesterLabel} />
 
-            <div className="p-6 max-w-6xl mx-auto w-full" suppressHydrationWarning>
+            <div className="p-4 md:p-6 max-w-6xl mx-auto w-full">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h1 className="text-2xl font-bold mb-1 text-gray-900">
@@ -59,12 +59,13 @@ export default function ClientPage({ semesterLabel, staffNip, semesterId }: Clie
                     </div>
 
                     {/* TAB */}
-                    <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-gray-200/60 w-fit">
+                    <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-gray-200/60 w-full md:w-fit overflow-x-auto">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
                             return (
                                 <button
                                     key={tab.key}
+                                    suppressHydrationWarning
                                     onClick={() => setActiveTab(tab.key as Tab)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none ${activeTab === tab.key
                                         ? "bg-white text-[var(--color-primary)] shadow-sm"

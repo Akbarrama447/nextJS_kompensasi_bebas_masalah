@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:https": "next dev --turbopack --experimental-https",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
@@ -15,6 +16,9 @@
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "lucide-react": "^1.8.0",
     "next": "15.5.14",
     "pg": "^8.20.0",
@@ -22,9 +26,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-webcam": "^7.2.0",
-    "xlsx": "^0.18.5",
-    "jspdf": "^2.5.2",
-    "jspdf-autotable": "^3.8.4"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

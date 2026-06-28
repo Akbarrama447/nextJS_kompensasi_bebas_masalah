@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, Fragment } from 'react'
 import {
   Menu as MenuIcon, Search, PlusCircle, Edit2, Trash2,
   Shield, X, AlertTriangle, CheckCircle2, ChevronRight,
@@ -309,9 +309,9 @@ export default function MenuManagementClient({
                 <tbody className="divide-y divide-slate-50">
                   {filteredMenus.length > 0 ? (
                     filteredMenus.map((menu, idx) => (
-                      <>
+                      <Fragment key={menu.id}>
                         {/* Parent row */}
-                        <tr key={menu.id} className="hover:bg-slate-50/30 transition-colors">
+                        <tr className="hover:bg-slate-50/30 transition-colors">
                           <td className="py-4 px-6 text-center font-bold text-xs text-slate-400">{idx + 1}</td>
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-2">
@@ -395,7 +395,7 @@ export default function MenuManagementClient({
                             </td>
                           </tr>
                         ))}
-                      </>
+                      </Fragment>
                     ))
                   ) : (
                     <tr>

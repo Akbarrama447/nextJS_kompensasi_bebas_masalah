@@ -83,8 +83,8 @@ export default function LoginPage() {
       </div>
 
       {/* Kolom Kanan - Form Login */}
-      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-10" suppressHydrationWarning>
+      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-4 md:p-8">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-10 text-gray-900" suppressHydrationWarning>
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang</h2>
             <p className="text-sm text-gray-500">Masuk ke akun anda untuk melanjutkan</p>
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                 placeholder="Masukkan NIM atau Email"
                 required
                 suppressHydrationWarning
@@ -120,7 +120,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                 placeholder="Masukkan Password"
                 required
                 suppressHydrationWarning

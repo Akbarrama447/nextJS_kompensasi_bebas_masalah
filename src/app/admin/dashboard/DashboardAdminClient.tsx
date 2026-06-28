@@ -25,13 +25,13 @@ export default function DashboardAdminClient({
     <>
       <UserHeader nama={namaAdmin} role="admin" semesterLabel={semesterLabel} />
 
-      <div className="p-10 max-w-6xl">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-0.5">Selamat Datang, {namaAdmin.split(' ')[0]}</h2>
+      <div className="p-4 md:p-10 max-w-6xl w-full">
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-0.5">Selamat Datang, {namaAdmin.split(' ')[0]}</h2>
           <p className="text-sm text-[#2e5299] font-medium opacity-80">Berikut ringkasan aktivitas kompensasi</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8">
           <div className="bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
             <p className="text-[#2e5299] font-semibold text-xs mb-3">Pekerjaan Aktif</p>
             <div className="flex items-baseline gap-1">
@@ -52,7 +52,7 @@ export default function DashboardAdminClient({
         </div>
 
         <h3 className="text-lg font-bold text-slate-700 mb-4">Status Penugasan</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
           {statusCounts.map((status) => (
             <div key={status.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
               <p className="text-slate-500 font-medium text-xs mb-2">{status.nama}</p>

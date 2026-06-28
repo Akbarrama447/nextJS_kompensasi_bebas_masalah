@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import * as Icons from 'lucide-react'
 import Link from 'next/link'
 import { LogOut, LucideIcon } from 'lucide-react'
+import MobileMenu from './MobileMenu'
 
 interface SidebarProps {
   role: 'mahasiswa' | 'admin' | 'superadmin'
@@ -73,8 +74,17 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
     return <Icons.Circle size={20} />
   }
 
+  const roleLabel = role === 'mahasiswa' ? 'Mahasiswa' : role === 'superadmin' ? 'Superadmin' : 'Admin'
+
   return (
     <div className="flex min-h-screen bg-[#f1f5f9] font-sans antialiased text-slate-900">
+      <MobileMenu
+        menus={menus}
+        role={role}
+        activePath={activePath}
+        nama={nama}
+        roleLabel={roleLabel}
+      />
       <aside className="hidden md:flex w-64 bg-[#2e5299] text-white flex-col shadow-lg">
         <div className="flex items-center gap-2.5 p-6 mb-2">
           <img src="/LOGO-POLITEKNIK-NEGERI-SEMARANG-2.png" alt="Logo" className="w-6 h-6 object-contain" />

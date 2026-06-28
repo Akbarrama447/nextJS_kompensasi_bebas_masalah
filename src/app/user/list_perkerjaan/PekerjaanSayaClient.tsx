@@ -19,6 +19,8 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [address, setAddress] = useState<string>("")
   const [nominal, setNominal] = useState<string>("")
+  const [cameraError, setCameraError] = useState<string>("")
+  const [lokasiError, setLokasiError] = useState<string>("")
 
   // --- STATE FILTER & PAGINATION ---
   const [searchTerm, setSearchTerm] = useState("")
@@ -47,11 +49,24 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
   const startIndex = (currentPage - 1) * rowsPerPage
   const currentRows = filteredData.slice(startIndex, startIndex + rowsPerPage)
 
+  const getPageNumbers = (current: number, total: number): (number | 'ellipsis')[] => {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+    const pages: (number | 'ellipsis')[] = [1]
+    if (current > 3) pages.push('ellipsis')
+    const start = Math.max(2, current - 1)
+    const end = Math.min(total - 1, current + 1)
+    for (let i = start; i <= end; i++) pages.push(i)
+    if (current < total - 2) pages.push('ellipsis')
+    pages.push(total)
+    return pages
+  }
+
   useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, filterTipe, rowsPerPage])
 
   const getLocation = () => {
+    setLokasiError("")
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
@@ -61,17 +76,25 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
           try {
             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
             const data = await response.json()
-            const loc = data.address.village || data.address.suburb || data.address.city || "Lokasi Terdeteksi"
+            const loc = data.address?.village || data.address?.suburb || data.address?.city || "Lokasi Terdeteksi"
             setAddress(loc)
           } catch { setAddress("Koordinat Terkunci") }
         },
-        (err) => console.error(err)
+        (_err) => {
+          const errCode = _err?.code
+          if (errCode === 1) setLokasiError("Izin lokasi ditolak. Izinkan akses lokasi di browser.")
+          else if (errCode === 2) setLokasiError("Lokasi tidak tersedia.")
+          else if (errCode === 3) setLokasiError("Waktu permintaan lokasi habis.")
+          else setLokasiError("Gagal mendapatkan lokasi. Periksa izin browser.")
+        }
       )
+    } else {
+      setLokasiError("Browser tidak mendukung geolokasi.")
     }
   }
 
   const handleAction = (tugas: any) => {
-    setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); getLocation(); setIsModalOpen(true);
+    setSelectedTugas(tugas); setImgSrc(null); setAddress("Mencari lokasi..."); setCameraError(""); setLokasiError(""); getLocation(); setIsModalOpen(true);
     setNominal("");
   }
 
@@ -100,32 +123,32 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
     <div className="w-full flex flex-col min-h-screen bg-white font-sans text-slate-800">
       
       {/* Header Title */}
-      <div className="px-6 md:px-10 py-8 bg-white border-b border-slate-100">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Pekerjaan Saya</h1>
-        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Sistem Kompensasi Mahasiswa</p>
+      <div className="px-4 md:px-10 py-6 md:py-8 bg-white border-b border-slate-100">
+        <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Pekerjaan Saya</h1>
+        <p className="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1">Sistem Kompensasi Mahasiswa</p>
       </div>
 
-      {/* FILTER BOX - Inline Table Style */}
-      <div className="px-4 md:px-10 py-6">
+      {/* FILTER BOX */}
+      <div className="px-3 md:px-10 py-4 md:py-6">
         <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/30">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative group">
+          <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/30">
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <div className="relative group w-full md:w-auto">
                 <input 
                   type="text" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Cari tugas..." 
-                  className="pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#2e5299] transition-all w-64" 
+                  className="pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#2e5299] transition-all w-full md:w-64" 
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               </div>
 
-              <div className="relative">
+              <div className="relative w-full md:w-auto">
                 <select 
                   value={filterTipe}
                   onChange={(e) => setFilterTipe(e.target.value)}
-                  className="appearance-none pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:border-[#2e5299] cursor-pointer"
+                  className="appearance-none pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:border-[#2e5299] cursor-pointer w-full md:w-auto"
                 >
                   {listTipe.map((tipe) => (
                     <option key={String(tipe)} value={String(tipe)}>{String(tipe)}</option>
@@ -151,48 +174,50 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse md:min-w-[700px]">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-                  <th className="px-4 py-5 text-center w-12">No</th>
-                  <th className="px-8 py-5">Pekerjaan</th>
-                  <th className="px-6 py-5 text-center hidden lg:table-cell">Tipe</th>
-                  <th className="px-6 py-5 text-center">Poin</th>
-                  <th className="px-6 py-5 text-center hidden md:table-cell">Semester</th>
-                  <th className="px-6 py-5 text-center hidden xl:table-cell">Status</th>
-                  <th className="px-8 py-5 text-right">Aksi</th>
+                  <th className="px-1 md:px-4 py-5 text-center w-8 md:w-12">No</th>
+                  <th className="px-2 md:px-8 py-5">Pekerjaan</th>
+                  <th className="px-1 md:px-6 py-5 text-center hidden lg:table-cell">Tipe</th>
+                  <th className="px-1 md:px-6 py-5 text-center">Poin</th>
+                  <th className="px-1 md:px-6 py-5 text-center hidden md:table-cell">Semester</th>
+                  <th className="px-1 md:px-6 py-5 text-center hidden xl:table-cell">Status</th>
+                  <th className="px-2 md:px-8 py-5 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="text-sm font-medium text-slate-600">
                 {currentRows.map((t: any, index: number) => (
                   <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
-                    <td className="px-4 py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
-                    <td className="px-8 py-6 text-left">
-                      <div className="font-bold text-slate-800 leading-tight text-base">{t.pekerjaan?.judul}</div>
+                    <td className="px-1 md:px-4 py-4 md:py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
+                    <td className="px-2 md:px-8 py-4 md:py-6 text-left min-w-0">
+                      <div className="font-bold text-slate-800 leading-tight text-sm md:text-base truncate max-w-[180px] md:max-w-none">{t.pekerjaan?.judul}</div>
                       <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-1 lowercase font-medium">
                         <MapPin size={12}/> {t.pekerjaan?.ruangan?.nama_ruangan || 'Polines'}
                       </div>
                     </td>
-                    <td className="px-6 py-6 text-center hidden lg:table-cell">
+                    <td className="px-1 md:px-6 py-4 md:py-6 text-center hidden lg:table-cell">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-[9px] font-bold uppercase ${
                         t.pekerjaan?.tipe_pekerjaan?.nama === 'Internal' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                       }`}>
                         {t.pekerjaan?.tipe_pekerjaan?.nama || 'Eksternal'}
                       </span>
                     </td>
-                    <td className="px-6 py-6 text-center text-slate-800 font-bold">{Math.floor(t.pekerjaan?.poin_jam || 0)} jam</td>
-                    <td className="px-6 py-6 text-center hidden md:table-cell text-slate-500 text-xs font-medium uppercase tracking-tighter">smt {t.pekerjaan?.semester?.nama || '-'}</td>
-                    <td className="px-6 py-6 text-center hidden xl:table-cell">
+                    <td className="px-1 md:px-6 py-4 md:py-6 text-center text-slate-800 font-bold text-xs md:text-sm whitespace-nowrap">{Math.floor(t.pekerjaan?.poin_jam || 0)}<span className="hidden md:inline">{' '}jam</span></td>
+                    <td className="px-1 md:px-6 py-4 md:py-6 text-center hidden md:table-cell text-slate-500 text-xs font-medium uppercase tracking-tighter">smt {t.pekerjaan?.semester?.nama || '-'}</td>
+                    <td className="px-1 md:px-6 py-4 md:py-6 text-center hidden xl:table-cell">
                       <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${
                         t.status_tugas_id === 2 ? 'bg-blue-50 text-[#2e5299]' :
-                        t.status_tugas_id === 3 ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-300'
+                        t.status_tugas_id === 3 ? 'bg-yellow-50 text-yellow-600' :
+                        t.status_tugas_id === 4 ? 'bg-green-50 text-green-600' :
+                        t.status_tugas_id === 5 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-300'
                       }`}>
                         {t.status_tugas?.nama || 'Menunggu'}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-2 md:px-8 py-4 md:py-6 text-right">
                       {t.status_tugas_id <= 2 && (
-                        <button onClick={() => handleAction(t)} className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 ${t.status_tugas_id === 1 ? 'bg-[#2e5299] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}>
+                        <button onClick={() => handleAction(t)} className={`px-3 md:px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 ${t.status_tugas_id === 1 ? 'bg-[#2e5299] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}>
                           {t.status_tugas_id === 1 ? 'Mulai' : 'Akhiri'}
                         </button>
                       )}
@@ -204,16 +229,20 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
           </div>
 
           {/* PAGINATION FOOTER */}
-          <div className="p-6 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="p-4 md:p-6 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
               Total {filteredData.length} Pekerjaan
             </p>
             <div className="flex items-center gap-2">
               <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="p-2 bg-white border border-slate-200 rounded-xl disabled:opacity-30"><ChevronLeft size={16} /></button>
               <div className="flex gap-1">
-                {[...Array(totalPages)].map((_, i) => (
-                  <button key={i} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg font-bold text-[10px] ${currentPage === i + 1 ? 'bg-[#2e5299] text-white' : 'bg-white border border-slate-200 text-slate-400'}`}> {i + 1} </button>
-                ))}
+                {getPageNumbers(currentPage, totalPages).map((item, i) =>
+                  item === 'ellipsis' ? (
+                    <span key={`e${i}`} className="w-8 h-8 flex items-center justify-center text-slate-300 text-xs font-bold">...</span>
+                  ) : (
+                    <button key={item} onClick={() => setCurrentPage(item)} className={`w-8 h-8 rounded-lg font-bold text-[10px] ${currentPage === item ? 'bg-[#2e5299] text-white' : 'bg-white border border-slate-200 text-slate-400'}`}>{item}</button>
+                  )
+                )}
               </div>
               <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(p => p + 1)} className="p-2 bg-white border border-slate-200 rounded-xl disabled:opacity-30"><ChevronRight size={16} /></button>
             </div>
@@ -221,25 +250,29 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
         </div>
       </div>
 
-      {/* MODAL (Tetap Sesuai Layout Sebelumnya) */}
+      {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/20 backdrop-blur-sm p-0 md:p-4 text-left">
-          <div className="bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in slide-in-from-bottom duration-300">
-             {/* ... (Konten Modal Sama dengan Sebelumnya) ... */}
-              <div className="px-8 py-6 flex justify-between items-center border-b border-slate-50">
-                <div className="text-left"><h3 className="text-lg font-bold">Verifikasi Progres</h3><p className="text-[10px] text-slate-400 font-bold uppercase">{selectedTugas?.pekerjaan?.judul}</p></div>
-                <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-50 rounded-full text-slate-300"><X size={20}/></button>
+          <div className="bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[95dvh] md:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200">
+              <div className="px-5 md:px-8 py-4 md:py-6 flex justify-between items-center border-b border-slate-50 sticky top-0 bg-white z-10">
+                <div className="text-left min-w-0"><h3 className="text-base md:text-lg font-bold">Verifikasi Progres</h3><p className="text-[10px] text-slate-400 font-bold uppercase truncate max-w-[180px] md:max-w-none">{selectedTugas?.pekerjaan?.judul}</p></div>
+                <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-50 rounded-full text-slate-300 hover:text-slate-500 transition-colors shrink-0"><X size={20}/></button>
              </div>
-             <div className="p-8 space-y-6">
-                <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 flex items-center gap-4">
-                  <MapPinned className="text-[#2e5299]"/><div className="text-left"><p className="text-sm font-bold text-slate-800">{address}</p><p className="text-[11px] font-mono text-slate-400 italic">{location?.lat.toFixed(6)}, {location?.lng.toFixed(6)}</p></div>
-                </div>
-                <div className="aspect-video bg-slate-50 rounded-[1.5rem] relative overflow-hidden border border-slate-100 shadow-inner group">
-                   {imgSrc ? <img src={imgSrc} className="w-full h-full object-cover"/> : <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" className="w-full h-full object-cover" />}
-                   <button onClick={imgSrc ? () => setImgSrc(null) : capture} className="absolute bottom-4 right-4 w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={22}/> : <Camera size={22}/>}</button>
-                </div>
+             <div className="p-5 md:p-8 space-y-5 md:space-y-6">
+                   <div className="bg-blue-50/50 p-4 md:p-5 rounded-2xl border border-blue-100 flex items-center gap-3 md:gap-4">
+                   <MapPinned className="text-[#2e5299] shrink-0"/><div className="text-left min-w-0"><p className="text-sm font-bold text-slate-800 truncate">{address}</p><p className="text-[11px] font-mono text-slate-400 italic truncate">{location ? `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}` : lokasiError || "Memuat lokasi..."}</p></div>
+                 </div>
+                 <div className="aspect-video bg-slate-50 rounded-[1.5rem] relative overflow-hidden border border-slate-100 shadow-inner group">
+                    {cameraError ? (
+                      <div className="w-full h-full flex items-center justify-center text-red-500 text-sm font-bold p-4 text-center">{cameraError}</div>
+                    ) : imgSrc ? (
+                      <img src={imgSrc} className="w-full h-full object-cover"/>
+                    ) : (
+                      <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" screenshotQuality={0.8} videoConstraints={{ width: 1280, height: 720, facingMode: 'user' }} className="w-full h-full object-cover" onUserMediaError={() => setCameraError("Kamera tidak dapat diakses. Izinkan akses kamera di browser.")} playsinline />
+                    )}
+                    <button onClick={imgSrc ? () => setImgSrc(null) : capture} className="absolute bottom-4 right-4 w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-[#2e5299] active:scale-95 transition-all">{imgSrc ? <RefreshCcw size={20}/> : <Camera size={20}/>}</button>
+                 </div>
                  
-                 {/* Nominal Input Field */}
                  <div className="flex flex-col gap-2">
                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
                      Nominal Kompensasi
@@ -262,7 +295,7 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                    </p>
                  </div>
 
-                 <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc || (selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && !nominal)} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all">Kirim Laporan</button>
+                 <button onClick={() => updateStatus(selectedTugas.id)} disabled={!imgSrc || (selectedTugas?.pekerjaan?.tipe_pekerjaan?.nama !== 'Internal' && !nominal)} className="w-full py-4 bg-[#2e5299] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg disabled:opacity-50 transition-all active:scale-[0.98]">Kirim Laporan</button>
              </div>
           </div>
         </div>

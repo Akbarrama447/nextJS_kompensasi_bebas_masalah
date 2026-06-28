@@ -63,7 +63,7 @@ export default function TabRiwayat() {
     };
 
     return (
-        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 relative" suppressHydrationWarning>
+        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 relative">
             {/* Header & Controls */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>

@@ -4806,15 +4806,15 @@ COPY public.kelas (id, prodi_id, nama_kelas) FROM stdin;
 13	8	IK-1
 14	8	IK-2
 15	9	SI-1
-16	\N	TI-1A
-17	\N	TI-1B
-18	\N	TI-1C
-19	\N	TI-2A
-20	\N	TI-2B
-21	\N	TI-2C
-22	\N	TI-3A
-23	\N	TI-3B
-24	\N	TI-3C
+16	1	TI-1A
+17	1	TI-1B
+18	1	TI-1C
+19	1	TI-2A
+20	1	TI-2B
+21	1	TI-2C
+22	1	TI-3A
+23	1	TI-3B
+24	1	TI-3C
 \.
 
 
@@ -5399,6 +5399,9 @@ COPY public.menus (id, key, label, icon, path, urutan, parent_id, created_at) FR
 15	pekerjaan_admin	Pekerjaan	Briefcase	/admin/list_pekerjaan	2	\N	2026-05-10 01:41:52.474978
 17	pengaturan	Pengaturan	Settings	/admin/pengaturan	4	\N	2026-05-10 01:41:52.474978
 16	laporan	Ekuivalensi	BookOpen	/admin/ekuivalensi	3	\N	2026-05-10 01:41:52.474978
+18	dashboard_superadmin	Dashboard	LayoutDashboard	/superadmin/dashboard	1	\N	2026-06-01 00:00:00
+19	users_superadmin	Users	Users	/superadmin/users	2	\N	2026-06-01 00:00:00
+20	manajemen_menu	Manajemen Menu	Menu	/superadmin/manajemen-menu	3	\N	2026-06-01 00:00:00
 \.
 
 
@@ -5822,10 +5825,8 @@ COPY public.registrasi_mahasiswa (id, nim, semester_id, kelas_id, status) FROM s
 --
 
 COPY public.role_has_menus (id, created_at, role_id, menus_id) FROM stdin;
-10	2026-05-09 18:41:52.474978+00	1	14
-11	2026-05-09 18:41:52.474978+00	1	15
-12	2026-05-09 18:41:52.474978+00	1	16
-13	2026-05-09 18:41:52.474978+00	1	17
+-- Super Admin pindah ke menu superadmin
+-- 10,11,12,13 removed from admin menus
 14	2026-05-09 18:41:52.474978+00	2	14
 15	2026-05-09 18:41:52.474978+00	2	15
 16	2026-05-09 18:41:52.474978+00	4	14
@@ -5833,6 +5834,9 @@ COPY public.role_has_menus (id, created_at, role_id, menus_id) FROM stdin;
 18	2026-05-09 18:41:52.474978+00	3	2
 19	2026-05-09 18:41:52.474978+00	3	3
 20	2026-05-09 18:44:38.741587+00	2	16
+21	2026-06-01 00:00:00+00	1	18
+22	2026-06-01 00:00:00+00	1	19
+23	2026-06-01 00:00:00+00	1	20
 \.
 
 

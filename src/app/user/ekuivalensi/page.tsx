@@ -113,8 +113,6 @@ export default async function EkuivalensiPage() {
           noTelepon: ekuivalensiData.no_telepon || '',
           noTeleponChangeCount: ekuivalensiData.no_telepon_change_count ?? 0,
         }
-      } else {
-        students = []
       }
     }
   }

@@ -10,7 +10,7 @@ export default function UserHeader({ nama, role = 'mahasiswa', semesterLabel }: 
   const roleLabel = role === 'admin' ? 'Admin' : 'Mahasiswa'
   
   return (
-    <header className="bg-white h-14 md:h-16 px-4 md:px-10 flex items-center justify-between border-b border-slate-200 gap-2">
+    <header className="bg-white h-14 md:h-16 pl-14 md:pl-10 pr-4 md:pr-10 flex items-center justify-between border-b border-slate-200 gap-2">
       
       {semesterLabel && (
         <div className="flex items-center gap-2">

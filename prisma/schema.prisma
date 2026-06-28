@@ -92,6 +92,7 @@ model Semester {
   is_aktif             Boolean?               @default(false)
   mulai                DateTime?              @db.Date
   selesai              DateTime?              @db.Date
+  
   daftar_pekerjaan     Daftar_pekerjaan[]
   ekuivalensi_kelas    Ekuivalensi_kelas[]
   import_log           Import_log[]

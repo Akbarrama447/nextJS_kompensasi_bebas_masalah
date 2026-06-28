@@ -195,6 +195,13 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
   const defaultPassword = process.env.DEFAULT_STUDENT_PASSWORD ?? 'Polines123!';
   const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
+  // ── 3.1 Mapping prefix kelas → prodi ────────────────────────────────────
+  const PREFIX_PRODI_MAP: Record<string, string> = {
+    'IK': 'Teknik Informatika',
+    'TI': 'Teknologi Rekayasa Komputer',
+    'TE': 'Telekomunikasi',
+  };
+
   // ── 4. Proses tiap mahasiswa ─────────────────────────────────────────────
   for (const student of students) {
     try {
@@ -203,10 +210,24 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
       let kelasId = kelasMap.get(normalizedStudentKelas);
       
       if (!kelasId) {
+        // Cari prodi_id dari prefix nama kelas
+        const prefix = student.kelas.trim().split(/[-\s]/)[0].toUpperCase();
+        const prodiKeyword = PREFIX_PRODI_MAP[prefix];
+        let prodiId: number | null = null;
+
+        if (prodiKeyword) {
+          const prodi = await prisma.prodi.findFirst({
+            where: { nama_prodi: { contains: prodiKeyword, mode: 'insensitive' } },
+            select: { id: true },
+          });
+          prodiId = prodi?.id ?? null;
+        }
+
         // Jika kelas belum ada, buat otomatis di tabel kelas
         const newKelas = await prisma.kelas.create({
           data: {
-            nama_kelas: student.kelas.trim(), // Simpan nama asli sesuai Excel (contoh: "IK-1A")
+            nama_kelas: student.kelas.trim(),
+            prodi_id: prodiId,
           },
         });
         

@@ -248,7 +248,7 @@ export default function EkuivalensiClient({
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-6 space-y-6">
           {namaKelas !== '-' && (
             <div className="flex items-center gap-3">
               <h3 className="text-lg font-extrabold text-slate-800 uppercase tracking-wide">
@@ -304,23 +304,23 @@ export default function EkuivalensiClient({
 
           {students.length > 0 ? (
             <>
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
-                <table className="min-w-full divide-y divide-slate-200">
+              <div className="border border-slate-200 rounded-xl overflow-x-auto">
+                <table className="md:min-w-[500px] w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-12">No</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nama</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">NIM</th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Sisa Jam</th>
+                      <th className="px-1 md:px-6 py-3 text-center text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider w-8 md:w-12">No</th>
+                      <th className="px-1 md:px-6 py-3 text-left text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Nama</th>
+                      <th className="px-1 md:px-6 py-3 text-left text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">NIM</th>
+                      <th className="px-1 md:px-6 py-3 text-left text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Sisa Jam</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-slate-100">
                     {students.map((s, i) => (
                       <tr key={i} className="hover:bg-slate-50/50 transition">
-                        <td className="px-6 py-4 text-center text-sm text-slate-400">{i + 1}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">{s.nama}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-500">{s.nim}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-700">{s.jam}</td>
+                        <td className="px-1 md:px-6 py-2 md:py-4 text-center text-xs md:text-sm text-slate-400">{i + 1}</td>
+                        <td className="px-1 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-semibold text-slate-700 max-w-[120px] md:max-w-none truncate">{s.nama}</td>
+                        <td className="px-1 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-semibold text-slate-500 truncate max-w-[90px] md:max-w-none">{s.nim}</td>
+                        <td className="px-1 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-bold text-slate-700">{s.jam}</td>
                       </tr>
                     ))}
                   </tbody>

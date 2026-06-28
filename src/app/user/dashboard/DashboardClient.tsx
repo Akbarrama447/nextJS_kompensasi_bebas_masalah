@@ -21,22 +21,14 @@ export default function DashboardClient({
     <>
       <UserHeader nama={namaMahasiswa} role="mahasiswa" semesterLabel={semesterLabel} />
 
-      <div className="p-10 max-w-6xl">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-0.5">Selamat Datang, {namaMahasiswa.split(' ')[0]}</h2>
+      <div className="p-4 md:p-10 max-w-6xl w-full">
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-0.5">Selamat Datang, {namaMahasiswa.split(' ')[0]}</h2>
           <p className="text-sm text-[#2e5299] font-medium opacity-80">Berikut ringkasan aktivitas kompensasi anda</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <p className="text-[#2e5299] font-semibold text-xs mb-3">Sisa Jam Kompen</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-slate-800">{sisaJam}</span>
-              <span className="text-sm font-medium text-slate-500">Jam</span>
-            </div>
-          </div>
-
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <p className="text-[#2e5299] font-semibold text-xs mb-3">Sisa Jam Kompen</p>
             <div className="flex items-baseline gap-1">
@@ -62,7 +54,7 @@ export default function DashboardClient({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           <div className="bg-white p-7 rounded-2xl shadow-sm border border-slate-100 hover:border-[#2e5299]/30 transition-all cursor-pointer group">
             <a href="/user/list_perkerjaan"><h3 className="text-[#2e5299] font-bold text-lg mb-1 group-hover:text-blue-700">Cek Pekerjaan</h3></a>
             <p className="text-slate-400 text-xs font-medium">Cek Daftar Pekerjaan Kompensasi</p>

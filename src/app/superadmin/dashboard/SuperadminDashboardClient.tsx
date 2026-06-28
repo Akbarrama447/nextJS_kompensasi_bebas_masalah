@@ -160,7 +160,7 @@ export default function SuperadminDashboardClient({
         </div>
       </div>
 
-      <div className="px-6 md:px-10 mt-8 space-y-8">
+      <div className="px-4 md:px-10 mt-6 md:mt-8 space-y-6 md:space-y-8">
         
         {/* ALERT NOTIFICATION */}
         {message && (
@@ -298,7 +298,7 @@ export default function SuperadminDashboardClient({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Tahun</label>
                     <input
@@ -384,6 +384,7 @@ export default function SuperadminDashboardClient({
 
               {/* Data Table Container */}
               <div className="flex-1 overflow-x-auto">
+                <div className="min-w-[600px]">
                 {activeTab === "jurusan" ? (
                   /* Jurusan Table */
                   <table className="w-full text-left border-collapse">
@@ -443,6 +444,7 @@ export default function SuperadminDashboardClient({
                     </tbody>
                   </table>
                 )}
+                </div>
               </div>
 
             </div>
