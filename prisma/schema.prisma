@@ -243,6 +243,7 @@ model Ekuivalensi_kelas {
   no_telepon            String?                 @map("no_telepon") @db.VarChar
   no_telepon_change_count Int?                  @default(0) @map("no_telepon_change_count")
   keterangan_pekerjaan  String?
+  link_barang           String?                 @map("link_barang")
   created_at            DateTime?               @default(now()) @map("created_at") @db.Timestamp(6)
   kelas                 Kelas?                  @relation(fields: [kelas_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mahasiswa             Mahasiswa?              @relation("PenanggungJawab", fields: [penanggung_jawab_nim], references: [nim], onDelete: NoAction, onUpdate: NoAction)

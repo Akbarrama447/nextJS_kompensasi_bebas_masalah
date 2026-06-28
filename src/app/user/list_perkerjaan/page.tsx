@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import PekerjaanSayaClient from './PekerjaanSayaClient'
 import Sidebar from '@/components/Sidebar'
 import UserHeader from '@/components/UserHeader'
+import { getMenuItems } from '@/lib/getMenuItems'
 
 export default async function PekerjaanSayaPage() {
   const cookieStore = await cookies()
@@ -58,10 +59,12 @@ export default async function PekerjaanSayaPage() {
     info: mhsAktif?.registrasi_mahasiswa?.[0] || null
   }
 
+  const menuItems = await getMenuItems('mahasiswa')
+  const activePath = '/user/list_perkerjaan'
+
   return (
-    <Sidebar role="mahasiswa" activePath="/user/list_perkerjaan">
-      <UserHeader nama={userData.nama} role="mahasiswa" semesterLabel={semesterLabel} />
-      {/* Lempar data ke Client Component */}
+    <Sidebar role="mahasiswa" activePath={activePath} items={menuItems}>
+      <UserHeader nama={userData.nama} role="mahasiswa" semesterLabel={semesterLabel} menuItems={menuItems} activePath={activePath} />
       <PekerjaanSayaClient initialData={penugasanSaya} user={userData} allTipePekerjaan={allTipePekerjaan} />
     </Sidebar>
   )

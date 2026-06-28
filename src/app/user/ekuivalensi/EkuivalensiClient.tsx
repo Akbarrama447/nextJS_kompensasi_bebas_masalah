@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import UserHeader from '@/components/UserHeader'
+import type { MenuItem } from '@/lib/getMenuItems'
 
 interface StudentData {
   nama: string
@@ -30,6 +31,8 @@ interface Props {
   students: StudentData[]
   ekuivalensi: EkuivalensiData | null
   semesterLabel?: string
+  menuItems?: MenuItem[]
+  activePath?: string
 }
 
 export default function EkuivalensiClient({
@@ -39,6 +42,8 @@ export default function EkuivalensiClient({
   students,
   ekuivalensi,
   semesterLabel,
+  menuItems,
+  activePath,
 }: Props) {
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -238,7 +243,7 @@ export default function EkuivalensiClient({
 
   return (
     <>
-      <UserHeader nama={namaMahasiswa} role="mahasiswa" semesterLabel={semesterLabel} />
+      <UserHeader nama={namaMahasiswa} role="mahasiswa" semesterLabel={semesterLabel} menuItems={menuItems} activePath={activePath} />
 
       <div className="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
         <div className="mb-8">
@@ -305,6 +310,7 @@ export default function EkuivalensiClient({
           {students.length > 0 ? (
             <>
               <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50">
                     <tr>
@@ -325,6 +331,7 @@ export default function EkuivalensiClient({
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 border border-slate-200 rounded-xl divide-y md:divide-y-0 md:divide-x divide-slate-200 overflow-hidden text-center">

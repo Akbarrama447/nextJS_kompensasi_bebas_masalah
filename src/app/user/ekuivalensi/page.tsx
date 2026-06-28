@@ -2,6 +2,7 @@ import Sidebar from '@/components/Sidebar'
 import { cookies } from 'next/headers'
 import prisma from '@/lib/prisma'
 import EkuivalensiClient from './EkuivalensiClient'
+import { getMenuItems } from '@/lib/getMenuItems'
 
 export default async function EkuivalensiPage() {
   const cookieStore = await cookies()
@@ -122,8 +123,11 @@ export default async function EkuivalensiPage() {
   const namaMahasiswa = mahasiswa?.nama || 'Mahasiswa'
   const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 
+  const menuItems = await getMenuItems('mahasiswa')
+  const activePath = '/user/ekuivalensi'
+
   return (
-    <Sidebar role="mahasiswa" activePath="/user/ekuivalensi">
+    <Sidebar role="mahasiswa" activePath={activePath} items={menuItems}>
       <main className="flex-1 flex flex-col">
         <EkuivalensiClient
           namaMahasiswa={namaMahasiswa}
@@ -132,6 +136,8 @@ export default async function EkuivalensiPage() {
           students={students}
           ekuivalensi={ekuivalensi}
           semesterLabel={semesterLabel}
+          menuItems={menuItems}
+          activePath={activePath}
         />
       </main>
     </Sidebar>

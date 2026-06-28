@@ -116,7 +116,7 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Cari tugas..." 
-                  className="pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#2e5299] transition-all w-64" 
+                  className="pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#2e5299] transition-all w-full md:w-64" 
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               </div>
@@ -154,35 +154,35 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-                  <th className="px-4 py-5 text-center w-12">No</th>
-                  <th className="px-8 py-5">Pekerjaan</th>
-                  <th className="px-6 py-5 text-center hidden lg:table-cell">Tipe</th>
-                  <th className="px-6 py-5 text-center">Poin</th>
-                  <th className="px-6 py-5 text-center hidden md:table-cell">Semester</th>
-                  <th className="px-6 py-5 text-center hidden xl:table-cell">Status</th>
-                  <th className="px-8 py-5 text-right">Aksi</th>
+                    <th className="px-2 md:px-4 py-4 md:py-5 text-center w-12">No</th>
+                  <th className="px-3 md:px-6 py-4 md:py-5">Pekerjaan</th>
+                  <th className="px-2 md:px-4 py-4 md:py-5 text-center hidden lg:table-cell">Tipe</th>
+                  <th className="px-2 md:px-4 py-4 md:py-5 text-center">Poin</th>
+                  <th className="px-2 md:px-4 py-4 md:py-5 text-center hidden md:table-cell">Semester</th>
+                  <th className="px-2 md:px-4 py-4 md:py-5 text-center hidden xl:table-cell">Status</th>
+                  <th className="px-3 md:px-6 py-4 md:py-5 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="text-sm font-medium text-slate-600">
                 {currentRows.map((t: any, index: number) => (
                   <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
-                    <td className="px-4 py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
-                    <td className="px-8 py-6 text-left">
+                    <td className="px-2 md:px-4 py-4 md:py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
+                    <td className="px-3 md:px-6 py-4 md:py-6 text-left">
                       <div className="font-bold text-slate-800 leading-tight text-base">{t.pekerjaan?.judul}</div>
                       <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-1 lowercase font-medium">
                         <MapPin size={12}/> {t.pekerjaan?.ruangan?.nama_ruangan || 'Polines'}
                       </div>
                     </td>
-                    <td className="px-6 py-6 text-center hidden lg:table-cell">
+                    <td className="px-2 md:px-4 py-4 md:py-6 text-center hidden lg:table-cell">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-[9px] font-bold uppercase ${
                         t.pekerjaan?.tipe_pekerjaan?.nama === 'Internal' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                       }`}>
                         {t.pekerjaan?.tipe_pekerjaan?.nama || 'Eksternal'}
                       </span>
                     </td>
-                    <td className="px-6 py-6 text-center text-slate-800 font-bold">{Math.floor(t.pekerjaan?.poin_jam || 0)} jam</td>
-                    <td className="px-6 py-6 text-center hidden md:table-cell text-slate-500 text-xs font-medium uppercase tracking-tighter">smt {t.pekerjaan?.semester?.nama || '-'}</td>
-                    <td className="px-6 py-6 text-center hidden xl:table-cell">
+                    <td className="px-2 md:px-4 py-4 md:py-6 text-center text-slate-800 font-bold">{Math.floor(t.pekerjaan?.poin_jam || 0)} jam</td>
+                    <td className="px-2 md:px-4 py-4 md:py-6 text-center hidden md:table-cell text-slate-500 text-xs font-medium uppercase tracking-tighter">smt {t.pekerjaan?.semester?.nama || '-'}</td>
+                    <td className="px-2 md:px-4 py-4 md:py-6 text-center hidden xl:table-cell">
                       <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${
                         t.status_tugas_id === 2 ? 'bg-blue-50 text-[#2e5299]' :
                         t.status_tugas_id === 3 ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-300'
@@ -190,9 +190,9 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                         {t.status_tugas?.nama || 'Menunggu'}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-3 md:px-6 py-4 md:py-6 text-right">
                       {t.status_tugas_id <= 2 && (
-                        <button onClick={() => handleAction(t)} className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 ${t.status_tugas_id === 1 ? 'bg-[#2e5299] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}>
+                        <button onClick={() => handleAction(t)} className={`px-4 md:px-6 py-2.5 md:py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 min-h-[44px] ${t.status_tugas_id === 1 ? 'bg-[#2e5299] text-white shadow-md' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}>
                           {t.status_tugas_id === 1 ? 'Mulai' : 'Akhiri'}
                         </button>
                       )}

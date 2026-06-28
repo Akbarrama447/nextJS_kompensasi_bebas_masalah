@@ -1,24 +1,34 @@
 "use client";
 
+import MobileNav from './MobileNav'
+import type { MenuItem } from '@/lib/getMenuItems'
+
 interface UserHeaderProps {
   nama: string
   role?: 'mahasiswa' | 'admin'
   semesterLabel?: string
+  menuItems?: MenuItem[]
+  activePath?: string
 }
 
-export default function UserHeader({ nama, role = 'mahasiswa', semesterLabel }: UserHeaderProps) {
+export default function UserHeader({ nama, role = 'mahasiswa', semesterLabel, menuItems, activePath }: UserHeaderProps) {
   const roleLabel = role === 'admin' ? 'Admin' : 'Mahasiswa'
-  
+
   return (
     <header className="bg-white h-14 md:h-16 px-4 md:px-10 flex items-center justify-between border-b border-slate-200 gap-2">
-      
-      {semesterLabel && (
-        <div className="flex items-center gap-2">
-          <span className="text-xs md:text-sm font-semibold text-[#2e5299] bg-[#eef2ff] px-3 py-1.5 rounded-lg">
-            {semesterLabel}
-          </span>
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        {menuItems && activePath && (
+          <MobileNav menuItems={menuItems} activePath={activePath} nama={nama} />
+        )}
+
+        {semesterLabel && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs md:text-sm font-semibold text-[#2e5299] bg-[#eef2ff] px-3 py-1.5 rounded-lg">
+              {semesterLabel}
+            </span>
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center gap-2 md:gap-3 ml-auto">
         <div className="flex flex-col text-right hidden sm:flex">

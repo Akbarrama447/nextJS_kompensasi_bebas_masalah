@@ -4,13 +4,22 @@ import * as Icons from 'lucide-react'
 import Link from 'next/link'
 import { LogOut, LucideIcon } from 'lucide-react'
 
+interface NavItem {
+  id: number
+  key: string
+  label: string
+  icon: string | null
+  href: string
+}
+
 interface SidebarProps {
   role: 'mahasiswa' | 'admin' | 'superadmin'
   activePath?: string
   children: React.ReactNode
+  items?: NavItem[]
 }
 
-export default async function Sidebar({ role, activePath = '', children }: SidebarProps) {
+export default async function Sidebar({ role, activePath = '', children, items }: SidebarProps) {
   const cookieStore = await cookies()
   
   let nama = 'Guest'
@@ -48,13 +57,15 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
 
   const allowedIds = allowedMenuIds.map((r) => r.menus_id).filter((id): id is number => id !== null)
 
-  const menus = await prisma.menus.findMany({
+  const dbMenus = await prisma.menus.findMany({
     where: {
       parent_id: null,
       ...(allowedIds.length > 0 ? { id: { in: allowedIds } } : {}),
     },
     orderBy: { urutan: 'asc' },
   })
+
+  const displayMenus = items ?? dbMenus
 
   const id = role === 'mahasiswa' 
     ? cookieStore.get('nim')?.value || '-'
@@ -86,15 +97,16 @@ export default async function Sidebar({ role, activePath = '', children }: Sideb
         
         <nav className="flex-1">
           <ul className="space-y-1">
-            {menus.map((menu) => {
-              let href = menu.path
-              if (role === 'admin') {
-                if (menu.key === 'pekerjaan' || menu.key === 'dashboard') {
-                  href = '/admin/list_pekerjaan'
-                } else {
-                  href = menu.path.replace('/user/', '/admin/')
+            {displayMenus.map((menu: { id: number; key: string; label: string; icon: string | null; path: string; href?: string }) => {
+              const href = menu.href || (() => {
+                if (role === 'admin') {
+                  if (menu.key === 'pekerjaan' || menu.key === 'dashboard') {
+                    return '/admin/list_pekerjaan'
+                  }
+                  return menu.path.replace('/user/', '/admin/')
                 }
-              }
+                return menu.path
+              })()
 
               const isActive = activePath === href || activePath.startsWith(href + '/') || (menu.key && activePath.includes(menu.key))
               return (

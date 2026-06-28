@@ -354,9 +354,9 @@ async function seedRoleHasMenus() {
 
   const roleMenuMap: { role_id: number; keys: string[] }[] = [
     { role_id: 1, keys: ['dashboard_superadmin', 'manajemen_menu', 'manajemen_user'] }, // Super Admin — superadmin access
-    { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin'] }, // Staf Jurusan
+    { role_id: 2, keys: ['dashboard_admin', 'pekerjaan_admin', 'ekuivalensi'] }, // Staf Jurusan
     { role_id: 3, keys: ['dashboard', 'pekerjaan', 'ekuivalensi'] }, // Mahasiswa
-    { role_id: 4, keys: ['dashboard_admin', 'pekerjaan_admin'] }, // Dosen
+    { role_id: 4, keys: ['dashboard_admin', 'pekerjaan_admin', 'ekuivalensi'] }, // Dosen
   ]
 
   for (const entry of roleMenuMap) {

@@ -2,6 +2,7 @@ import Sidebar from '@/components/Sidebar'
 import { cookies } from 'next/headers'
 import prisma from '@/lib/prisma'
 import DashboardClient from './DashboardClient'
+import { getMenuItems } from '@/lib/getMenuItems'
 
 export default async function DashboardMahasiswa() {
   const cookieStore = await cookies()
@@ -45,8 +46,11 @@ export default async function DashboardMahasiswa() {
 
   const semesterLabel = activeSemester ? `${activeSemester.nama} - ${activeSemester.tahun}` : ''
 
+  const menuItems = await getMenuItems('mahasiswa')
+  const activePath = '/user/dashboard'
+
   return (
-    <Sidebar role="mahasiswa" activePath="/user/dashboard">
+    <Sidebar role="mahasiswa" activePath={activePath} items={menuItems}>
       <main className="flex-1 flex flex-col">
         <DashboardClient
           namaMahasiswa={namaMahasiswa}
@@ -54,6 +58,8 @@ export default async function DashboardMahasiswa() {
           totalJamSelesai={totalJamSelesai}
           totalJamWajib={totalJamWajib}
           semesterLabel={semesterLabel}
+          menuItems={menuItems}
+          activePath={activePath}
         />
       </main>
     </Sidebar>
