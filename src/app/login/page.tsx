@@ -46,18 +46,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen" suppressHydrationWarning>
-      {/* Kolom Kiri - Branding */}
-      {/* Tambahkan 'relative' dan 'overflow-hidden' agar grid tidak keluar batas */}
-      <div className="relative hidden lg:flex flex-col w-1/2 bg-[#0F172A] items-center justify-center p-12 overflow-hidden">
+    <div className="relative flex flex-col lg:flex-row min-h-screen">
 
-        {/* Elemen Animasi Background Grid */}
+      {/* Background Animasi — full screen di mobile, left half di desktop */}
+      <div className="absolute inset-0 bg-[#0F172A] overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern animate-grid" />
-
-        {/* (Opsional) Efek Gradient Mask agar grid terlihat memudar secara elegan ke arah pinggir */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#0F172A_80%)]" />
-
-        {/* Elemen Kotak-Kotak Melayang */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="floating-square" style={{ left: '10%', width: '80px', height: '80px', animationDelay: '0s', animationDuration: '18s' }} />
           <div className="floating-square" style={{ left: '25%', width: '40px', height: '40px', animationDelay: '2s', animationDuration: '12s' }} />
@@ -66,9 +60,11 @@ export default function LoginPage() {
           <div className="floating-square" style={{ left: '75%', width: '90px', height: '90px', animationDelay: '5s', animationDuration: '20s' }} />
           <div className="floating-square" style={{ left: '90%', width: '50px', height: '50px', animationDelay: '3s', animationDuration: '14s' }} />
         </div>
+      </div>
 
-        {/* Konten Teks - Tambahkan 'relative' dan 'z-10' agar posisi teks tetap di depan animasi */}
-        <div className="relative z-10 text-center space-y-4">
+      {/* Kolom Kiri — Branding */}
+      <div className="relative z-10 flex items-start lg:items-center justify-center w-full lg:w-1/2 p-8 lg:p-12 pt-16 lg:pt-0 lg:min-h-screen">
+        <div className="text-center space-y-4">
           <div>
             <h1 className="text-2xl font-bold text-white">
               Sistem Kompensasi dan Bebas Masalah
@@ -77,16 +73,16 @@ export default function LoginPage() {
               Politeknik Negeri Semarang
             </h2>
           </div>
-          <p className="text-slate-400 text-sm tracking-[6px] leading-relaxed">
+          <p className="hidden lg:block text-slate-400 text-sm tracking-[6px] leading-relaxed">
             Platform managemen kompensasi mahasiswa <br />
             Politeknik Negeri Semarang
           </p>
         </div>
       </div>
 
-      {/* Kolom Kanan - Form Login */}
-      <div className="flex w-full lg:w-1/2 bg-slate-50 items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-10" suppressHydrationWarning>
+      {/* Kolom Kanan — Form Login */}
+      <div className="relative z-10 flex items-center justify-center w-full lg:w-1/2 lg:bg-slate-50 p-8 flex-1 lg:min-h-screen">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 sm:p-10">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Selamat Datang</h2>
             <p className="text-sm text-gray-500">Masuk ke akun anda untuk melanjutkan</p>
@@ -98,8 +94,8 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5" suppressHydrationWarning>
-            <div suppressHydrationWarning>
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 NIM / Email
               </label>
@@ -110,11 +106,10 @@ export default function LoginPage() {
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                 placeholder="Masukkan NIM atau Email"
                 required
-                suppressHydrationWarning
               />
             </div>
 
-            <div suppressHydrationWarning>
+            <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Password
               </label>
@@ -126,7 +121,6 @@ export default function LoginPage() {
                   className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                   placeholder="Masukkan Password"
                   required
-                  suppressHydrationWarning
                 />
                 <button
                   type="button"
@@ -143,7 +137,6 @@ export default function LoginPage() {
               type="submit"
               disabled={loading}
               className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors mt-4 disabled:opacity-50"
-              suppressHydrationWarning
             >
               {loading ? 'Memuat...' : 'Masuk'}
             </button>
