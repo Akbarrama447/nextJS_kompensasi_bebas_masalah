@@ -9,7 +9,17 @@ interface NavItem {
   key: string
   label: string
   icon: string | null
+  path?: string
   href: string
+}
+
+type DisplayMenu = {
+  id: number
+  key: string
+  label: string
+  icon: string | null
+  path?: string
+  href?: string
 }
 
 interface SidebarProps {
@@ -65,7 +75,7 @@ export default async function Sidebar({ role, activePath = '', children, items }
     orderBy: { urutan: 'asc' },
   })
 
-  const displayMenus = items ?? dbMenus
+  const displayMenus: DisplayMenu[] = items ?? dbMenus
 
   const id = role === 'mahasiswa' 
     ? cookieStore.get('nim')?.value || '-'
@@ -97,15 +107,15 @@ export default async function Sidebar({ role, activePath = '', children, items }
         
         <nav className="flex-1">
           <ul className="space-y-1">
-            {displayMenus.map((menu: { id: number; key: string; label: string; icon: string | null; path: string; href?: string }) => {
+            {displayMenus.map((menu) => {
               const href = menu.href || (() => {
                 if (role === 'admin') {
                   if (menu.key === 'pekerjaan' || menu.key === 'dashboard') {
                     return '/admin/list_pekerjaan'
                   }
-                  return menu.path.replace('/user/', '/admin/')
+                  return (menu.path || '').replace('/user/', '/admin/')
                 }
-                return menu.path
+                return menu.path || '/'
               })()
 
               const isActive = activePath === href || activePath.startsWith(href + '/') || (menu.key && activePath.includes(menu.key))
