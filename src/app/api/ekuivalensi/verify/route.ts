@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { authErrorResponse, requireAdmin } from '@/lib/auth'
+import { STATUS_EKUIVALENSI } from '@/lib/constants'
 
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin()
     const body = await req.json()
     const { ekuivalensiId, statusId, catatan } = body
 
     if (!ekuivalensiId || !statusId) {
       return NextResponse.json({ message: 'ekuivalensiId dan statusId diperlukan' }, { status: 400 })
     }
-
-    const nip = req.cookies.get('nip')?.value || null
 
     const ekuivalensi = await prisma.ekuivalensi_kelas.findUnique({
       where: { id: ekuivalensiId },
@@ -25,12 +26,12 @@ export async function POST(req: NextRequest) {
       where: { id: ekuivalensiId },
       data: {
         status_ekuivalensi_id: statusId,
-        verified_by_nip: nip,
+        verified_by_nip: admin.nip,
         catatan: catatan || null,
       },
     })
 
-    if (statusId === 2 && ekuivalensi.jam_diakui && ekuivalensi.kelas_id && ekuivalensi.semester_id) {
+    if (statusId === STATUS_EKUIVALENSI.DISETUJUI && ekuivalensi.jam_diakui && ekuivalensi.kelas_id && ekuivalensi.semester_id) {
       const registrations = await prisma.registrasi_mahasiswa.findMany({
         where: {
           kelas_id: ekuivalensi.kelas_id,
@@ -56,6 +57,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Berhasil melakukan verifikasi' })
   } catch (error) {
+    const authResponse = authErrorResponse(error)
+    if (authResponse) return authResponse
+
     console.error('Verify error:', error)
     return NextResponse.json({ message: 'Terjadi kesalahan server' }, { status: 500 })
   }

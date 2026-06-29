@@ -1,5 +1,12 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { assertMahasiswaInClass, authErrorResponse, requireAuthenticated } from "@/lib/auth";
+
+type StudentListItem = {
+  nama: string | null;
+  nim: string | null;
+  jam: number;
+};
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,6 +17,8 @@ export async function GET(req: Request) {
   }
 
   try {
+    const actor = await requireAuthenticated();
+
     // 0. Cari semester aktif
     const activeSemester = await prisma.semester.findFirst({
       where: { is_aktif: true }
@@ -19,12 +28,23 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Tidak ada semester aktif" }, { status: 404 });
     }
 
+    const kelasData = await prisma.kelas.findFirst({
+      where: { nama_kelas: kelas },
+      select: { id: true },
+    });
+
+    if (!kelasData) {
+      return NextResponse.json({ message: "Kelas tidak ditemukan" }, { status: 404 });
+    }
+
+    if (actor.type === 'mahasiswa') {
+      await assertMahasiswaInClass(actor.nim, kelasData.id, activeSemester.id);
+    }
+
     // 1. Ambil data UTAMA dari tabel ekuivalensi_kelas, lalu dihubungkan (join) ke tabel lain
     const ekuivalensi = await prisma.ekuivalensi_kelas.findFirst({
       where: {
-        kelas: {
-            nama_kelas: kelas
-        },
+        kelas_id: kelasData.id,
         semester_id: activeSemester.id
       },
       include: {
@@ -35,7 +55,7 @@ export async function GET(req: Request) {
     });
 
     // 2. Mapping ke UI
-    let studentList: any[] = [];
+    let studentList: StudentListItem[] = [];
     if (ekuivalensi) {
       if (ekuivalensi.mahasiswa) {
         // Ada Penanggung Jawab (dari pengajuan user)
@@ -114,6 +134,9 @@ export async function GET(req: Request) {
       } : null
     });
   } catch (err) {
+    const authResponse = authErrorResponse(err);
+    if (authResponse) return authResponse;
+
     console.error(err);
     return NextResponse.json(
       { message: "error ambil data" },

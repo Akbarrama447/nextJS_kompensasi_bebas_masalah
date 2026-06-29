@@ -1,8 +1,12 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { authErrorResponse, requireAdmin } from "@/lib/auth";
+import { STATUS_EKUIVALENSI } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   try {
+    await requireAdmin();
+
     const body = await req.json();
     const { ekuivalensiId, keterangan_pekerjaan, kelas } = body;
 
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
             kelas_id: kelasData.id,
             semester_id: activeSemester.id,
             keterangan_pekerjaan: keterangan_pekerjaan,
-            status_ekuivalensi_id: 1, // status default 'pending'
+            status_ekuivalensi_id: STATUS_EKUIVALENSI.MENUNGGU,
           },
         });
 
@@ -99,6 +103,9 @@ export async function POST(req: NextRequest) {
       message: "Pekerjaan berhasil disimpan",
     });
   } catch (error) {
+    const authResponse = authErrorResponse(error);
+    if (authResponse) return authResponse;
+
     console.error("Save pekerjaan error:", error);
     return NextResponse.json(
       { message: "Terjadi kesalahan server saat menyimpan pekerjaan" },

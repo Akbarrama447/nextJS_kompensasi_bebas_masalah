@@ -3,9 +3,11 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import prisma from '@/lib/prisma'
 import { existsSync } from 'fs'
+import { assertMahasiswaInClass, authErrorResponse, requireAuthenticated } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
+    const actor = await requireAuthenticated()
     const formData = await request.formData()
     const file = formData.get('file') as File
     const ekuivalensiId = formData.get('ekuivalensiId') as string
@@ -15,6 +17,26 @@ export async function POST(request: NextRequest) {
         { message: 'File dan ekuivalensiId diperlukan' },
         { status: 400 }
       )
+    }
+
+    const ekuivalensi = await prisma.ekuivalensi_kelas.findUnique({
+      where: { id: parseInt(ekuivalensiId) },
+      select: {
+        id: true,
+        kelas_id: true,
+        semester_id: true,
+      },
+    })
+
+    if (!ekuivalensi) {
+      return NextResponse.json(
+        { message: 'Data ekuivalensi tidak ditemukan' },
+        { status: 404 }
+      )
+    }
+
+    if (actor.type === 'mahasiswa') {
+      await assertMahasiswaInClass(actor.nim, ekuivalensi.kelas_id, ekuivalensi.semester_id)
     }
 
     // Validasi tipe file
@@ -54,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Update database
     const notaUrl = `/nota/${fileName}`
     await prisma.ekuivalensi_kelas.update({
-      where: { id: parseInt(ekuivalensiId) },
+      where: { id: ekuivalensi.id },
       data: { nota_url: notaUrl },
     })
 
@@ -66,6 +88,9 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
+    const authResponse = authErrorResponse(error)
+    if (authResponse) return authResponse
+
     console.error('Upload error:', error)
     return NextResponse.json(
       { message: 'Terjadi kesalahan saat upload file' },

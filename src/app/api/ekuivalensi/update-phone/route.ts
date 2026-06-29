@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { assertMahasiswaInClass, authErrorResponse, requireMahasiswa } from '@/lib/auth'
 
 const MAX_CHANGE = 5
 
 export async function PATCH(req: NextRequest) {
   try {
+    const session = await requireMahasiswa()
     const body = await req.json()
-    const { ekuivalensiId, noTelepon, nim } = body
+    const { ekuivalensiId, noTelepon } = body
+    const nim = session.nim
 
-    if (!ekuivalensiId || !noTelepon || !nim) {
+    if (!ekuivalensiId || !noTelepon) {
       return NextResponse.json({ message: 'Data tidak lengkap' }, { status: 400 })
     }
 
@@ -27,18 +30,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ message: 'Data ekuivalensi tidak ditemukan' }, { status: 404 })
     }
 
-    const isInClass = await prisma.registrasi_mahasiswa.findFirst({
-      where: {
-        nim,
-        kelas_id: ekuivalensi.kelas_id ?? undefined,
-        semester_id: ekuivalensi.semester_id ?? undefined,
-        status: 'Aktif',
-      },
-    })
-
-    if (!isInClass) {
-      return NextResponse.json({ message: 'Kamu tidak terdaftar di kelas ini' }, { status: 403 })
-    }
+    await assertMahasiswaInClass(nim, ekuivalensi.kelas_id, ekuivalensi.semester_id)
 
     const currentCount = ekuivalensi.no_telepon_change_count ?? 0
 
@@ -68,6 +60,9 @@ export async function PATCH(req: NextRequest) {
       sisaUbah: MAX_CHANGE - (updated.no_telepon_change_count ?? 0),
     })
   } catch (error) {
+    const authResponse = authErrorResponse(error)
+    if (authResponse) return authResponse
+
     console.error('Update phone error:', error)
     console.error('Error details:', JSON.stringify(error, null, 2))
     if (error instanceof Error) {

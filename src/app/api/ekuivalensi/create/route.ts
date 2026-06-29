@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { authErrorResponse, requireMahasiswa } from '@/lib/auth'
+import { STATUS_EKUIVALENSI } from '@/lib/constants'
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await requireMahasiswa()
     const body = await req.json()
-    const { nim, noTelepon } = body
-
-    if (!nim) {
-      return NextResponse.json({ message: 'NIM diperlukan' }, { status: 400 })
-    }
+    const { noTelepon } = body
+    const nim = session.nim
 
     if (!noTelepon) {
       return NextResponse.json({ message: 'Nomor telepon perwakilan harus diisi' }, { status: 400 })
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       where: {
         kelas_id: registrasi.kelas_id,
         semester_id: activeSemester.id,
-        status_ekuivalensi_id: 1,
+        status_ekuivalensi_id: STATUS_EKUIVALENSI.MENUNGGU,
       },
     })
 
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
         penanggung_jawab_nim: nim,
         jam_diakui: totalSisaJam,
         nominal_total: nominalTotal,
-        status_ekuivalensi_id: 1,
+        status_ekuivalensi_id: STATUS_EKUIVALENSI.MENUNGGU,
         no_telepon: noTelepon,
       },
     })
@@ -114,6 +114,9 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (error) {
+    const authResponse = authErrorResponse(error)
+    if (authResponse) return authResponse
+
     console.error('Create ekuivalensi error:', error)
     return NextResponse.json({ message: 'Gagal membuat pengajuan ekuivalensi' }, { status: 500 })
   }

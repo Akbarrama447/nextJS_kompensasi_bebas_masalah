@@ -8,8 +8,12 @@ export function middleware(req: NextRequest) {
   const role = req.cookies.get('role')?.value
   const isAuthenticated = !!(nim || nip)
 
-  if (pathname === '/login' || pathname.startsWith('/api/')) {
+  if (pathname === '/login' || pathname === '/api/login') {
     return NextResponse.next()
+  }
+
+  if (pathname.startsWith('/api/') && !isAuthenticated) {
+    return NextResponse.json({ message: 'Unauthorized: Silakan login terlebih dahulu' }, { status: 401 })
   }
 
   if (pathname === '/' || pathname === '/user' || pathname === '/admin' || pathname === '/superadmin') {

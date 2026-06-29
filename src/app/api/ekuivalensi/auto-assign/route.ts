@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { authErrorResponse, requireAdmin } from '@/lib/auth'
+import { STATUS_EKUIVALENSI } from '@/lib/constants'
 
 async function autoAssign() {
   const activeSemester = await prisma.semester.findFirst({
@@ -93,7 +95,7 @@ async function autoAssign() {
       where: {
         kelas_id: kelasId,
         semester_id: activeSemester.id,
-        status_ekuivalensi_id: { in: [1, 2] },
+        status_ekuivalensi_id: { in: [STATUS_EKUIVALENSI.MENUNGGU, STATUS_EKUIVALENSI.SEDANG_DIPROSES] },
       },
     })
 
@@ -111,7 +113,7 @@ async function autoAssign() {
         semester_id: activeSemester.id,
         jam_diakui: totalJamDiakui,
         nominal_total: nominalTotal,
-        status_ekuivalensi_id: 1,
+        status_ekuivalensi_id: STATUS_EKUIVALENSI.MENUNGGU,
         catatan: 'Auto-generated: mahasiswa tidak mendapat/mengerjakan tugas',
       },
     })
@@ -130,20 +132,18 @@ async function autoAssign() {
 
 export async function POST() {
   try {
+    await requireAdmin()
     const result = await autoAssign()
     return NextResponse.json(result)
   } catch (error) {
+    const authResponse = authErrorResponse(error)
+    if (authResponse) return authResponse
+
     console.error('Auto-assign error:', error)
     return NextResponse.json({ message: 'Gagal auto-assign ekuivalensi' }, { status: 500 })
   }
 }
 
 export async function GET() {
-  try {
-    const result = await autoAssign()
-    return NextResponse.json(result)
-  } catch (error) {
-    console.error('Auto-assign error:', error)
-    return NextResponse.json({ message: 'Gagal auto-assign ekuivalensi' }, { status: 500 })
-  }
+  return NextResponse.json({ message: 'Method not allowed' }, { status: 405 })
 }

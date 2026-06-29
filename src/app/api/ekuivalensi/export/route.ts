@@ -1,5 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { authErrorResponse, requireAdmin } from '@/lib/auth';
+import { STATUS_EKUIVALENSI } from '@/lib/constants';
+
+type ExportRow = {
+  NIM: string | null;
+  Nama: string | null;
+  Kelas: string;
+  Prodi: string;
+  Semester: string;
+  Pekerjaan: string;
+  'Jam Diakui': number;
+  'Total Nominal (Rp)': number;
+  Status: string;
+  Tipe: string;
+};
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,6 +25,8 @@ export async function GET(req: Request) {
   }
 
   try {
+    await requireAdmin();
+
     const activeSemester = await prisma.semester.findFirst({
       where: { is_aktif: true },
     });
@@ -50,7 +67,7 @@ export async function GET(req: Request) {
       },
     });
 
-    const exportData: any[] = [];
+    const exportData: ExportRow[] = [];
 
     // Ambil data mahasiswa aktif — filter berdasarkan prodi atau single kelas
     const regWhere = prodi
@@ -88,8 +105,8 @@ export async function GET(req: Request) {
 
     for (const eq of ekuivalensiList) {
       let statusLabel = 'Pending';
-      if (eq.status_ekuivalensi_id === 2) statusLabel = 'DISETUJUI';
-      if (eq.status_ekuivalensi_id === 3) statusLabel = 'DITOLAK';
+      if (eq.status_ekuivalensi_id === STATUS_EKUIVALENSI.DISETUJUI) statusLabel = 'DISETUJUI';
+      if (eq.status_ekuivalensi_id === STATUS_EKUIVALENSI.DITOLAK) statusLabel = 'DITOLAK';
       const pekerjaan = eq.keterangan_pekerjaan || '';
       const jamDiakui = Math.floor(eq.jam_diakui || 0);
 
@@ -141,6 +158,9 @@ export async function GET(req: Request) {
     }, { status: 200 });
 
   } catch (error) {
+    const authResponse = authErrorResponse(error);
+    if (authResponse) return authResponse;
+
     console.error('Export error:', error);
     return NextResponse.json({ message: 'Terjadi kesalahan saat export' }, { status: 500 });
   }
