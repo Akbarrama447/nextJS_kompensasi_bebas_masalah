@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import UserHeader from "@/components/UserHeader";
 import PopupBukti from "@/app/admin/ekuivalensi/components/PopupBukti";
 import PopupTolak from "@/app/admin/ekuivalensi/components/PopupTolak";
+import { STATUS_EKUIVALENSI } from "@/lib/constants";
 
 export default function ClientPage({ semesterLabel }: { semesterLabel?: string }) {
   const [kelas, setKelas] = useState("");
@@ -443,7 +444,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
               {(() => {
                 // Logika warna tombol bukti
                 const hasFoto = !!ekuivalensi?.notaUrl;
-                const isVerified = ekuivalensi?.statusId === 2;
+                const isVerified = ekuivalensi?.statusId === STATUS_EKUIVALENSI.DISETUJUI;
 
                 let btnClass = "w-full sm:w-auto px-4 py-2 rounded-lg transition text-center font-medium ";
 
@@ -488,13 +489,19 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
                     </span>
                   )}
 
-                  {ekuivalensi.statusId === 3 && (
+                  {ekuivalensi.statusId === STATUS_EKUIVALENSI.SEDANG_DIPROSES && (
+                    <span className="px-3 py-2 bg-yellow-400 text-white rounded-lg text-sm font-medium">
+                      SEDANG DIPROSES
+                    </span>
+                  )}
+
+                  {ekuivalensi.statusId === STATUS_EKUIVALENSI.DITOLAK && (
                     <span className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium">
                       DITOLAK
                     </span>
                   )}
 
-                  {ekuivalensi.statusId === 2 && (
+                  {ekuivalensi.statusId === STATUS_EKUIVALENSI.DISETUJUI && (
                     <span className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm font-medium">
                       DISETUJUI
                     </span>
@@ -595,7 +602,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
         <PopupBukti
           open={openPopup}
           onClose={() => setOpenPopup(false)}
-          onApprove={() => handleVerify(2)}
+          onApprove={() => handleVerify(STATUS_EKUIVALENSI.DISETUJUI)}
           onReject={() => {
             setOpenPopup(false);
             setOpenTolak(true);
@@ -624,7 +631,7 @@ export default function ClientPage({ semesterLabel }: { semesterLabel?: string }
           setOpenTolak(false);
           setOpenPopup(true);
         }}
-        onSubmit={(alasan) => handleVerify(3, alasan)}
+        onSubmit={(alasan) => handleVerify(STATUS_EKUIVALENSI.DITOLAK, alasan)}
       />
 
       {loading && (
