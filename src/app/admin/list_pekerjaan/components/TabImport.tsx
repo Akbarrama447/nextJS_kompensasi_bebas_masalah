@@ -34,6 +34,7 @@ export default function TabImport({ staffNip, semesterId, onSuccess }: TabImport
     const [errorMessage, setErrorMessage] = useState("");
     const [parseErrors, setParseErrors] = useState<string[]>([]);
     const [students, setStudents] = useState<ParsedStudent[]>([]);
+    const [excelSemesterCode, setExcelSemesterCode] = useState<string | undefined>(undefined);
     const [currentFileName, setCurrentFileName] = useState("");
     const [summary, setSummary] = useState<ImportSummary | null>(null);
 
@@ -80,8 +81,15 @@ export default function TabImport({ staffNip, semesterId, onSuccess }: TabImport
                 return;
             }
 
+            if (!result.semesterCode) {
+                setErrorMessage("Informasi Semester tidak ditemukan di dalam berkas Excel. Harap pastikan file Anda memiliki baris penanda 'Semester' di kolom pertama.");
+                setModalState("error");
+                return;
+            }
+
             setStudents(result.students);
             setParseErrors(result.errors);
+            setExcelSemesterCode(result.semesterCode);
             setPage(1);
             setModalState("preview");
         } catch (err) {
@@ -102,6 +110,7 @@ export default function TabImport({ staffNip, semesterId, onSuccess }: TabImport
                 semesterId,
                 staffNip,
                 namaFile: currentFileName,
+                excelSemesterCode,
             });
 
             setSummary({
@@ -129,6 +138,7 @@ export default function TabImport({ staffNip, semesterId, onSuccess }: TabImport
         setModalState("hidden");
         setStudents([]);
         setParseErrors([]);
+        setExcelSemesterCode(undefined);
         setSummary(null);
         setErrorMessage("");
         setCurrentFileName("");
@@ -168,6 +178,16 @@ export default function TabImport({ staffNip, semesterId, onSuccess }: TabImport
                 </button>
             </div>
 
+
+            {/* Semester Info Banner */}
+            {students.length > 0 && excelSemesterCode && (
+                <div className="mb-4 flex items-center gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
+                    <AlertCircle className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span>
+                        Semester Terdeteksi di Excel: <strong>{excelSemesterCode}</strong> ({excelSemesterCode.endsWith('1') ? 'Ganjil' : 'Genap'})
+                    </span>
+                </div>
+            )}
 
             {/* Table Preview */}
             <div className="border border-gray-200 rounded-lg overflow-hidden">

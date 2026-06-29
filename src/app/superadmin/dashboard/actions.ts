@@ -42,8 +42,16 @@ export async function createSemester(data: { nama: string; tahun: number; period
       return { success: false, error: 'Semua kolom wajib diisi!' }
     }
 
+    // Hitung ID berikutnya secara manual (Auto-increment di level kode)
+    const lastSemester = await prisma.semester.findFirst({
+      orderBy: { id: 'desc' },
+      select: { id: true }
+    })
+    const nextId = (lastSemester?.id ?? 0) + 1
+
     await prisma.semester.create({
       data: {
+        id: nextId,
         nama,
         tahun: Number(tahun),
         periode,

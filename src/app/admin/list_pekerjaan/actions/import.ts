@@ -40,6 +40,7 @@ export interface ImportPayload {
   semesterId: number;
   staffNip: string;
   namaFile: string;
+  excelSemesterCode?: string;
 }
 
 export interface ImportResult {
@@ -53,7 +54,7 @@ export interface ImportResult {
 // ─────────────────────────────────────────
 
 export async function executeImport(payload: ImportPayload): Promise<ImportResult> {
-  const { students, semesterId, staffNip, namaFile } = payload;
+  const { students, semesterId, staffNip, namaFile, excelSemesterCode } = payload;
   const errors: { nim: string; nama: string; error: string }[] = [];
   let successCount = 0;
 
@@ -76,15 +77,15 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
 
   // ── 0.1 Validasi Semester ───────────────────────────────────────────
   let finalSemesterId = semesterId;
-  const semesterExists = await prisma.semester.findUnique({ where: { id: semesterId } });
-  if (!semesterExists) {
-    const activeSemester = await prisma.semester.findFirst({ where: { is_aktif: true }, select: { id: true } });
-    if (activeSemester) {
-      finalSemesterId = activeSemester.id;
+  let targetSemester = await prisma.semester.findUnique({ where: { id: semesterId } });
+  if (!targetSemester) {
+    targetSemester = await prisma.semester.findFirst({ where: { is_aktif: true } });
+    if (targetSemester) {
+      finalSemesterId = targetSemester.id;
     } else {
-      const firstSemester = await prisma.semester.findFirst({ select: { id: true } });
-      if (firstSemester) {
-        finalSemesterId = firstSemester.id;
+      targetSemester = await prisma.semester.findFirst();
+      if (targetSemester) {
+        finalSemesterId = targetSemester.id;
       } else {
          return {
           successCount: 0,
@@ -92,6 +93,26 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
           importLogId: null,
         };
       }
+    }
+  }
+
+  // Bandingkan kode semester Excel dengan semester target di database
+  if (targetSemester && excelSemesterCode) {
+    const suffix = targetSemester.periode === 'Ganjil' ? '1' : '2';
+    const systemSemesterCode = targetSemester.tahun ? `${targetSemester.tahun}${suffix}` : '';
+
+    if (systemSemesterCode && excelSemesterCode !== systemSemesterCode) {
+      const parsedPeriode = excelSemesterCode.endsWith('1') ? 'Ganjil' : (excelSemesterCode.endsWith('2') ? 'Genap' : 'Tidak Valid');
+      const parsedTahun = excelSemesterCode.substring(0, 4);
+      return {
+        successCount: 0,
+        errors: [{
+          nim: '-',
+          nama: '-',
+          error: `Gagal import! File Excel ditujukan untuk semester ${parsedTahun} ${parsedPeriode} (${excelSemesterCode}), sedangkan semester aktif sistem saat ini adalah ${targetSemester.tahun} ${targetSemester.periode} (${systemSemesterCode}).`
+        }],
+        importLogId: null,
+      };
     }
   }
 

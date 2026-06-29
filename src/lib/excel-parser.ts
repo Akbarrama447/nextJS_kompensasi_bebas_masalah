@@ -20,6 +20,7 @@ export interface ParsedStudent {
 export interface ParseResult {
   students: ParsedStudent[];
   errors: string[]; // baris yang gagal di-parse
+  semesterCode?: string; // kode semester terdeteksi (misal: "20251")
 }
 
 // ─────────────────────────────────────────
@@ -29,6 +30,7 @@ export interface ParseResult {
 export async function parseExcelFile(file: File): Promise<ParseResult> {
   const students: ParsedStudent[] = [];
   const errors: string[] = [];
+  let semesterCode: string | undefined = undefined;
 
   // Baca file sebagai ArrayBuffer
   const buffer = await file.arrayBuffer();
@@ -63,6 +65,24 @@ export async function parseExcelFile(file: File): Promise<ParseResult> {
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const lineNum = i + 1; // Untuk pesan error (1-indexed)
+
+    // Cek info semester sebelum kita menemukan header utama NIM/NAMA
+    if (nimIdx === -1) {
+      for (let j = 0; j < row.length; j++) {
+        const cell = String(row[j] ?? '').toLowerCase().trim();
+        if (cell === 'semester' || cell === 'semester:') {
+          // Ambil nilai non-kosong berikutnya di baris yang sama
+          for (let k = j + 1; k < row.length; k++) {
+            const val = String(row[k] ?? '').trim();
+            if (val) {
+              semesterCode = val;
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
 
     // 1. Cek apakah baris ini adalah baris Header
     let tempNim = -1, tempNama = -1, tempKelas = -1, tempJam = -1;
@@ -125,5 +145,5 @@ export async function parseExcelFile(file: File): Promise<ParseResult> {
      };
   }
 
-  return { students, errors };
+  return { students, errors, semesterCode };
 }
