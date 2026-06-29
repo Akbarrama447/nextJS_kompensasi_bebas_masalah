@@ -11,13 +11,6 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
-// Test accounts - students
-const studentAccounts = [
-  { nim: '3372001', nama: 'Ahmad Faisal', password: 'password123' },
-  { nim: '3372002', nama: 'Budi Santoso', password: 'password123' },
-  { nim: '3372003', nama: 'Citra Dewi', password: 'password123' },
-]
-
 // Test accounts - admin & staff
 const staffAccounts = [
   {
@@ -99,7 +92,7 @@ const adminMenus = [
 // Menus for mahasiswa
 const mahasiswaMenus = [
   { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/user/dashboard', urutan: 1, parent_id: null },
-  { key: 'pekerjaan', label: 'Pekerjaan', icon: 'Briefcase', path: '/user/pekerjaan', urutan: 2, parent_id: null },
+  { key: 'pekerjaan', label: 'Pekerjaan', icon: 'Briefcase', path: '/user/list_perkerjaan', urutan: 2, parent_id: null },
   { key: 'ekuivalensi', label: 'Ekuivalensi', icon: 'BookOpen', path: '/user/ekuivalensi', urutan: 3, parent_id: null },
 ]
 
@@ -151,7 +144,7 @@ async function seedRefStatus() {
 
   // Roles — sync dengan data di database
   const roles = [
-    { id: 1, nama: 'Super Admin', key_menu: ['all'], key_condition: { all: true } },
+    { id: 1, nama: 'superadmin', key_menu: ['all'], key_condition: { all: true } },
     { id: 2, nama: 'Staf Jurusan', key_menu: ['daftar_pekerjaan', 'penugasan', 'verifikasi'], key_condition: { jurusan_only: true } },
     { id: 3, nama: 'Mahasiswa', key_menu: ['pekerjaan', 'riwayat', 'profil'], key_condition: { self_only: true } },
     { id: 4, nama: 'Dosen', key_menu: ['verifikasi', 'laporan'], key_condition: { jurusan_only: true } },
@@ -196,6 +189,25 @@ async function seedRefStatus() {
     });
     console.log(`  ✓ prodi: ${p.nama_prodi}`)
   }
+
+  // Prefix mapping untuk import Excel
+  const prefixMapping: Record<string, string> = {
+    'IK': 'Teknik Informatika',
+    'TI': 'Teknologi Rekayasa Komputer',
+    'TE': 'Telekomunikasi',
+  };
+  await prisma.pengaturan_sistem.upsert({
+    where: { key: 'mapping' },
+    update: { value: JSON.stringify(prefixMapping), grup: 'prefix_prodi', keterangan: 'Mapping prefix kelas ke keyword nama prodi' },
+    create: {
+      grup: 'prefix_prodi',
+      key: 'mapping',
+      value: JSON.stringify(prefixMapping),
+      tipe_data: 'json',
+      keterangan: 'Mapping prefix kelas ke keyword nama prodi',
+    },
+  });
+  console.log(`  ✓ pengaturan_sistem: prefix_prodi mapping (${Object.keys(prefixMapping).length} prefix)`)
 }
 
 async function seedSemester() {
@@ -257,79 +269,6 @@ async function seedStaff() {
   }
 }
 
-async function seedStudents() {
-  console.log('\n👨‍🎓 Seeding student accounts...')
-
-  // Get or create default kelas
-  const prodi = await prisma.prodi.findFirst()
-  let kelasId = null
-
-  if (prodi) {
-    const kelas = await prisma.kelas.upsert({
-      where: { id: 1 },
-      update: { prodi_id: prodi.id, nama_kelas: 'Reguler A' },
-      create: { id: 1, prodi_id: prodi.id, nama_kelas: 'Reguler A' },
-    })
-    kelasId = kelas.id
-    console.log(`  ✓ Kelas: ${kelas.nama_kelas}`)
-  }
-
-  for (const account of studentAccounts) {
-    try {
-      const hashedPassword = await hash(account.password, 10)
-      const email = `${account.nim}@student.polnes.ac.id`
-
-      // Cari atau buat User agar aman dari duplikasi email
-      let user = await prisma.users.findUnique({
-        where: { email }
-      })
-
-      if (!user) {
-        user = await prisma.users.create({
-          data: {
-            email,
-            kata_sandi: hashedPassword,
-            role_id: 3 // Mahasiswa (role_id di DB)
-          }
-        })
-      }
-
-      await prisma.mahasiswa.upsert({
-        where: { nim: account.nim },
-        update: { user_id: user.user_id, nama: account.nama },
-        create: {
-          nim: account.nim,
-          user_id: user.user_id,
-          nama: account.nama,
-        },
-      })
-
-      // Create kompen_awal for student
-      // Check if kompen_awal exists for this student
-      const existingKompen = await prisma.kompen_awal.findFirst({
-        where: { nim: account.nim },
-      })
-
-      // Create kompen_awal for student
-      const jamKompen = Math.floor(Math.random() * 16) + 8 // 8-24 jam random
-
-      if (!existingKompen) {
-        await prisma.kompen_awal.create({
-          data: {
-            nim: account.nim,
-            semester_id: 1,
-            total_jam_wajib: jamKompen,
-          },
-        })
-      }
-
-      console.log(`  ✓ Student: ${account.nim} (${account.nama}) | Password: ${account.password} | Jam Kompen: ${jamKompen}jam`)
-    } catch (e) {
-      console.error(`  ✗ Error creating student ${account.nim}:`, e)
-    }
-  }
-}
-
 async function seedMenus() {
   console.log('\n📱 Seeding menus...')
 
@@ -384,7 +323,6 @@ async function main() {
   await seedRefStatus()
   await seedSemester()
   await seedStaff()
-  await seedStudents()
   await seedMenus()
   await seedRoleHasMenus()
 

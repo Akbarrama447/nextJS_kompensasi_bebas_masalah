@@ -195,12 +195,13 @@ export async function executeImport(payload: ImportPayload): Promise<ImportResul
   const defaultPassword = process.env.DEFAULT_STUDENT_PASSWORD ?? 'Polines123!';
   const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-  // ── 3.1 Mapping prefix kelas → prodi ────────────────────────────────────
-  const PREFIX_PRODI_MAP: Record<string, string> = {
-    'IK': 'Teknik Informatika',
-    'TI': 'Teknologi Rekayasa Komputer',
-    'TE': 'Telekomunikasi',
-  };
+  // ── 3.1 Mapping prefix kelas → prodi (baca dari pengaturan_sistem) ──────
+  const mappingRow = await prisma.pengaturan_sistem.findUnique({
+    where: { key: 'mapping' },
+  });
+  const PREFIX_PRODI_MAP: Record<string, string> = mappingRow?.value
+    ? JSON.parse(mappingRow.value)
+    : {};
 
   // ── 4. Proses tiap mahasiswa ─────────────────────────────────────────────
   for (const student of students) {
