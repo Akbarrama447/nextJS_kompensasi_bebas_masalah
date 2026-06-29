@@ -58,11 +58,6 @@ export async function generatePlotting(
       },
       include: {
         penugasan: {
-          where: {
-            status_tugas_id: {
-              notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
-            },
-          },
           select: { id: true, nim: true },
         },
       },
@@ -102,7 +97,7 @@ export async function generatePlotting(
     const activePenugasan = await prisma.penugasan.findMany({
       where: {
         status_tugas_id: {
-          notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
+          notIn: [STATUS_TUGAS.DIVERIFIKASI],
         },
       },
       select: {
@@ -300,11 +295,6 @@ export async function assignMahasiswaManual(
       where: { id: pekerjaanId },
       include: {
         penugasan: {
-          where: {
-            status_tugas_id: {
-              notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
-            },
-          },
           select: { id: true, nim: true },
         },
       },

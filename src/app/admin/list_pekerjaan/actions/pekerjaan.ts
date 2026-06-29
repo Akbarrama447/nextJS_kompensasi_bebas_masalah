@@ -168,11 +168,6 @@ export async function getDaftarPekerjaan(
             select: { id: true, nama_ruangan: true },
           },
           penugasan: {
-            where: {
-              status_tugas_id: {
-                notIn: [STATUS_TUGAS.SELESAI, STATUS_TUGAS.DIVERIFIKASI],
-              },
-            },
             select: { id: true },
           },
         },
