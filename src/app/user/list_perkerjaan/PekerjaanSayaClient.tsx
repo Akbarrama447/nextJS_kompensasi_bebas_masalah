@@ -169,9 +169,20 @@ export default function PekerjaanSayaClient({ initialData, user, allTipePekerjaa
                     <td className="px-2 md:px-4 py-4 md:py-6 text-center text-slate-500 font-semibold">{startIndex + index + 1}</td>
                     <td className="px-3 md:px-6 py-4 md:py-6 text-left">
                       <div className="font-bold text-slate-800 leading-tight text-base">{t.pekerjaan?.judul}</div>
+                      {t.pekerjaan?.deskripsi && (
+                        <div className="text-[12px] text-slate-500 mt-0.5 leading-snug line-clamp-2">
+                          {t.pekerjaan.deskripsi}
+                        </div>
+                      )}
                       <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-1 lowercase font-medium">
                         <MapPin size={12}/> {t.pekerjaan?.ruangan?.nama_ruangan || 'Polines'}
                       </div>
+                      {t.catatan_verifikasi && (
+                        <div className="flex items-start gap-1.5 mt-1.5 text-[11px] text-red-600 bg-red-50/80 px-2.5 py-1.5 rounded-lg border border-red-100">
+                          <FileText size={12} className="mt-0.5 shrink-0" />
+                          <span className="font-medium leading-tight">{t.catatan_verifikasi}</span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-2 md:px-4 py-4 md:py-6 text-center hidden lg:table-cell">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-[9px] font-bold uppercase ${

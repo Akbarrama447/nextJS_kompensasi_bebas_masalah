@@ -68,6 +68,31 @@ export default function EkuivalensiClient({
 
   const totalJam = students.reduce((sum, s) => sum + s.jam, 0)
 
+  const refreshData = async () => {
+    try {
+      const res = await fetch(`/api/ekuivalensi/by-kelas?kelas=${namaKelas}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.ekuivalensi) {
+        setLocalEkuivalensi({
+          id: data.ekuivalensi.id,
+          status: data.ekuivalensi.status,
+          jam: data.ekuivalensi.jam,
+          nominal: data.ekuivalensi.nominal,
+          notaUrl: data.ekuivalensi.notaUrl || '',
+          catatan: data.ekuivalensi.catatan || '',
+          keterangan_pekerjaan: data.ekuivalensi.keterangan_pekerjaan || '',
+          linkBarang: data.ekuivalensi.link_barang || '',
+          penanggung_jawab_nim: data.ekuivalensi.penanggung_jawab_nim || '',
+          noTelepon: data.ekuivalensi.noTelepon || '',
+          noTeleponChangeCount: data.ekuivalensi.noTeleponChangeCount ?? 0,
+        })
+      }
+    } catch {
+      // silent — jangan ganggu flow user kalau refresh gagal
+    }
+  }
+
   const handleAjukan = async () => {
     if (!noTelepon.trim()) {
       setPhoneError('Nomor telepon harus diisi')
@@ -109,6 +134,8 @@ export default function EkuivalensiClient({
 
       setUploadMessage({ type: 'success', text: 'Pengajuan berhasil! Upload bukti sekarang.' })
       setTimeout(() => setUploadMessage(null), 3000)
+
+      refreshData()
     } catch {
       setUploadMessage({ type: 'error', text: 'Terjadi kesalahan koneksi' })
     } finally {
@@ -161,6 +188,8 @@ export default function EkuivalensiClient({
       setUploadMessage({ type: 'success', text: 'File berhasil diupload' })
       setLocalEkuivalensi((prev) => prev ? { ...prev, notaUrl: data.notaUrl } : prev)
       setTimeout(() => setUploadMessage(null), 2000)
+
+      refreshData()
     } catch {
       setUploadMessage({ type: 'error', text: 'Terjadi kesalahan saat upload' })
     } finally {
@@ -209,6 +238,8 @@ export default function EkuivalensiClient({
       setPhoneEditMode(false)
       setUploadMessage({ type: 'success', text: `Nomor telepon berhasil diupdate. Sisa ${data.sisaUbah}x perubahan.` })
       setTimeout(() => setUploadMessage(null), 3000)
+
+      refreshData()
     } catch {
       setPhoneError('Terjadi kesalahan koneksi')
     } finally {
