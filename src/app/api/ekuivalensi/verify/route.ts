@@ -22,38 +22,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Data ekuivalensi tidak ditemukan' }, { status: 404 })
     }
 
-    await prisma.ekuivalensi_kelas.update({
-      where: { id: ekuivalensiId },
-      data: {
-        status_ekuivalensi_id: statusId,
-        verified_by_nip: admin.nip,
-        catatan: catatan || null,
-      },
-    })
+    if (ekuivalensi.status_ekuivalensi_id === STATUS_EKUIVALENSI.DISETUJUI) {
+      return NextResponse.json({ success: true, message: 'Ekuivalensi sudah disetujui sebelumnya' })
+    }
 
-    if (statusId === STATUS_EKUIVALENSI.DISETUJUI && ekuivalensi.jam_diakui && ekuivalensi.kelas_id && ekuivalensi.semester_id) {
-      const registrations = await prisma.registrasi_mahasiswa.findMany({
-        where: {
-          kelas_id: ekuivalensi.kelas_id,
-          semester_id: ekuivalensi.semester_id,
-          status: 'Aktif',
+    await prisma.$transaction(async (tx) => {
+      await tx.ekuivalensi_kelas.update({
+        where: { id: ekuivalensiId },
+        data: {
+          status_ekuivalensi_id: statusId,
+          verified_by_nip: admin.nip,
+          catatan: catatan || null,
         },
       })
 
-      if (registrations.length > 0) {
-        const jamPerStudent = ekuivalensi.jam_diakui / registrations.length
-
-        await prisma.log_potong_jam.createMany({
-          data: registrations.map((r) => ({
-            nim: r.nim || '',
-            semester_id: ekuivalensi.semester_id,
-            ekuivalensi_id: ekuivalensiId,
-            jam_dikurangi: Math.round(jamPerStudent * 100) / 100,
-            keterangan: `Ekuivalensi kelas ${ekuivalensi.kelas?.nama_kelas || ''}`,
-          })),
+      if (statusId === STATUS_EKUIVALENSI.DISETUJUI && ekuivalensi.jam_diakui && ekuivalensi.kelas_id && ekuivalensi.semester_id) {
+        const sudahAda = await tx.log_potong_jam.findFirst({
+          where: { ekuivalensi_id: ekuivalensiId },
+          select: { id: true },
         })
+
+        if (sudahAda) return
+
+        const registrations = await tx.registrasi_mahasiswa.findMany({
+          where: {
+            kelas_id: ekuivalensi.kelas_id,
+            semester_id: ekuivalensi.semester_id,
+            status: 'Aktif',
+          },
+        })
+
+        if (registrations.length > 0) {
+          const jamPerStudent = ekuivalensi.jam_diakui / registrations.length
+
+          await tx.log_potong_jam.createMany({
+            data: registrations.map((r) => ({
+              nim: r.nim || '',
+              semester_id: ekuivalensi.semester_id,
+              ekuivalensi_id: ekuivalensiId,
+              jam_dikurangi: Math.round(jamPerStudent * 100) / 100,
+              keterangan: `Ekuivalensi kelas ${ekuivalensi.kelas?.nama_kelas || ''}`,
+            })),
+          })
+        }
       }
-    }
+    })
 
     return NextResponse.json({ success: true, message: 'Berhasil melakukan verifikasi' })
   } catch (error) {
